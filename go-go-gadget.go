@@ -11,13 +11,15 @@ import (
 )
 
 func help() {
-  fmt.Println(`
+  fmt.Print(`
 go-go-gadget is a set of command line tools.
 
 Options:
   help        Display go-go-gadget help
+  k8s         Take a string and k8s-ify it
   reverse     Take a string and reverse it
   time        Display the current time
+
 `)
 }
 
@@ -48,7 +50,7 @@ func main() {
   if (len(params) > 0) {
     choice, params = params[0], params[1:]
   } else {
-    options := []string{"help reverse", "time"}
+    options := []string{"help", "k8s", "reverse", "time"}
     fmt.Print("Options ", options, ": ")
     choice = prompt()
   }
@@ -56,6 +58,14 @@ func main() {
   switch choice {
   case "help":
     help()
+  case "k8s":
+    if (len(params) > 0) {
+      fmt.Println(strtwist.K8s(params[0]))
+    } else {
+      fmt.Print("Enter string to be K8s: ")
+      str := prompt()
+      fmt.Println(strtwist.K8s(str))
+    }
   case "reverse":
     if (len(params) > 0) {
       fmt.Println(strtwist.Reverse(params[0]))
