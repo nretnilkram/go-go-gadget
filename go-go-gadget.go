@@ -17,10 +17,16 @@ func help() {
 go-go-gadget is a set of command line tools.
 
 Options:
-  help        Display go-go-gadget help
-  k8s         Take a string and k8s-ify it
-  reverse     Take a string and reverse it
-  time        Display the current time
+  --help            Display go-go-gadget help
+    -h, help
+  --kubernetes      Take a string and k8s-ify it
+    -k, --k8s, k8s
+  --password         Take a string and reverse it
+    -p, --pw, pw, password
+  --reverse         Take a string and reverse it
+    -r, reverse
+  --time            Display the current time
+    -t, time
 
 `)
 }
@@ -58,9 +64,9 @@ func main() {
   }
 
   switch choice {
-  case "help":
+  case "help", "--help", "-h":
     help()
-  case "k8s":
+  case "k8s", "-k", "--kkubernetes", "--k8s":
     if (len(params) > 0) {
       fmt.Println(strtwist.K8s(params[0]))
     } else {
@@ -68,7 +74,7 @@ func main() {
       str := prompt()
       fmt.Println(strtwist.K8s(str))
     }
-  case "password":
+  case "password", "pw", "--pw", "-p", "--password":
     if (len(params) > 0) {
       length, _ := strconv.Atoi(params[0])
       fmt.Println(pswd.Password(length, true))
@@ -78,7 +84,7 @@ func main() {
       length, _ := strconv.Atoi(str)
       fmt.Println(pswd.Password(length, true))
     }
-  case "reverse":
+  case "reverse", "-r", "--reverse":
     if (len(params) > 0) {
       fmt.Println(strtwist.Reverse(params[0]))
     } else {
@@ -86,7 +92,7 @@ func main() {
       str := prompt()
       fmt.Println(strtwist.Reverse(str))
     }
-  case "time":
+  case "time", "-t", "--time":
     fmt.Println(timeStamp())
   default:
     help()
