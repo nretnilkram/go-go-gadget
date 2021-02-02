@@ -5,8 +5,10 @@ import (
         "fmt"
         "os"
         "strings"
+        "strconv"
         "time"
 
+        "github.com/nretnilkram/go-go-gadget/pswd"
         "github.com/nretnilkram/go-go-gadget/strtwist"
 )
 
@@ -50,7 +52,7 @@ func main() {
   if (len(params) > 0) {
     choice, params = params[0], params[1:]
   } else {
-    options := []string{"help", "k8s", "reverse", "time"}
+    options := []string{"help", "k8s", "password", "reverse", "time"}
     fmt.Print("Options ", options, ": ")
     choice = prompt()
   }
@@ -65,6 +67,16 @@ func main() {
       fmt.Print("Enter string to be K8s: ")
       str := prompt()
       fmt.Println(strtwist.K8s(str))
+    }
+  case "password":
+    if (len(params) > 0) {
+      length, _ := strconv.Atoi(params[0])
+      fmt.Println(pswd.Password(length, true))
+    } else {
+      fmt.Print("How long should the password be: ")
+      str := prompt()
+      length, _ := strconv.Atoi(str)
+      fmt.Println(pswd.Password(length, true))
     }
   case "reverse":
     if (len(params) > 0) {
