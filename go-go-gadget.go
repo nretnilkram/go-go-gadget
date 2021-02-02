@@ -75,14 +75,15 @@ func main() {
       fmt.Println(strtwist.K8s(str))
     }
   case "password", "pw", "--pw", "-p", "--password":
+    weight := PasswordWeight { lower: 4, upper: 3, digit: 3, symbol: 2, }
     if (len(params) > 0) {
       length, _ := strconv.Atoi(params[0])
-      fmt.Println(pswd.Password(length, true))
+      fmt.Println(pswd.Password(length, weight))
     } else {
       fmt.Print("How long should the password be: ")
       str := prompt()
       length, _ := strconv.Atoi(str)
-      fmt.Println(pswd.Password(length, true))
+      fmt.Println(pswd.Password(length, weight))
     }
   case "reverse", "-r", "--reverse":
     if (len(params) > 0) {
