@@ -10,6 +10,7 @@ import (
 
         "github.com/nretnilkram/go-go-gadget/pswd"
         "github.com/nretnilkram/go-go-gadget/strtwist"
+        "github.com/nretnilkram/go-go-gadget/words"
 )
 
 func help() {
@@ -21,12 +22,14 @@ Options:
     -h, help
   --kubernetes      Take a string and k8s-ify it
     -k, --k8s, k8s
-  --password         Take a string and reverse it
+  --password        Return a password of desired length
     -p, --pw, pw, password
   --reverse         Take a string and reverse it
     -r, reverse
   --time            Display the current time
     -t, time
+  --words           Return a desired number of words (english)
+    -w, words
 
 `)
 }
@@ -58,7 +61,7 @@ func main() {
   if (len(params) > 0) {
     choice, params = params[0], params[1:]
   } else {
-    options := []string{"help", "k8s", "password", "reverse", "time"}
+    options := []string{"help", "k8s", "password", "reverse", "time", "words"}
     fmt.Print("Options ", options, ": ")
     choice = prompt()
   }
@@ -75,7 +78,7 @@ func main() {
       fmt.Println(strtwist.K8s(str))
     }
   case "password", "pw", "--pw", "-p", "--password":
-    weight := PasswordWeight { lower: 4, upper: 3, digit: 3, symbol: 2, }
+    weight := pswd.PasswordWeight { Lower: 4, Upper: 3, Digit: 3, Symbol: 2, }
     if (len(params) > 0) {
       length, _ := strconv.Atoi(params[0])
       fmt.Println(pswd.Password(length, weight))
@@ -84,6 +87,17 @@ func main() {
       str := prompt()
       length, _ := strconv.Atoi(str)
       fmt.Println(pswd.Password(length, weight))
+    }
+  case "words", "-w", "--words":
+    weight := words.WordSetWeight { Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1, }
+    if (len(params) > 0) {
+      length, _ := strconv.Atoi(params[0])
+      fmt.Println(words.Words(length, weight))
+    } else {
+      fmt.Print("How many words would you like: ")
+      str := prompt()
+      length, _ := strconv.Atoi(str)
+      fmt.Println(words.Words(length, weight))
     }
   case "reverse", "-r", "--reverse":
     if (len(params) > 0) {
