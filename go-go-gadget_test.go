@@ -3,6 +3,8 @@ package main
 import (
         "fmt"
         "os/exec"
+        "regexp"
+        "strconv"
         "strings"
         "testing"
 )
@@ -69,6 +71,34 @@ func TestGoGoGadgetK8s(t *testing.T) {
     if err != nil || got != c.want {
       fmt.Println(got, out, err)
       t.Errorf("go-go-gadget k8s %q == %q, want %q", c.in, got, c.want)
+    }
+  }
+}
+
+func WordCount(value string) int {
+  // Match non-space character sequences.
+  re := regexp.MustCompile(`[\S]+`)
+
+  // Find all matches and return count.
+  results := re.FindAllString(value, -1)
+  return len(results)
+}
+
+func TestGoGoGadgetWords(t *testing.T) {
+  cases := []struct {
+    in, want int
+  }{
+    {8, 8},
+    {10, 10},
+    {1000, 1000},
+  }
+  for _, c := range cases {
+    cmd := exec.Command("go-go-gadget", "words", strconv.Itoa(c.in))
+    out, err := cmd.CombinedOutput()
+    got := WordCount(strings.TrimSuffix(string(out), "\n")) // because out is []byte
+    if err != nil || got != c.want {
+      fmt.Println(got, out, err)
+      t.Errorf("go-go-gadget symsub %q == %q, want %q", c.in, got, c.want)
     }
   }
 }
