@@ -29,6 +29,25 @@ func TestGoGoGadgetReverse(t *testing.T) {
   }
 }
 
+func TestGoGoGadgetSymSub(t *testing.T) {
+  cases := []struct {
+    in, want string
+  }{
+    {"abcdefghijklmnopqrstuvwxyz", "@bcd3fgh!jklmn0pqr$tuvwxyz"},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZ", "@BCD3FGH!JKLMN0PQR$TUVWXYZ"},
+    {"ABCDEF GHIJKLMNOP QRSTUVW XYZ", "@BCD3F GH!JKLMN0P QR$TUVW XYZ"},
+  }
+  for _, c := range cases {
+    cmd := exec.Command("go-go-gadget", "symsub", c.in)
+    out, err := cmd.CombinedOutput()
+    got := strings.TrimSuffix(string(out), "\n") // because out is []byte
+    if err != nil || got != c.want {
+      fmt.Println(got, out, err)
+      t.Errorf("go-go-gadget symsub %q == %q, want %q", c.in, got, c.want)
+    }
+  }
+}
+
 func TestGoGoGadgetK8s(t *testing.T) {
   cases := []struct {
     in, want string

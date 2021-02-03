@@ -26,6 +26,8 @@ Options:
     -p, --pw, pw, password
   --reverse         Take a string and reverse it
     -r, reverse
+  --symsub          Take a string and substitute some chars to symbols
+    -s, symsub
   --time            Display the current time
     -t, time
   --words           Return a desired number of words (english)
@@ -61,7 +63,7 @@ func main() {
   if (len(params) > 0) {
     choice, params = params[0], params[1:]
   } else {
-    options := []string{"help", "k8s", "password", "reverse", "time", "words"}
+    options := []string{"help", "k8s", "password", "reverse", "symsub", "time", "words"}
     fmt.Print("Options ", options, ": ")
     choice = prompt()
   }
@@ -88,6 +90,24 @@ func main() {
       length, _ := strconv.Atoi(str)
       fmt.Println(pswd.Password(length, weight))
     }
+  case "reverse", "-r", "--reverse":
+    if (len(params) > 0) {
+      fmt.Println(strtwist.Reverse(params[0]))
+    } else {
+      fmt.Print("Enter string to be reversed: ")
+      str := prompt()
+      fmt.Println(strtwist.Reverse(str))
+    }
+  case "symsub", "-s", "--symsub":
+    if (len(params) > 0) {
+      fmt.Println(strtwist.SymbolSubstitution(params[0]))
+    } else {
+      fmt.Print("Enter string to be subbed: ")
+      str := prompt()
+      fmt.Println(strtwist.SymbolSubstitution(str))
+    }
+  case "time", "-t", "--time":
+    fmt.Println(timeStamp())
   case "words", "-w", "--words":
     weight := words.WordSetWeight { Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1, }
     if (len(params) > 0) {
@@ -99,16 +119,6 @@ func main() {
       length, _ := strconv.Atoi(str)
       fmt.Println(words.Words(length, weight))
     }
-  case "reverse", "-r", "--reverse":
-    if (len(params) > 0) {
-      fmt.Println(strtwist.Reverse(params[0]))
-    } else {
-      fmt.Print("Enter string to be reversed: ")
-      str := prompt()
-      fmt.Println(strtwist.Reverse(str))
-    }
-  case "time", "-t", "--time":
-    fmt.Println(timeStamp())
   default:
     help()
   }
