@@ -38,10 +38,10 @@ func randUpper() string {
 }
 
 type PasswordWeight struct {
-    lower int
-    upper int
-    digit int
-    symbol int
+    Lower  int
+    Upper  int
+    Digit  int
+    Symbol int
 }
 
 // Password returns a password based on its input parameters.
@@ -51,16 +51,16 @@ func Password(length int, weight PasswordWeight) string {
   }
 
   var weighted []int
-  for i := 0; i < weight.lower; i++ {
+  for i := 0; i < weight.Lower; i++ {
     weighted = append(weighted, 0)
   }
-  for i := 0; i < weight.upper; i++ {
+  for i := 0; i < weight.Upper; i++ {
     weighted = append(weighted, 1)
   }
-  for i := 0; i < weight.digit; i++ {
+  for i := 0; i < weight.Digit; i++ {
     weighted = append(weighted, 2)
   }
-  for i := 0; i < weight.symbol; i++ {
+  for i := 0; i < weight.Symbol; i++ {
     weighted = append(weighted, 3)
   }
 
