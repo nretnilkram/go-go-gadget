@@ -30,7 +30,8 @@ func LoadJsonWords (filename string) WordSet {
   jsonFile, err := os.Open(filename)
   defer jsonFile.Close()
   if err != nil {
-    fmt.Println(err.Error())
+    fmt.Println("The json file does not exist at " + getEnv("GO_GO_GADGET_WORDS_FILE", "NOT DEFINED") + ".  Please check GO_GO_GADGET_WORDS_FILE environment variable.")
+    os.Exit(1)
   }
   jsonParser := json.NewDecoder(jsonFile)
   jsonParser.Decode(&wordSet)
@@ -54,7 +55,7 @@ func Words(length int, weight WordSetWeight) string {
     return ""
   }
 
-  words_file := getEnv("GO_GO_GADGET_WORDS_FILE", "english_words.json")
+  words_file := getEnv("GO_GO_GADGET_WORDS_FILE", "NOT DEFINED")
 
   englishWords := LoadJsonWords(words_file)
 
