@@ -33,12 +33,18 @@ Options:
   --words           Return a desired number of words (english)
     -w, words
 
+Examples:
+
+go-go-gadget
+go-go-gadget --pw
+go-go-gadget -p 15
+
 `)
 }
 
 func timeStamp() string {
   t := time.Now()
-  return t.Format("06/01/02 15:04:05")
+  return t.Format("2006-01-02 15:04:05")
 }
 
 func getArgs() (string, []string) {

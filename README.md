@@ -20,6 +20,18 @@ export GO_GO_GADGET_WORDS_FILE=$HOME/go-go-gadget/words/english_words.json
 alias ggg="~/go/bin/go-go-gadget"
 ```
 
+### Execution
+
+You can run the app by simply typing `go-go-gadget` and following the prompts.  Or you can pass all the parameters at once.
+
+```
+go-go-gadget
+```
+```
+go-go-gadget password 25
+go-go-gadget -w 1000
+```
+
 ### Help
 
 ```
@@ -42,4 +54,10 @@ Options:
     -t, time
   --words           Return a set of words of desired length
     -w, words
+
+Examples:
+
+go-go-gadget
+go-go-gadget --pw
+go-go-gadget -p 15
 ```
