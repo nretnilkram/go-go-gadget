@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nretnilkram/go-go-gadget/pswd"
 	"github.com/nretnilkram/go-go-gadget/strtwist"
 	"github.com/nretnilkram/go-go-gadget/words"
+	"github.com/nretnilkram/pswd"
 )
 
 func help() {
