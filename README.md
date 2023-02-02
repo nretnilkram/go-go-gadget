@@ -4,19 +4,19 @@ Set of gadgets written in golang
 
 ## Install Package to different location
 
-```
-GOBIN=/usr/local/bin/ go install
+```sh
+GOBIN=$HOME/go/bin/ go install
 ```
 
 ### Setup
 
-```
-export GO_GO_GADGET_WORDS_FILE=$HOME/go-go-gadget/words/english_words.json
+```sh
+export GO_GO_GADGET_WORDS_FILE=$HOME/dev/nretnil_kram/go-go-gadget/words/english_words.json
 ```
 
 ### Create Alias for go-go-gadget
 
-```
+```sh
 alias ggg="~/go/bin/go-go-gadget"
 ```
 
@@ -24,21 +24,19 @@ alias ggg="~/go/bin/go-go-gadget"
 
 You can run the app by simply typing `go-go-gadget` and following the prompts.  Or you can pass all the parameters at once.
 
-```
+```sh
 go-go-gadget
-```
-```
 go-go-gadget password 25
 go-go-gadget -w 1000
 ```
 
 ### Help
 
-```
+```sh
 go-go-gadget help
 ```
 
-```
+```sh
 go-go-gadget is a set of command line tools.
 
 Options:
