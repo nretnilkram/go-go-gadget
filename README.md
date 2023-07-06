@@ -30,6 +30,10 @@ go-go-gadget password 25
 go-go-gadget -w 1000
 ```
 
+```sh
+go run go-go-gadget.go
+```
+
 ### Help
 
 ```sh
