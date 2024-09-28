@@ -84,7 +84,7 @@ func TestGoGoGadgetPassword(t *testing.T) {
 		{1000, 1000},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "password", strconv.Itoa(c.in))
+		cmd := exec.Command("go-go-gadget", "password", "--length", strconv.Itoa(c.in))
 		out, err := cmd.CombinedOutput()
 		got := len(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
@@ -112,7 +112,7 @@ func TestGoGoGadgetWords(t *testing.T) {
 		{1000, 1000},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "words", strconv.Itoa(c.in))
+		cmd := exec.Command("go-go-gadget", "words", "--count", strconv.Itoa(c.in))
 		out, err := cmd.CombinedOutput()
 		got := WordCount(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
