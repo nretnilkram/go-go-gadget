@@ -28,7 +28,7 @@ var inspectCmd = &cobra.Command{
 
 var k8sCmd = &cobra.Command{
 	Use:   "k8s",
-	Short: "Kubernetesifies a string",
+	Short: "Kubernetesify a string",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		res := go_go_gadget.K8s(args[0])
