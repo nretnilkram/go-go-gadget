@@ -38,6 +38,8 @@ go-go-gadget --help
 ### Testing
 
 ```sh
+GOBIN=$HOME/go/bin/ go install
+
 PATH="$PATH:$HOME/go/bin" go test -v ./...
 
 PATH="$PATH:$HOME/go/bin" go test -v main_test.go

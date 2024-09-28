@@ -3,7 +3,7 @@ package go_go_gadget
 import (
 	"fmt"
 
-	go_go_gadget "github.com/nretnilkram/go-go-gadget/pkg/stringer"
+	go_go_gadget "github.com/nretnilkram/go-go-gadget/pkg/strtwist"
 	"github.com/spf13/cobra"
 )
 
