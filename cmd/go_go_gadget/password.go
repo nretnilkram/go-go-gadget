@@ -12,7 +12,7 @@ var passwordSymbols bool
 
 var passwordCmd = &cobra.Command{
 	Use:     "password",
-	Aliases: []string{"pw"},
+	Aliases: []string{"p", "pw"},
 	Short:   "Generate a password",
 	Run: func(cmd *cobra.Command, args []string) {
 		weight := pswd.PasswordWeight{Lower: 4, Upper: 3, Digit: 3, Symbol: 0}
@@ -28,6 +28,6 @@ var passwordCmd = &cobra.Command{
 
 func init() {
 	passwordCmd.Flags().BoolVarP(&passwordSymbols, "symbols", "s", true, "Include Symbols")
-	passwordCmd.Flags().IntVarP(&passwordLength, "length", "l", 8, "Length of Password")
+	passwordCmd.Flags().IntVarP(&passwordLength, "length", "l", 32, "Length of Password")
 	rootCmd.AddCommand(passwordCmd)
 }

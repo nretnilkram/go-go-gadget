@@ -39,4 +39,6 @@ go-go-gadget --help
 
 ```sh
 PATH="$PATH:$HOME/go/bin" go test -v ./...
+
+PATH="$PATH:$HOME/go/bin" go test -v main_test.go
 ```

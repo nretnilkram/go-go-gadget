@@ -49,7 +49,7 @@ var reverseCmd = &cobra.Command{
 
 var symSubCmd = &cobra.Command{
 	Use:     "symsub",
-	Aliases: []string{"sub"},
+	Aliases: []string{"sym", "sub"},
 	Short:   "Substitute symbols into a string",
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
