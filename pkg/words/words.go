@@ -1,12 +1,9 @@
-// Package pswd implements password generation functionality.
 package words
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"os"
-	"time"
 )
 
 type WordSet struct {
@@ -27,19 +24,14 @@ type WordSetWeight struct {
 
 func LoadJsonWords(filename string) WordSet {
 	var wordSet WordSet
-	jsonFile, err := os.Open(filename)
-	defer jsonFile.Close()
+	err := json.Unmarshal([]byte(words), &wordSet)
 	if err != nil {
-		fmt.Println("The json file does not exist at " + getEnv("GO_GO_GADGET_WORDS_FILE", "NOT DEFINED") + ".  Please check GO_GO_GADGET_WORDS_FILE environment variable.")
-		os.Exit(1)
+		panic(err)
 	}
-	jsonParser := json.NewDecoder(jsonFile)
-	jsonParser.Decode(&wordSet)
 	return wordSet
 }
 
 func randomItem(list []string) string {
-	rand.Seed(time.Now().UnixNano())
 	return list[rand.Intn(len(list))]
 }
 
@@ -82,7 +74,6 @@ func Words(length int, weight WordSetWeight) string {
 
 	var word_list string
 	for i := 0; i < length; i++ {
-		rand.Seed(time.Now().UnixNano())
 		switch weighted[rand.Intn(len(weighted))] {
 		case 0:
 			word_list += randomItem(englishWords.Adjectives) + " "

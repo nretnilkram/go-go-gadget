@@ -50,6 +50,45 @@ func TestGoGoGadgetSymSub(t *testing.T) {
 	}
 }
 
+func TestGoGoGadgetInspect(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"abcdefghijklmnopqrstuvwxyz", "'abcdefghijklmnopqrstuvwxyz' has 26 chars."},
+		{"Mark", "'Mark' has 4 chars."},
+		{"Nretnil Kram", "'Nretnil Kram' has 12 chars."},
+		{"a1b2c3d4 e5f6 g7", "'a1b2c3d4 e5f6 g7' has 16 chars."},
+	}
+	for _, c := range cases {
+		cmd := exec.Command("go-go-gadget", "inspect", c.in)
+		out, err := cmd.CombinedOutput()
+		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
+		if err != nil || got != c.want {
+			fmt.Println(got, out, err)
+			t.Errorf("go-go-gadget inspect %q == %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestGoGoGadgetInspectDigits(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"abcdefghijklmnopqrstuvwxyz", "'abcdefghijklmnopqrstuvwxyz' has 0 digits."},
+		{"abcdefghijklmnopqrstuvwxyz0123456789", "'abcdefghijklmnopqrstuvwxyz0123456789' has 10 digits."},
+		{"a1b2c3d4 e5f6 g7", "'a1b2c3d4 e5f6 g7' has 7 digits."},
+	}
+	for _, c := range cases {
+		cmd := exec.Command("go-go-gadget", "inspect", "--digits", c.in)
+		out, err := cmd.CombinedOutput()
+		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
+		if err != nil || got != c.want {
+			fmt.Println(got, out, err)
+			t.Errorf("go-go-gadget inspect %q == %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
 func TestGoGoGadgetK8s(t *testing.T) {
 	cases := []struct {
 		in, want string
@@ -84,7 +123,7 @@ func TestGoGoGadgetPassword(t *testing.T) {
 		{1000, 1000},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "password", strconv.Itoa(c.in))
+		cmd := exec.Command("go-go-gadget", "password", "--length", strconv.Itoa(c.in))
 		out, err := cmd.CombinedOutput()
 		got := len(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
@@ -112,7 +151,7 @@ func TestGoGoGadgetWords(t *testing.T) {
 		{1000, 1000},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "words", strconv.Itoa(c.in))
+		cmd := exec.Command("go-go-gadget", "words", "--count", strconv.Itoa(c.in))
 		out, err := cmd.CombinedOutput()
 		got := WordCount(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
