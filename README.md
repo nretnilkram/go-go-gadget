@@ -1,6 +1,6 @@
 # go-go-gadget
 
-Set of gadgets written in golang
+Set of cli gadgets written in golang
 
 ## Install Package
 
