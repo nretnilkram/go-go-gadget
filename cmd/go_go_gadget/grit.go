@@ -12,13 +12,7 @@ var gritCmd = &cobra.Command{
 	Use:   "grit",
 	Short: "Run git command on multiple repositories",
 	Run: func(cmd *cobra.Command, args []string) {
-		gritDirExists, _ := grit.FileDirExists(".grit")
-		configFileExists, _ := grit.FileDirExists(".grit/config.yaml")
-
-		if !gritDirExists || !configFileExists {
-			fmt.Println("This is not a grit directory.")
-			return
-		}
+		grit.TestGritDir()
 
 		grit.RunCommand(args)
 	},
@@ -28,13 +22,7 @@ var gritConfigCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Run git command on multiple repositories",
 	Run: func(cmd *cobra.Command, args []string) {
-		gritDirExists, _ := grit.FileDirExists(".grit")
-		configFileExists, _ := grit.FileDirExists(".grit/config.yaml")
-
-		if !gritDirExists || !configFileExists {
-			fmt.Println("This is not a grit directory.")
-			return
-		}
+		grit.TestGritDir()
 
 		// Read the file content
 		data, err := os.ReadFile(".grit/config.yml")
