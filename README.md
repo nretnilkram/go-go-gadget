@@ -2,7 +2,7 @@
 
 Set of gadgets written in golang
 
-## Install Package to different location
+## Install Package
 
 ```sh
 GOBIN=$HOME/go/bin/ go install
@@ -24,22 +24,22 @@ go-go-gadget password 25
 go-go-gadget -w 1000
 ```
 
+## Run Locally
+
 ```sh
 go run main.go
 ```
 
-### Help
+## Help
 
 ```sh
 go-go-gadget -h
 go-go-gadget --help
 ```
 
-### Testing
+## Testing
 
 ```sh
-GOBIN=$HOME/go/bin/ go install
-
 PATH="$PATH:$HOME/go/bin" go test -v ./...
 
 PATH="$PATH:$HOME/go/bin" go test -v ./pkg/...
