@@ -21,7 +21,7 @@ func TestGoGoGadgetReverse(t *testing.T) {
 		{"Mark", "kraM"},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "reverse", c.in)
+		cmd := exec.Command("go", "run", "main.go", "reverse", c.in)
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
 		if err != nil || got != c.want {
@@ -40,7 +40,7 @@ func TestGoGoGadgetSymSub(t *testing.T) {
 		{"ABCDEF GHIJKLMNOP QRSTUVW XYZ", "@BCD3F GH!JKLMN0P QR$TUVW XYZ"},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "symsub", c.in)
+		cmd := exec.Command("go", "run", "main.go", "symsub", c.in)
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
 		if err != nil || got != c.want {
@@ -60,7 +60,7 @@ func TestGoGoGadgetInspect(t *testing.T) {
 		{"a1b2c3d4 e5f6 g7", "'a1b2c3d4 e5f6 g7' has 16 chars."},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "inspect", c.in)
+		cmd := exec.Command("go", "run", "main.go", "inspect", c.in)
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
 		if err != nil || got != c.want {
@@ -79,7 +79,7 @@ func TestGoGoGadgetInspectDigits(t *testing.T) {
 		{"a1b2c3d4 e5f6 g7", "'a1b2c3d4 e5f6 g7' has 7 digits."},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "inspect", "--digits", c.in)
+		cmd := exec.Command("go", "run", "main.go", "inspect", "--digits", c.in)
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
 		if err != nil || got != c.want {
@@ -104,7 +104,7 @@ func TestGoGoGadgetK8s(t *testing.T) {
 		{"one two three", "o1e t1o t3e"},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "k8s", c.in)
+		cmd := exec.Command("go", "run", "main.go", "k8s", c.in)
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte with a new line
 		if err != nil || got != c.want {
@@ -123,7 +123,7 @@ func TestGoGoGadgetPassword(t *testing.T) {
 		{1000, 1000},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "password", "--length", strconv.Itoa(c.in))
+		cmd := exec.Command("go", "run", "main.go", "password", "--length", strconv.Itoa(c.in))
 		out, err := cmd.CombinedOutput()
 		got := len(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
@@ -151,7 +151,7 @@ func TestGoGoGadgetWords(t *testing.T) {
 		{1000, 1000},
 	}
 	for _, c := range cases {
-		cmd := exec.Command("go-go-gadget", "words", "--count", strconv.Itoa(c.in))
+		cmd := exec.Command("go", "run", "main.go", "words", "--count", strconv.Itoa(c.in))
 		out, err := cmd.CombinedOutput()
 		got := WordCount(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {

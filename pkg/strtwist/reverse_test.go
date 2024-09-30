@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestReverse(t *testing.T) {
+func TestStringReverse(t *testing.T) {
 	cases := []struct {
 		in, want string
 	}{
