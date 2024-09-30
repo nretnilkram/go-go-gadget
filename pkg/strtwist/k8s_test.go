@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestK8s(t *testing.T) {
+func TestStringK8s(t *testing.T) {
 	cases := []struct {
 		in, want string
 	}{

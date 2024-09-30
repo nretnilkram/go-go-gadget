@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSymbolSubstitution(t *testing.T) {
+func TestStringSymbolSubstitution(t *testing.T) {
 	cases := []struct {
 		in, want string
 	}{

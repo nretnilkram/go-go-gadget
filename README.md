@@ -42,5 +42,7 @@ GOBIN=$HOME/go/bin/ go install
 
 PATH="$PATH:$HOME/go/bin" go test -v ./...
 
+PATH="$PATH:$HOME/go/bin" go test -v ./pkg/...
+
 PATH="$PATH:$HOME/go/bin" go test -v main_test.go
 ```
