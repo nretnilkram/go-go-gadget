@@ -27,6 +27,17 @@ var gritCmd = &cobra.Command{
 	},
 }
 
+var gritAddAllReposCmd = &cobra.Command{
+	Use:     "add-all-repos",
+	Aliases: []string{"add-all"},
+	Short:   "Show the grit conifig for the current directory",
+	Run: func(cmd *cobra.Command, args []string) {
+		grit.TestGritDir()
+
+		grit.AddAllRepos()
+	},
+}
+
 var gritConfigCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Show the grit conifig for the current directory",
@@ -93,6 +104,8 @@ var gritResetCmd = &cobra.Command{
 }
 
 func init() {
+	gritCmd.AddCommand(gritAddAllReposCmd)
+
 	gritCmd.AddCommand(gritConfigCmd)
 
 	gritCmd.AddCommand(gritHistoryCmd)

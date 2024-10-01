@@ -51,3 +51,13 @@ func WriteConfig(config Config) {
 	writeErr := os.WriteFile(ConfigFile, data, 0644)
 	Check(writeErr)
 }
+
+func AddRepoToConfig(name string, path string) {
+	config := LoadConfig()
+	repo := Repository{
+		Name: name,
+		Path: path,
+	}
+	config.Repositories = append(config.Repositories, repo)
+	WriteConfig(config)
+}

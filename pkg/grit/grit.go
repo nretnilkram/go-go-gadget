@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -32,6 +33,24 @@ func AppendHistory(command string) {
 	// Write the data to the file
 	if _, err := file.WriteString(command + "\n"); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func isGitRepo(path string) bool {
+	doesGitDirExist, err := FileDirExists(path + "/.git")
+	Check(err)
+	return doesGitDirExist
+}
+
+func AddAllRepos() {
+	entries, err := os.ReadDir(".")
+	Check(err)
+
+	for _, entry := range entries {
+		if entry.IsDir() && isGitRepo(filepath.Join(entry.Name())) {
+			gitDir := entry.Name()
+			AddRepoToConfig(gitDir, gitDir)
+		}
 	}
 }
 
