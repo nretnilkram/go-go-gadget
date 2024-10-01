@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
 
 var GritDir = ".grit"
 var ConfigFile = GritDir + "/config.yml"
+var HisotryFile = GritDir + "/history.log"
 
 func TestGritDir() {
 	gritDirExists, _ := FileDirExists(GritDir)
@@ -46,7 +48,7 @@ type Config struct {
 
 func LoadConfig() Config {
 	// Read the file content
-	data, err := os.ReadFile(".grit/config.yml")
+	data, err := os.ReadFile(ConfigFile)
 	if err != nil {
 		fmt.Println("Error reading file: ", err)
 	}
@@ -57,10 +59,39 @@ func LoadConfig() Config {
 	// Unmarshal the YAML string into the map
 	err = yaml.Unmarshal([]byte(data), &config)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Error mapping config: ", err)
 	}
 
 	return config
+}
+
+func WriteConfig(config Config) {
+	// Marshal the data into YAML format with indentation
+	yamlData, err := yaml.Marshal(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	data := []byte("---\n" + string(yamlData))
+
+	writeErr := os.WriteFile(ConfigFile, data, 0644)
+	if writeErr != nil {
+		fmt.Println("Error writing file: ", writeErr)
+	}
+}
+
+func AppendHistory(command string) {
+	// Open the file in append mode
+	file, err := os.OpenFile(HisotryFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	// Write the data to the file
+	if _, err := file.WriteString(command + "\n"); err != nil {
+		panic(err)
+	}
 }
 
 func RunCommand(args []string) {
@@ -70,6 +101,9 @@ func RunCommand(args []string) {
 
 	for _, repo := range config.Repositories {
 		path := repo.Path
+		name := repo.Name
+		fmt.Println(name)
 		fmt.Println(path)
+		fmt.Println("git " + strings.Join(args, " "))
 	}
 }
