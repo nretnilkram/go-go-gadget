@@ -26,6 +26,8 @@ go-go-gadget words --count 1000
 go-go-gadget k8s "Nretnil Kram"
 
 go-go-gadget grit init
+go-go-gadget grit add-all
+go-go-gadget grit reset
 go-go-gadget grit config
 go-go-gadget grit pull
 ```
