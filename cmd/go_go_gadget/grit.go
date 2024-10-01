@@ -2,10 +2,11 @@ package go_go_gadget
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/nretnilkram/go-go-gadget/pkg/grit"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
 
 var gritCmd = &cobra.Command{
@@ -24,17 +25,15 @@ var gritConfigCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 
-		// Read the file content
-		data, err := os.ReadFile(".grit/config.yml")
+		var config map[string]interface{} = grit.LoadConfig()
+
+		// Marshal the data into YAML format with indentation
+		yamlData, err := yaml.Marshal(config)
 		if err != nil {
-			fmt.Println("Error reading file:", err)
-			return
+			log.Fatal(err)
 		}
 
-		// Convert the byte slice to a string
-		content := string(data)
-
-		fmt.Println(content)
+		fmt.Println(string(yamlData))
 	},
 }
 

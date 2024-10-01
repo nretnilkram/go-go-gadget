@@ -2,7 +2,10 @@ package grit
 
 import (
 	"fmt"
+	"log"
 	"os"
+
+	"gopkg.in/yaml.v2"
 )
 
 var GritDir = ".grit"
@@ -30,6 +33,32 @@ func FileDirExists(path string) (bool, error) {
 	return false, err
 }
 
+func LoadConfig() map[string]interface{} {
+	// Read the file content
+	data, err := os.ReadFile(".grit/config.yml")
+	if err != nil {
+		fmt.Println("Error reading file: ", err)
+	}
+
+	// Create a map to store the parsed YAML data
+	var config map[string]interface{}
+
+	// Unmarshal the YAML string into the map
+	err = yaml.Unmarshal([]byte(data), &config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return config
+}
+
 func RunCommand(args []string) {
 	fmt.Println("testing...")
+	// Create a map to store the parsed YAML data
+	var config map[string]interface{} = LoadConfig()
+
+	for _, repo := range config["repositories"].([]interface{}) {
+		path := repo.(map[interface{}]interface{})["path"]
+		fmt.Println(path)
+	}
 }
