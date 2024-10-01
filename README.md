@@ -24,6 +24,10 @@ go-go-gadget
 go-go-gadget password --length 25
 go-go-gadget words --count 1000
 go-go-gadget k8s "Nretnil Kram"
+
+go-go-gadget grit init
+go-go-gadget grit config
+go-go-gadget grit pull
 ```
 
 ## Run Locally
@@ -50,6 +54,7 @@ Usage:
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
+  grit        Run git commands on multiple repositories at once
   help        Help about any command
   inspect     Inspects a string
   k8s         Kubernetesify a string

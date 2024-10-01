@@ -14,7 +14,7 @@ var gritSyncronous bool
 
 var gritCmd = &cobra.Command{
 	Use:   "grit",
-	Short: "Run git command on multiple repositories",
+	Short: "Run git commands on multiple repositories at once",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
@@ -29,7 +29,7 @@ var gritCmd = &cobra.Command{
 
 var gritConfigCmd = &cobra.Command{
 	Use:   "config",
-	Short: "Run git command on multiple repositories",
+	Short: "Show the grit conifig for the current directory",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 
@@ -45,7 +45,7 @@ var gritConfigCmd = &cobra.Command{
 
 var gritInitCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Init new Grit directory",
+	Short: "Initialize new Grit directory",
 	Run: func(cmd *cobra.Command, args []string) {
 		configFileExists, _ := grit.FileDirExists(grit.GritDir)
 		if configFileExists {
