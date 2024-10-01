@@ -109,12 +109,25 @@ var gritHistoryCmd = &cobra.Command{
 
 var gritResetCmd = &cobra.Command{
 	Use:   "reset",
-	Short: "Remove grit from directory",
+	Short: "Reset grit to default config",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 
 		var config grit.Config = grit.DefaultConfig()
 		grit.WriteConfig(config)
+
+		grit.PrintTagLine(cmd.Root().Version)
+	},
+}
+
+var gritDestroyCmd = &cobra.Command{
+	Use:   "destroy",
+	Short: "Remove grit from directory",
+	Run: func(cmd *cobra.Command, args []string) {
+		grit.TestGritDir()
+
+		err := os.Remove(grit.GritDir)
+		grit.Check(err)
 
 		grit.PrintTagLine(cmd.Root().Version)
 	},
@@ -126,6 +139,8 @@ func init() {
 	gritCmd.AddCommand(gritAddRepoCmd)
 
 	gritCmd.AddCommand(gritConfigCmd)
+
+	gritCmd.AddCommand(gritDestroyCmd)
 
 	gritCmd.AddCommand(gritHistoryCmd)
 
