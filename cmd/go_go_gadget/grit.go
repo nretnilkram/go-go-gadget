@@ -16,7 +16,7 @@ var gritCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
-		grit.RunCommand(args)
+		grit.RunGitCommand(args)
 	},
 }
 
@@ -61,6 +61,16 @@ var gritInitCmd = &cobra.Command{
 	},
 }
 
+var gritPullCmd = &cobra.Command{
+	Use:   "pull",
+	Short: "Run Git Pull on all repos",
+	Run: func(cmd *cobra.Command, args []string) {
+		grit.TestGritDir()
+		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
+		grit.RunGitPullCommand(args)
+	},
+}
+
 var gritResetCmd = &cobra.Command{
 	Use:   "reset",
 	Short: "Remove grit from directory",
@@ -73,6 +83,8 @@ func init() {
 	gritCmd.AddCommand(gritConfigCmd)
 
 	gritCmd.AddCommand(gritInitCmd)
+
+	gritCmd.AddCommand(gritPullCmd)
 
 	gritCmd.AddCommand(gritResetCmd)
 
