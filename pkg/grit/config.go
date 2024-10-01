@@ -63,3 +63,15 @@ func AddRepoToConfig(name string, path string) {
 	config.Repositories = append(config.Repositories, repo)
 	WriteConfig(config)
 }
+
+func RemoveRepoFromConfig(name string) {
+	config := LoadConfig()
+
+	for i, repo := range config.Repositories {
+		if name == repo.Name {
+			config.Repositories = append(config.Repositories[:i], config.Repositories[i+1:]...)
+		}
+	}
+	fmt.Println("Removing " + name)
+	WriteConfig(config)
+}
