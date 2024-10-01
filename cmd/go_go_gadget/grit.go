@@ -24,6 +24,7 @@ var gritCmd = &cobra.Command{
 		} else {
 			grit.RunGitCommandParallel(args)
 		}
+		grit.PrintTagLine(cmd.Root().Version)
 	},
 }
 
@@ -33,8 +34,8 @@ var gritAddAllReposCmd = &cobra.Command{
 	Short:   "Show the grit conifig for the current directory",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
-
 		grit.AddAllRepos()
+		grit.PrintTagLine(cmd.Root().Version)
 	},
 }
 
@@ -51,6 +52,7 @@ var gritConfigCmd = &cobra.Command{
 		grit.Check(err)
 
 		fmt.Println(string(yamlData))
+		grit.PrintTagLine(cmd.Root().Version)
 	},
 }
 
@@ -76,6 +78,7 @@ var gritInitCmd = &cobra.Command{
 		f, historyErr := os.Create(grit.HisotryFile)
 		grit.Check(historyErr)
 		defer f.Close()
+		grit.PrintTagLine(cmd.Root().Version)
 	},
 }
 
@@ -89,6 +92,7 @@ var gritHistoryCmd = &cobra.Command{
 		grit.Check(err)
 
 		fmt.Println(string(history))
+		grit.PrintTagLine(cmd.Root().Version)
 	},
 }
 
@@ -100,6 +104,7 @@ var gritResetCmd = &cobra.Command{
 
 		err := os.Remove(grit.GritDir)
 		grit.Check(err)
+		grit.PrintTagLine(cmd.Root().Version)
 	},
 }
 

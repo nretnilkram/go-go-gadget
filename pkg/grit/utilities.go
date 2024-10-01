@@ -48,3 +48,7 @@ func PrintHeader(header string) {
 func PrintFooter() {
 	fmt.Println(GritFooter())
 }
+
+func PrintTagLine(version string) {
+	fmt.Println("\n--------\ngo-go-gadget grit v" + version)
+}
