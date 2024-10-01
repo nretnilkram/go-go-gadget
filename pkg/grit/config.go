@@ -1,6 +1,7 @@
 package grit
 
 import (
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -58,6 +59,7 @@ func AddRepoToConfig(name string, path string) {
 		Name: name,
 		Path: path,
 	}
+	fmt.Println("Adding " + name)
 	config.Repositories = append(config.Repositories, repo)
 	WriteConfig(config)
 }

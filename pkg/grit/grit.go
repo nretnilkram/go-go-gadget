@@ -49,7 +49,6 @@ func AddAllRepos() {
 	for _, entry := range entries {
 		if entry.IsDir() && isGitRepo(filepath.Join(entry.Name())) {
 			gitDir := entry.Name()
-			fmt.Println("Adding " + gitDir)
 			AddRepoToConfig(gitDir, gitDir)
 		}
 	}
