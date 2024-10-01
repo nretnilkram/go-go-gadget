@@ -113,8 +113,9 @@ var gritResetCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 
-		err := os.Remove(grit.GritDir)
-		grit.Check(err)
+		var config grit.Config = grit.DefaultConfig()
+		grit.WriteConfig(config)
+
 		grit.PrintTagLine(cmd.Root().Version)
 	},
 }

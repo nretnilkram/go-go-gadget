@@ -20,7 +20,7 @@ type Config struct {
 
 func DefaultConfig() Config {
 	config := Config{
-		Root:        "asdf",
+		Root:        GetWorkingDir(),
 		Ignore_Root: true,
 	}
 
