@@ -25,7 +25,7 @@ var gritConfigCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 
-		var config map[string]interface{} = grit.LoadConfig()
+		var config grit.Config = grit.LoadConfig()
 
 		// Marshal the data into YAML format with indentation
 		yamlData, err := yaml.Marshal(config)

@@ -21,7 +21,7 @@ func TestGritDir() {
 	}
 }
 
-// exists returns whether the given file or directory exists
+// FileDirExists returns whether the given file or directory exists
 func FileDirExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -33,7 +33,18 @@ func FileDirExists(path string) (bool, error) {
 	return false, err
 }
 
-func LoadConfig() map[string]interface{} {
+type Repository struct {
+	Name string
+	Path string
+}
+
+type Config struct {
+	Root         string
+	Repositories []Repository
+	Ingore_Root  bool
+}
+
+func LoadConfig() Config {
 	// Read the file content
 	data, err := os.ReadFile(".grit/config.yml")
 	if err != nil {
@@ -41,7 +52,7 @@ func LoadConfig() map[string]interface{} {
 	}
 
 	// Create a map to store the parsed YAML data
-	var config map[string]interface{}
+	var config Config
 
 	// Unmarshal the YAML string into the map
 	err = yaml.Unmarshal([]byte(data), &config)
@@ -55,10 +66,10 @@ func LoadConfig() map[string]interface{} {
 func RunCommand(args []string) {
 	fmt.Println("testing...")
 	// Create a map to store the parsed YAML data
-	var config map[string]interface{} = LoadConfig()
+	var config Config = LoadConfig()
 
-	for _, repo := range config["repositories"].([]interface{}) {
-		path := repo.(map[interface{}]interface{})["path"]
+	for _, repo := range config.Repositories {
+		path := repo.Path
 		fmt.Println(path)
 	}
 }
