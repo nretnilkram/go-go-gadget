@@ -7,13 +7,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "2.0.0"
+var version = "2.1.0"
 
 var rootCmd = &cobra.Command{
 	Use:     "go_go_gadget",
 	Version: version,
 	Short:   "go_go_gadget - a simple CLI with useful tools",
-	Long: `Go Go Gadget is a super fancy CLI (kidding)
+	Long: `Go Go Gadget is a set of helpful CLI tools
 
 One can use go_go_gadget to run useful tools from the terminal`,
 	Run: func(cmd *cobra.Command, args []string) {

@@ -3,7 +3,7 @@ package go_go_gadget
 import (
 	"fmt"
 
-	go_go_gadget "github.com/nretnilkram/go-go-gadget/pkg/strtwist"
+	"github.com/nretnilkram/go-go-gadget/pkg/strtwist"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +16,7 @@ var inspectCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		i := args[0]
-		res, kind := go_go_gadget.Inspect(i, onlyDigits)
+		res, kind := strtwist.Inspect(i, onlyDigits)
 
 		pluralS := "s"
 		if res == 1 {
@@ -31,7 +31,7 @@ var k8sCmd = &cobra.Command{
 	Short: "Kubernetesify a string",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		res := go_go_gadget.K8s(args[0])
+		res := strtwist.K8s(args[0])
 		fmt.Println(res)
 	},
 }
@@ -42,7 +42,7 @@ var reverseCmd = &cobra.Command{
 	Short:   "Reverses a string",
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		res := go_go_gadget.Reverse(args[0])
+		res := strtwist.Reverse(args[0])
 		fmt.Println(res)
 	},
 }
@@ -53,7 +53,7 @@ var symSubCmd = &cobra.Command{
 	Short:   "Substitute symbols into a string",
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		res := go_go_gadget.SymbolSubstitution(args[0])
+		res := strtwist.SymbolSubstitution(args[0])
 		fmt.Println(res)
 	},
 }
