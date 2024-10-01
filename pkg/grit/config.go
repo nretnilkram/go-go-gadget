@@ -70,6 +70,7 @@ func RemoveRepoFromConfig(name string) {
 	for i, repo := range config.Repositories {
 		if name == repo.Name {
 			config.Repositories = append(config.Repositories[:i], config.Repositories[i+1:]...)
+			break
 		}
 	}
 	fmt.Println("Removing " + name)

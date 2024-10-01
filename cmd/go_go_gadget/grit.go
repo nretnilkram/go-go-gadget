@@ -34,6 +34,7 @@ var gritAddRepoCmd = &cobra.Command{
 	Short:   "Add repository to grit config",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
+		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 		grit.AddRepoToConfig(args[0], args[0])
 		grit.PrintTagLine(cmd.Root().Version)
 	},
@@ -45,6 +46,7 @@ var gritAddAllReposCmd = &cobra.Command{
 	Short:   "Add all git repositories in directory to grit config",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
+		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 		grit.AddAllRepos()
 		grit.PrintTagLine(cmd.Root().Version)
 	},
@@ -55,6 +57,7 @@ var gritConfigCmd = &cobra.Command{
 	Short: "Show the grit conifig for the current directory",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
+		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 
 		var config grit.Config = grit.LoadConfig()
 
@@ -113,6 +116,7 @@ var gritRemoveRepoCmd = &cobra.Command{
 	Short:   "Remove repository from config",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
+		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 		grit.RemoveRepoFromConfig(args[0])
 		grit.PrintTagLine(cmd.Root().Version)
 	},
@@ -123,6 +127,7 @@ var gritResetCmd = &cobra.Command{
 	Short: "Reset grit to default config",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
+		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 
 		var config grit.Config = grit.DefaultConfig()
 		grit.WriteConfig(config)
