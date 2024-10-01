@@ -33,10 +33,18 @@ func FileDirExists(path string) (bool, error) {
 	return false, err
 }
 
+func GritHeader(header string) string {
+	return "----------------------------------------\n# " + header
+}
+
+func GritFooter() string {
+	return "----------------------------------------\n"
+}
+
 func PrintHeader(header string) {
-	fmt.Println("**************\n\n* " + header + "\n\n**************\n")
+	fmt.Println(GritHeader((header)))
 }
 
 func PrintFooter() {
-	fmt.Println("**************\n ")
+	fmt.Println(GritFooter())
 }

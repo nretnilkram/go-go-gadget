@@ -10,13 +10,20 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var gritSyncronous bool
+
 var gritCmd = &cobra.Command{
 	Use:   "grit",
 	Short: "Run git command on multiple repositories",
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
-		grit.RunGitCommand(args)
+
+		if gritSyncronous {
+			grit.RunGitCommandSyncronous(args)
+		} else {
+			grit.RunGitCommandParallel(args)
+		}
 	},
 }
 
@@ -61,16 +68,6 @@ var gritInitCmd = &cobra.Command{
 	},
 }
 
-var gritPullCmd = &cobra.Command{
-	Use:   "pull",
-	Short: "Run Git Pull on all repos",
-	Run: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
-		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
-		grit.RunGitPullCommand(args)
-	},
-}
-
 var gritResetCmd = &cobra.Command{
 	Use:   "reset",
 	Short: "Remove grit from directory",
@@ -84,9 +81,8 @@ func init() {
 
 	gritCmd.AddCommand(gritInitCmd)
 
-	gritCmd.AddCommand(gritPullCmd)
-
 	gritCmd.AddCommand(gritResetCmd)
 
+	gritCmd.Flags().BoolVarP(&gritSyncronous, "syncronous", "s", false, "Run Grit Command Syncronously")
 	rootCmd.AddCommand(gritCmd)
 }

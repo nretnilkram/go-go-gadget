@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
 var GritDir = ".grit"
@@ -34,7 +35,7 @@ func AppendHistory(command string) {
 	}
 }
 
-func RunShellCommand(command string, path string) {
+func RunShellCommand(command string, path string) string {
 	commandArray := strings.Split(command, " ")
 
 	cmd := exec.Command(commandArray[0], strings.Join(commandArray[1:], " "))
@@ -45,13 +46,33 @@ func RunShellCommand(command string, path string) {
 	if err != nil {
 		fmt.Println("Error:", err)
 		fmt.Println(string(output))
-		return
+		return ""
 	}
 
-	fmt.Println(string(output))
+	return string(output)
 }
 
-func RunGitCommand(args []string) {
+func RunGitCommandParallel(args []string) {
+	// Create a map to store the parsed YAML data
+	var config Config = LoadConfig()
+	// Create WaitGroup for parallel runs
+	var wg sync.WaitGroup
+	for _, repo := range config.Repositories {
+		wg.Add(1)
+		go func(repo Repository) {
+			defer wg.Done()
+			path := repo.Path
+			name := repo.Name
+			command := "git " + strings.Join(args, " ")
+			repoDir := config.Root + "/" + path
+			fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+command) + "\n" + RunShellCommand(command, repoDir) + GritFooter())
+		}(repo)
+	}
+	wg.Wait()
+}
+
+func RunGitCommandSyncronous(args []string) {
+
 	// Create a map to store the parsed YAML data
 	var config Config = LoadConfig()
 
@@ -60,23 +81,7 @@ func RunGitCommand(args []string) {
 		name := repo.Name
 		command := "git " + strings.Join(args, " ")
 		repoDir := config.Root + "/" + path
-		PrintHeader(name + " - " + command)
-		RunShellCommand(command, repoDir)
-		PrintFooter()
+		fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+command) + "\n" + RunShellCommand(command, repoDir) + GritFooter())
 	}
-}
 
-func RunGitPullCommand(args []string) {
-	// Create a map to store the parsed YAML data
-	var config Config = LoadConfig()
-
-	for _, repo := range config.Repositories {
-		path := repo.Path
-		name := repo.Name
-		command := "git pull"
-		repoDir := config.Root + "/" + path
-		PrintHeader(name + " - " + command)
-		RunShellCommand(command, repoDir)
-		PrintFooter()
-	}
 }
