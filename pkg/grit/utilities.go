@@ -50,5 +50,5 @@ func PrintFooter() {
 }
 
 func PrintTagLine(version string) {
-	fmt.Println("\n--------\ngo-go-gadget grit v" + version)
+	fmt.Println("\n--------\ngo-go-gadget grit v" + version + "\n")
 }
