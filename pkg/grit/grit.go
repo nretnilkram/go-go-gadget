@@ -67,9 +67,8 @@ func RunShellCommand(command string, path string) string {
 	// Run the command and capture its output
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Println("Error:", err)
-		fmt.Println(string(output))
-		return ""
+		errString := err.Error()
+		return "ERROR: " + string(errString) + "\n"
 	}
 
 	return string(output)
