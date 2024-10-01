@@ -2,7 +2,6 @@ package go_go_gadget
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -31,9 +30,7 @@ var gritConfigCmd = &cobra.Command{
 
 		// Marshal the data into YAML format with indentation
 		yamlData, err := yaml.Marshal(config)
-		if err != nil {
-			log.Fatal(err)
-		}
+		grit.Check(err)
 
 		fmt.Println(string(yamlData))
 	},
@@ -43,21 +40,32 @@ var gritInitCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Init new Grit directory",
 	Run: func(cmd *cobra.Command, args []string) {
-		configFileExists, _ := grit.FileDirExists(grit.ConfigFile)
+		configFileExists, _ := grit.FileDirExists(grit.GritDir)
 		if configFileExists {
 			fmt.Println("Grit is already initialized.")
 			return
 		}
 
-		var config grit.Config = grit.LoadConfig()
+		// Create .grit Dir
+		dirErr := os.Mkdir(grit.GritDir, 0755)
+		grit.Check(dirErr)
 
-		f, err := os.Create(grit.HisotryFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer f.Close()
-
+		// Create Default Config File
+		var config grit.Config = grit.DefaultConfig()
 		grit.WriteConfig(config)
+
+		// Create Hisotry File
+		f, historyErr := os.Create(grit.HisotryFile)
+		grit.Check(historyErr)
+		defer f.Close()
+	},
+}
+
+var gritResetCmd = &cobra.Command{
+	Use:   "reset",
+	Short: "Remove grit from directory",
+	Run: func(cmd *cobra.Command, args []string) {
+		grit.TestGritDir()
 	},
 }
 
@@ -65,6 +73,8 @@ func init() {
 	gritCmd.AddCommand(gritConfigCmd)
 
 	gritCmd.AddCommand(gritInitCmd)
+
+	gritCmd.AddCommand(gritResetCmd)
 
 	rootCmd.AddCommand(gritCmd)
 }
