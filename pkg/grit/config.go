@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"gopkg.in/yaml.v2"
 )
 
@@ -20,7 +21,7 @@ type Config struct {
 
 func DefaultConfig() Config {
 	config := Config{
-		Root:        GetWorkingDir(),
+		Root:        utilities.GetWorkingDir(),
 		Ignore_Root: true,
 	}
 
@@ -30,14 +31,14 @@ func DefaultConfig() Config {
 func LoadConfig() Config {
 	// Read the file content
 	data, err := os.ReadFile(ConfigFile)
-	Check(err)
+	utilities.Check(err)
 
 	// Create a map to store the parsed YAML data
 	var config Config
 
 	// Unmarshal the YAML string into the map
 	err = yaml.Unmarshal([]byte(data), &config)
-	Check(err)
+	utilities.Check(err)
 
 	return config
 }
@@ -45,12 +46,12 @@ func LoadConfig() Config {
 func WriteConfig(config Config) {
 	// Marshal the data into YAML format with indentation
 	yamlData, err := yaml.Marshal(config)
-	Check(err)
+	utilities.Check(err)
 
 	data := []byte("---\n" + string(yamlData))
 
 	writeErr := os.WriteFile(ConfigFile, data, 0644)
-	Check(writeErr)
+	utilities.Check(writeErr)
 }
 
 func AddRepoToConfig(name string, path string) {

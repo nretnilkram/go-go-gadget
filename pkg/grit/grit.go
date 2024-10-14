@@ -4,31 +4,22 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
 var GritDir = ".grit"
 var ConfigFile = GritDir + "/config.yml"
 var HisotryFile = GritDir + "/history.log"
 
-func TestGritDir() {
-	gritDirExists, _ := FileDirExists(GritDir)
-	configFileExists, _ := FileDirExists(ConfigFile)
-
-	if !gritDirExists || !configFileExists {
-		fmt.Println("This is not a grit directory.")
-		os.Exit(1)
-	}
-}
-
 func AppendHistory(command string) {
 	// Open the file in append mode
 	file, err := os.OpenFile(HisotryFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	Check(err)
+	utilities.Check(err)
 	defer file.Close()
 
 	// Create timestamp
@@ -40,38 +31,16 @@ func AppendHistory(command string) {
 	}
 }
 
-func isGitRepo(path string) bool {
-	doesGitDirExist, err := FileDirExists(path + "/.git")
-	Check(err)
-	return doesGitDirExist
-}
-
 func AddAllRepos() {
 	entries, err := os.ReadDir(".")
-	Check(err)
+	utilities.Check(err)
 
 	for _, entry := range entries {
-		if entry.IsDir() && isGitRepo(filepath.Join(entry.Name())) {
+		if entry.IsDir() && utilities.IsGitRepo(filepath.Join(entry.Name())) {
 			gitDir := entry.Name()
 			AddRepoToConfig(gitDir, gitDir)
 		}
 	}
-}
-
-func RunShellCommand(command string, path string) string {
-	commandArray := strings.Split(command, " ")
-
-	cmd := exec.Command(commandArray[0], strings.Join(commandArray[1:], " "))
-	cmd.Dir = path
-
-	// Run the command and capture its output
-	output, err := cmd.Output()
-	if err != nil {
-		errString := err.Error()
-		return "ERROR: " + string(errString) + "\n"
-	}
-
-	return string(output)
 }
 
 func RunGitCommandParallel(args []string) {
@@ -87,7 +56,7 @@ func RunGitCommandParallel(args []string) {
 			name := repo.Name
 			command := "git " + strings.Join(args, " ")
 			repoDir := config.Root + "/" + path
-			fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+command) + "\n" + RunShellCommand(command, repoDir) + GritFooter())
+			fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+command) + "\n" + utilities.RunShellCommand(command, repoDir) + GritFooter())
 		}(repo)
 	}
 	wg.Wait()
@@ -103,7 +72,7 @@ func RunGitCommandSyncronous(args []string) {
 		name := repo.Name
 		command := "git " + strings.Join(args, " ")
 		repoDir := config.Root + "/" + path
-		fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+command) + "\n" + RunShellCommand(command, repoDir) + GritFooter())
+		fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+command) + "\n" + utilities.RunShellCommand(command, repoDir) + GritFooter())
 	}
 
 }
