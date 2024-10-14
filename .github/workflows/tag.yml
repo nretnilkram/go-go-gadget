@@ -1,0 +1,18 @@
+---
+# This workflow tags on pushes to main
+#
+# https://github.com/marketplace/actions/create-tags-from
+
+name: Tag Commit
+on:
+    push:
+        branches: ["main"]
+jobs:
+    tag:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Create Tag
+              id: create_tag
+              uses: ./.github/actions/tag
