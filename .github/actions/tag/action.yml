@@ -23,6 +23,8 @@ runs:
 
         echo -e "TAG: $TAG"
 
+        echo -e "${{ toJson(github) }}"
+
         # In case only a shallow clone was done
         git fetch --tags
 
