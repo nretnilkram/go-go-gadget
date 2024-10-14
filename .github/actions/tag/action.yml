@@ -22,6 +22,8 @@ runs:
         TAG="$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/')"
 
         echo -e "TAG: $TAG"
+        echo -e "GIT_USER_NAME: $GIT_USER_NAME"
+        echo -e "GIT_USER_EMAIL: $GIT_USER_EMAIL"
 
         echo -e "${{ toJson(github) }}"
 
@@ -38,5 +40,5 @@ runs:
           echo "'${TAG}' already exists. No action taken."
         fi
       env:
-        GIT_USER_NAME: ${{ github.pusher.name }}
-        GIT_USER_EMAIL: ${{ github.pusher.email }}
+        GIT_USER_NAME: ${{ github.head_commit.pusher.name }}
+        GIT_USER_EMAIL: ${{ github.head_commit.pusher.email }}
