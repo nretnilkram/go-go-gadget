@@ -4,13 +4,6 @@ branding:
   icon: package
   color: green
 description: Creates a new Git tag whenever the cli version has changed.
-inputs:
-  git-user-email:
-    description: Git user.email to use.
-    default: 41898282+github-actions[bot]@users.noreply.github.com
-  git-user-name:
-    description: Git user.name.
-    default: github-actions[bot]
 runs:
   using: composite
   steps:
@@ -24,8 +17,6 @@ runs:
         echo -e "TAG: $TAG"
         echo -e "GIT_USER_NAME: $GIT_USER_NAME"
         echo -e "GIT_USER_EMAIL: $GIT_USER_EMAIL"
-
-        echo -e "${{ toJson(github.event.head_commit) }}"
 
         # In case only a shallow clone was done
         git fetch --tags
