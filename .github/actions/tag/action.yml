@@ -1,0 +1,42 @@
+---
+name: Tag on CLI Version Change
+branding:
+  icon: package
+  color: green
+description: Creates a new Git tag whenever the cli version has changed.
+inputs:
+  git-user-email:
+    description: Git user.email to use.
+    default: 41898282+github-actions[bot]@users.noreply.github.com
+  git-user-name:
+    description: Git user.name.
+    default: github-actions[bot]
+  tag-prefix:
+    description: Prefix prepended to the version in cmd/go_go_gadget/root.go
+    default: v
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        #!/bin/bash
+        set -eux
+
+        TAG="${TAG_PREFIX}$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/"
+
+        # In case only a shallow clone was done
+        git fetch --tags
+
+        if ! git tag | grep "${TAG}"; then
+          git config user.name ${GIT_USER_NAME}
+          git config user.email ${GIT_USER_EMAIL}
+
+          git tag -a ${TAG} -m ${TAG}
+          git push --follow-tags
+        else
+          echo "'${TAG}' already exists. No action taken."
+        fi
+      env:
+        GIT_USER_NAME: ${{ inputs.git-user-name }}
+        GIT_USER_EMAIL: ${{ inputs.git-user-email }}
+        TAG_PREFIX: ${{ inputs.tag-prefix }}
