@@ -25,7 +25,7 @@ runs:
         echo -e "GIT_USER_NAME: $GIT_USER_NAME"
         echo -e "GIT_USER_EMAIL: $GIT_USER_EMAIL"
 
-        echo -e "${{ toJson(github) }}"
+        echo -e "${{ toJson(github.event) }}"
 
         # In case only a shallow clone was done
         git fetch --tags
