@@ -15,24 +15,24 @@ func Check(e error) {
 	}
 }
 
+var lastQuote = rune(0)
+var f = func(c rune) bool {
+	switch {
+	case c == lastQuote:
+		lastQuote = rune(0)
+		return false
+	case lastQuote != rune(0):
+		return false
+	case unicode.In(c, unicode.Quotation_Mark):
+		lastQuote = c
+		return false
+	default:
+		return unicode.IsSpace(c)
+	}
+}
+
 // Run Shell Command and return result as string
 func RunShellCommand(command string, path string) string {
-	lastQuote := rune(0)
-	f := func(c rune) bool {
-		switch {
-		case c == lastQuote:
-			lastQuote = rune(0)
-			return false
-		case lastQuote != rune(0):
-			return false
-		case unicode.In(c, unicode.Quotation_Mark):
-			lastQuote = c
-			return false
-		default:
-			return unicode.IsSpace(c)
-		}
-	}
-
 	commandArray := strings.FieldsFunc(command, f)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
