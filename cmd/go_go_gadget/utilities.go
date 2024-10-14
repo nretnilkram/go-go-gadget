@@ -58,6 +58,7 @@ var gitQuickCommitCmd = &cobra.Command{
 
 		if utilities.IsGitRepo(path) {
 			fmt.Print(utilities.RunShellCommand(command, path))
+			fmt.Print(utilities.RunShellCommand("git push", path))
 		} else {
 			fmt.Print("This is not a git repository.")
 		}
@@ -76,6 +77,7 @@ var gitEmptyCommitCmd = &cobra.Command{
 
 		if utilities.IsGitRepo(path) {
 			fmt.Print(utilities.RunShellCommand(command, path))
+			fmt.Print(utilities.RunShellCommand("git push", path))
 		} else {
 			fmt.Print("This is not a git repository.")
 		}
