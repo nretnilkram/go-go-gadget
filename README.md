@@ -30,6 +30,8 @@ go-go-gadget grit add-all
 go-go-gadget grit reset
 go-go-gadget grit config
 go-go-gadget grit pull
+
+go-go-gadget utilities quick-branch
 ```
 
 ## Run Locally

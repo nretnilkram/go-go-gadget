@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/nretnilkram/go-go-gadget/pkg/grit"
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
@@ -63,7 +64,7 @@ var gritConfigCmd = &cobra.Command{
 
 		// Marshal the data into YAML format with indentation
 		yamlData, err := yaml.Marshal(config)
-		grit.Check(err)
+		utilities.Check(err)
 
 		fmt.Println(string(yamlData))
 		grit.PrintTagLine(cmd.Root().Version)
@@ -74,7 +75,7 @@ var gritInitCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize new Grit directory",
 	Run: func(cmd *cobra.Command, args []string) {
-		configFileExists, _ := grit.FileDirExists(grit.GritDir)
+		configFileExists, _ := utilities.FileDirExists(grit.GritDir)
 		if configFileExists {
 			fmt.Println("Grit is already initialized.")
 			return
@@ -82,7 +83,7 @@ var gritInitCmd = &cobra.Command{
 
 		// Create .grit Dir
 		dirErr := os.Mkdir(grit.GritDir, 0755)
-		grit.Check(dirErr)
+		utilities.Check(dirErr)
 
 		// Create Default Config File
 		var config grit.Config = grit.DefaultConfig()
@@ -90,7 +91,7 @@ var gritInitCmd = &cobra.Command{
 
 		// Create Hisotry File
 		f, historyErr := os.Create(grit.HisotryFile)
-		grit.Check(historyErr)
+		utilities.Check(historyErr)
 		defer f.Close()
 		grit.PrintTagLine(cmd.Root().Version)
 	},
@@ -103,7 +104,7 @@ var gritHistoryCmd = &cobra.Command{
 		grit.TestGritDir()
 
 		history, err := os.ReadFile(grit.HisotryFile)
-		grit.Check(err)
+		utilities.Check(err)
 
 		fmt.Println(string(history))
 		grit.PrintTagLine(cmd.Root().Version)
@@ -143,7 +144,7 @@ var gritDestroyCmd = &cobra.Command{
 		grit.TestGritDir()
 
 		err := os.Remove(grit.GritDir)
-		grit.Check(err)
+		utilities.Check(err)
 
 		grit.PrintTagLine(cmd.Root().Version)
 	},
