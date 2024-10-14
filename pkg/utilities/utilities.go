@@ -34,6 +34,7 @@ var f = func(c rune) bool {
 // Run Shell Command and return result as string
 func RunShellCommand(command string, path string) string {
 	commandArray := strings.FieldsFunc(command, f)
+
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 
@@ -47,10 +48,10 @@ func RunShellCommand(command string, path string) string {
 
 	err := cmd.Run()
 	if err != nil {
-		return "ERROR: " + string(err.Error()) + "\n" + stderr.String()
+		return string(err.Error()) + "\n" + stderr.String() + "\n" + out.String()
 	}
 
-	return out.String()
+	return out.String() + stderr.String()
 }
 
 // FileDirExists returns whether the given file or directory exists

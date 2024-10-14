@@ -26,16 +26,21 @@ var gitQuickBranchCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
 		today := now.ShowDateTime("dash", false)
-		random := words.Words(2, weight)
-		branchName := "m8-" + today + "-" + strings.Replace(strings.TrimSpace(random), " ", "-", -1)
+		name := words.Words(2, weight)
+
+		if len(args) > 0 {
+			name = strings.Replace(strings.TrimSpace(strings.Join(args, " ")), " ", "-", -1)
+		}
+
+		branchName := "m8-" + today + "-" + strings.Replace(strings.TrimSpace(name), " ", "-", -1)
 
 		command := "git checkout -b " + branchName
 		path := utilities.GetWorkingDir()
 
 		if utilities.IsGitRepo(path) {
-			fmt.Println(utilities.RunShellCommand(command, path))
+			fmt.Print(utilities.RunShellCommand(command, path))
 		} else {
-			fmt.Println("This is not a git repository.")
+			fmt.Print("This is not a git repository.")
 		}
 	},
 }
@@ -52,9 +57,9 @@ var gitQuickCommitCmd = &cobra.Command{
 		path := utilities.GetWorkingDir()
 
 		if utilities.IsGitRepo(path) {
-			fmt.Println(utilities.RunShellCommand(command, path))
+			fmt.Print(utilities.RunShellCommand(command, path))
 		} else {
-			fmt.Println("This is not a git repository.")
+			fmt.Print("This is not a git repository.")
 		}
 	},
 }
