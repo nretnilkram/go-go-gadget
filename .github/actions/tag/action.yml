@@ -11,9 +11,6 @@ inputs:
   git-user-name:
     description: Git user.name.
     default: github-actions[bot]
-  tag-prefix:
-    description: Prefix prepended to the version in cmd/go_go_gadget/root.go
-    default: v
 runs:
   using: composite
   steps:
@@ -22,7 +19,7 @@ runs:
         #!/bin/bash
         set -eux
 
-        TAG="${TAG_PREFIX}$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/)"
+        TAG="$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/')"
 
         echo -e "TAG: $TAG"
 
@@ -41,4 +38,3 @@ runs:
       env:
         GIT_USER_NAME: ${{ inputs.git-user-name }}
         GIT_USER_EMAIL: ${{ inputs.git-user-email }}
-        TAG_PREFIX: ${{ inputs.tag-prefix }}
