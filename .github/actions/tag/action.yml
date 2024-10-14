@@ -22,7 +22,9 @@ runs:
         #!/bin/bash
         set -eux
 
-        TAG="${TAG_PREFIX}$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/"
+        TAG="${TAG_PREFIX}$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/)"
+
+        echo -e "TAG: $TAG"
 
         # In case only a shallow clone was done
         git fetch --tags
