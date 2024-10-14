@@ -64,10 +64,30 @@ var gitQuickCommitCmd = &cobra.Command{
 	},
 }
 
+var gitEmptyCommitCmd = &cobra.Command{
+	Use:     "empty-commit",
+	Aliases: []string{"ec"},
+	Short:   "Create an empty commit message",
+	Run: func(cmd *cobra.Command, args []string) {
+		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
+		message := strings.TrimSpace(words.Words(3, weight))
+		command := "git commit --allow-empty -m 'empty commit " + message + "'"
+		path := utilities.GetWorkingDir()
+
+		if utilities.IsGitRepo(path) {
+			fmt.Print(utilities.RunShellCommand(command, path))
+		} else {
+			fmt.Print("This is not a git repository.")
+		}
+	},
+}
+
 func init() {
 	utilCmd.AddCommand(gitQuickBranchCmd)
 
 	utilCmd.AddCommand(gitQuickCommitCmd)
+
+	utilCmd.AddCommand(gitEmptyCommitCmd)
 
 	rootCmd.AddCommand(utilCmd)
 }
