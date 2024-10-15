@@ -10,12 +10,11 @@ on:
 jobs:
     tag:
         runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.createtag.outputs.version }}
+            isnewtag: ${{ steps.createtag.outputs.isnewtag }}
         steps:
             - uses: actions/checkout@v4
-
-            # - name: Load Current Version
-            #   id: get_version
-            #   run: echo "::set-output name=version::$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/')"
 
             - name: Create Tag
               id: createtag
@@ -28,7 +27,7 @@ jobs:
                 OUTPUTS: ${{ toJSON(steps.createtag.outputs) }}
 
             - name: Create Release
-              if: steps.createtag.output.newtag == true
+              if: steps.createtag.output.isnewtag == true
               id: createrelease
               uses: actions/create-release@latest
               env:
