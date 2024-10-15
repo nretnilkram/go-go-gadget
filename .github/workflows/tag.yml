@@ -3,7 +3,7 @@
 #
 # https://github.com/marketplace/actions/create-tags-from
 
-name: Tag Commit
+name: Tag and Release
 on:
     push:
         branches: ["main"]
