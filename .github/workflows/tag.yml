@@ -10,9 +10,6 @@ on:
 jobs:
     tag:
         runs-on: ubuntu-latest
-        outputs:
-            version: ${{ steps.createtag.outputs.version }}
-            isnewtag: ${{ steps.createtag.outputs.isnewtag }}
         steps:
             - uses: actions/checkout@v4
 
