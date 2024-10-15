@@ -54,7 +54,7 @@ jobs:
                 OUTPUTS: ${{ toJSON(steps.createtag.outputs) }}
 
             - name: Create Release
-              if: steps.createtag.output.isnewtag == true
+              if: steps.createtag.outputs.isnewtag == "true"
               id: createrelease
               uses: actions/create-release@latest
               env:
