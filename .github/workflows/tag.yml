@@ -13,6 +13,21 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Load Current Version
+              id: get_version
+              run: echo "::set-output name=version::$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/')"
+
             - name: Create Tag
               id: create_tag
               uses: ./.github/actions/tag
+
+            # - name: Release snapshot
+            #   id: release-snapshot
+            #   uses: actions/create-release@latest
+            #   env:
+            #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            #   with:
+            #     tag_name: ${{ steps.get_vesion.outputs.version }}
+            #     release_name: Release v${{ steps.get_vesion.outputs.version }}
+            #     draft: false
+            #     prerelease: false
