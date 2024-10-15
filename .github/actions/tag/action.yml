@@ -27,6 +27,15 @@ runs:
 
           git tag -a ${TAG} -m ${TAG}
           git push --follow-tags
+
+          LATEST_VERSION=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" repos/stingerlabs/gg-tf-modules/releases/latest --jq '.["tag_name"]')
+          VERSION_FILE=$TAG
+
+          if [ ! "$LATEST_VERSION" = "$VERSION_FILE" ]; then
+            gh release create $VERSION_FILE --generate-notes
+          else
+            printf "Release tag already exist!\n"
+          fi
         else
           echo "'${TAG}' already exists. No action taken."
         fi
