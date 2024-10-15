@@ -1,9 +1,12 @@
 package utilities
 
 import (
+	"bufio"
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"unicode"
 )
@@ -54,6 +57,24 @@ func RunShellCommand(command string, path string) string {
 	return out.String() + stderr.String()
 }
 
+// Run Shell Command and return result as string
+func RunShellCommandv2(app string, args []string, path string) string {
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+
+	cmd := exec.Command(app, args...)
+	cmd.Dir = path
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	if err != nil {
+		return string(err.Error()) + "\n" + stderr.String() + "\n" + out.String()
+	}
+
+	return out.String() + stderr.String()
+}
+
 // FileDirExists returns whether the given file or directory exists
 func FileDirExists(path string) (bool, error) {
 	_, err := os.Stat(path)
@@ -78,4 +99,46 @@ func GetWorkingDir() string {
 	dir, err := os.Getwd()
 	Check(err)
 	return dir
+}
+
+func GrepFileForTFResources(filename string) []string {
+	pattern := "resource |module"
+
+	resources := []string{}
+
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		fmt.Println("Invalid regex pattern:", err)
+		os.Exit(1)
+	}
+
+	file, err := os.Open(filename)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if re.MatchString(line) {
+			resources = append(resources, line)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading file:", err)
+		os.Exit(1)
+	}
+
+	return (resources)
+}
+
+// | grep -E 'resource |module ' | sed 's/resource "/--target=/' | sed 's/module "/--target=module./' | sed 's/" "/./' | sed 's/" {/ \\/'
+
+func ListTFResources(files []string) {
+	for _, file := range files {
+		fmt.Println(strings.Join(GrepFileForTFResources(file), "\n"))
+	}
 }

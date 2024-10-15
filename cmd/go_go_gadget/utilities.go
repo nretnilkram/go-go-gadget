@@ -84,12 +84,23 @@ var gitEmptyCommitCmd = &cobra.Command{
 	},
 }
 
+var tfListResourcesCmd = &cobra.Command{
+	Use:     "tf-list-resources",
+	Aliases: []string{"tflr"},
+	Short:   "List Terraform resources from files",
+	Run: func(cmd *cobra.Command, args []string) {
+		utilities.ListTFResources(args)
+	},
+}
+
 func init() {
 	utilCmd.AddCommand(gitQuickBranchCmd)
 
 	utilCmd.AddCommand(gitQuickCommitCmd)
 
 	utilCmd.AddCommand(gitEmptyCommitCmd)
+
+	utilCmd.AddCommand(tfListResourcesCmd)
 
 	rootCmd.AddCommand(utilCmd)
 }
