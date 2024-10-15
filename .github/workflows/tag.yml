@@ -18,16 +18,23 @@ jobs:
             #   run: echo "::set-output name=version::$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/')"
 
             - name: Create Tag
-              id: create_tag
+              id: createtag
               uses: ./.github/actions/tag
 
-            - name: Create Tag and Release
-              id: create-tag-and-release
+            - name: Show createtag Outputs
+              run:   echo "$OUTPUTS"
+              shell: bash
+              env:
+                OUTPUTS: ${{ toJSON(steps.createtag.outputs) }}
+
+            - name: Create Release
+              if: steps.createtag.output.newtag == true
+              id: createrelease
               uses: actions/create-release@latest
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
-                tag_name: ${{ steps.get_vesion.outputs.version }}
-                release_name: Release v${{ steps.get_vesion.outputs.version }}
+                tag_name: ${{ steps.createtag.outputs.version }}
+                release_name: Release v${{ steps.createtag.outputs.version }}
                 draft: false
                 prerelease: false

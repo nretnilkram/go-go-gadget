@@ -28,9 +28,11 @@ runs:
           git tag -a ${TAG} -m ${TAG}
           git push --follow-tags
 
-          echo "::set-output name=version::$TAG"
+          echo "version=${TAG}" >> $GITHUB_OUTPUT
+          echo "newtag=true" >> $GITHUB_OUTPUT
         else
           echo "'${TAG}' already exists. No action taken."
+          echo "newtag=false" >> $GITHUB_OUTPUT
         fi
       env:
         GIT_USER_NAME: ${{ github.event.head_commit.author.username }}
