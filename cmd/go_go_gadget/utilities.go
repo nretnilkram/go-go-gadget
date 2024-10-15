@@ -72,7 +72,7 @@ var gitEmptyCommitCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
 		message := strings.TrimSpace(words.Words(3, weight))
-		command := "git commit --allow-empty -m \"empty commit " + message + "\""
+		command := fmt.Sprintf(`git commit --allow-empty -m "empty commit %s"`, message)
 		path := utilities.GetWorkingDir()
 
 		if utilities.IsGitRepo(path) {
