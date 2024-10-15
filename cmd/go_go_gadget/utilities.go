@@ -53,7 +53,7 @@ var gitQuickCommitCmd = &cobra.Command{
 		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
 		message := strings.TrimSpace(words.Words(5, weight))
 
-		command := "git commit -am '" + message + "'"
+		command := "git commit -am \"" + message + "\""
 		path := utilities.GetWorkingDir()
 
 		if utilities.IsGitRepo(path) {
@@ -72,7 +72,7 @@ var gitEmptyCommitCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
 		message := strings.TrimSpace(words.Words(3, weight))
-		command := "git commit --allow-empty -m 'empty commit " + message + "'"
+		command := "git commit --allow-empty -m \"empty commit " + message + "\""
 		path := utilities.GetWorkingDir()
 
 		if utilities.IsGitRepo(path) {

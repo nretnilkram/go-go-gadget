@@ -32,6 +32,7 @@ go-go-gadget grit config
 go-go-gadget grit pull
 
 go-go-gadget utilities quick-branch
+go-go-gadget utilities quick-commit
 ```
 
 ## Run Locally
