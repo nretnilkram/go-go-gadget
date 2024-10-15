@@ -13,13 +13,13 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Load Current Version
-              id: get_version
-              run: echo "::set-output name=version::$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/')"
+            # - name: Load Current Version
+            #   id: get_version
+            #   run: echo "::set-output name=version::$(cat cmd/go_go_gadget/root.go | grep "var version = " | perl -pe '($_)=/([0-9]+([.][0-9]+)+)/')"
 
-            # - name: Create Tag
-            #   id: create_tag
-            #   uses: ./.github/actions/tag
+            - name: Create Tag
+              id: create_tag
+              uses: ./.github/actions/tag
 
             - name: Create Tag and Release
               id: create-tag-and-release

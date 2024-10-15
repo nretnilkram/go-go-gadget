@@ -27,6 +27,8 @@ runs:
 
           git tag -a ${TAG} -m ${TAG}
           git push --follow-tags
+
+          echo "::set-output name=version::$TAG"
         else
           echo "'${TAG}' already exists. No action taken."
         fi
