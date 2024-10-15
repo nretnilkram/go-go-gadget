@@ -56,7 +56,7 @@ jobs:
             - name: Create Release
               if: steps.createtag.outputs.isnewtag == 'true'
               id: createrelease
-              uses: actions/create-release@latest
+              uses: nretnilkram/create-release@v0
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
