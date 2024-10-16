@@ -10,8 +10,9 @@ import (
 var wordCount int
 
 var wordsCmd = &cobra.Command{
-	Use:   "words",
-	Short: "create list of words",
+	Use:     "words",
+	Aliases: []string{"w"},
+	Short:   "Create list of words",
 	Run: func(cmd *cobra.Command, args []string) {
 		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
 

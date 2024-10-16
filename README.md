@@ -15,6 +15,12 @@ alias go-go-gadget="~/go/bin/go-go-gadget"
 alias ggg="go-go-gadget"
 ```
 
+### Setup Autocomplete
+
+```sh
+go-go-gadget completion zsh > (/path/to/completion/dir)/go_go_gadget_auto_complete
+```
+
 ### Execution
 
 You can run the app by simply typing `go-go-gadget` and following the prompts.  Or you can pass all the parameters at once.
@@ -22,6 +28,7 @@ You can run the app by simply typing `go-go-gadget` and following the prompts.  
 ```sh
 go-go-gadget
 go-go-gadget password --length 25
+go-go-gadget pw -l 64
 go-go-gadget words --count 1000
 go-go-gadget k8s "Nretnil Kram"
 
@@ -33,6 +40,8 @@ go-go-gadget grit pull
 
 go-go-gadget utilities quick-branch
 go-go-gadget utilities quick-commit
+
+go-go-gadget utilities tf-list-resources
 ```
 
 ## Run Locally
@@ -63,10 +72,12 @@ Available Commands:
   help        Help about any command
   inspect     Inspects a string
   k8s         Kubernetesify a string
+  now         Show todays date
   password    Generate a password
   reverse     Reverses a string
   symsub      Substitute symbols into a string
-  words       create list of words
+  utilities   Useful utility commands
+  words       Create list of words
 
 Flags:
   -h, --help      help for go_go_gadget

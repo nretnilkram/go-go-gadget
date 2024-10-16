@@ -62,7 +62,7 @@ func RunGitCommandParallel(args []string) {
 	wg.Wait()
 }
 
-func RunGitCommandSyncronous(args []string) {
+func RunGitCommandSynchronous(args []string) {
 
 	// Create a map to store the parsed YAML data
 	var config Config = LoadConfig()

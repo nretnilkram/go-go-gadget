@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var gritSyncronous bool
+var gritSynchronous bool
 
 var gritCmd = &cobra.Command{
 	Use:   "grit",
@@ -20,8 +20,8 @@ var gritCmd = &cobra.Command{
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 
-		if gritSyncronous {
-			grit.RunGitCommandSyncronous(args)
+		if gritSynchronous {
+			grit.RunGitCommandSynchronous(args)
 		} else {
 			grit.RunGitCommandParallel(args)
 		}
@@ -30,9 +30,10 @@ var gritCmd = &cobra.Command{
 }
 
 var gritAddRepoCmd = &cobra.Command{
-	Use:     "add-repo",
-	Aliases: []string{"add"},
-	Short:   "Add repository to grit config",
+	Use:                   "add-repo",
+	Aliases:               []string{"add"},
+	Short:                 "Add repository to grit config",
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
@@ -42,9 +43,10 @@ var gritAddRepoCmd = &cobra.Command{
 }
 
 var gritAddAllReposCmd = &cobra.Command{
-	Use:     "add-all-repos",
-	Aliases: []string{"add-all"},
-	Short:   "Add all git repositories in directory to grit config",
+	Use:                   "add-all-repos",
+	Aliases:               []string{"add-all"},
+	Short:                 "Add all git repositories in directory to grit config",
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
@@ -54,8 +56,9 @@ var gritAddAllReposCmd = &cobra.Command{
 }
 
 var gritConfigCmd = &cobra.Command{
-	Use:   "config",
-	Short: "Show the grit conifig for the current directory",
+	Use:                   "config",
+	Short:                 "Show the grit conifig for the current directory",
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
@@ -72,8 +75,9 @@ var gritConfigCmd = &cobra.Command{
 }
 
 var gritInitCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Initialize new Grit directory",
+	Use:                   "init",
+	Short:                 "Initialize new Grit directory",
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		configFileExists, _ := utilities.FileDirExists(grit.GritDir)
 		if configFileExists {
@@ -98,8 +102,9 @@ var gritInitCmd = &cobra.Command{
 }
 
 var gritHistoryCmd = &cobra.Command{
-	Use:   "history",
-	Short: "Show grit history",
+	Use:                   "history",
+	Short:                 "Show grit history",
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 
@@ -112,9 +117,10 @@ var gritHistoryCmd = &cobra.Command{
 }
 
 var gritRemoveRepoCmd = &cobra.Command{
-	Use:     "remove-repo",
-	Aliases: []string{"remove"},
-	Short:   "Remove repository from config",
+	Use:                   "remove-repo",
+	Aliases:               []string{"remove"},
+	Short:                 "Remove repository from config",
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
@@ -124,8 +130,9 @@ var gritRemoveRepoCmd = &cobra.Command{
 }
 
 var gritResetCmd = &cobra.Command{
-	Use:   "reset",
-	Short: "Reset grit to default config",
+	Use:                   "reset",
+	Short:                 "Reset grit to default config",
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
@@ -138,8 +145,9 @@ var gritResetCmd = &cobra.Command{
 }
 
 var gritDestroyCmd = &cobra.Command{
-	Use:   "destroy",
-	Short: "Remove grit from directory",
+	Use:                   "destroy",
+	Short:                 "Remove grit from directory",
+	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 
@@ -167,6 +175,6 @@ func init() {
 
 	gritCmd.AddCommand(gritResetCmd)
 
-	gritCmd.Flags().BoolVarP(&gritSyncronous, "syncronous", "s", false, "Run Grit Command Syncronously")
+	gritCmd.Flags().BoolVarP(&gritSynchronous, "synchronous", "s", false, "Run Grit Command Synchronously")
 	rootCmd.AddCommand(gritCmd)
 }

@@ -12,8 +12,8 @@ import (
 
 var utilCmd = &cobra.Command{
 	Use:     "utilities",
-	Aliases: []string{"util", "utils"},
-	Short:   "Useful Utility Commands",
+	Aliases: []string{"u", "util", "utils"},
+	Short:   "Useful utility commands",
 	Run: func(cmd *cobra.Command, args []string) {
 
 	},
