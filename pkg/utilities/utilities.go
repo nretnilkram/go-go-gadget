@@ -139,10 +139,18 @@ func GrepFileForTFResources(filename string) []string {
 	return (resources)
 }
 
-// | grep -E 'resource |module ' | sed 's/resource "/--target=/' | sed 's/module "/--target=module./' | sed 's/" "/./' | sed 's/" {/ \\/'
-
 func ListTFResources(files []string) {
 	for _, file := range files {
 		fmt.Println(strings.Join(GrepFileForTFResources(file), "\n"))
 	}
+}
+
+func RegexTest(input string, pattern string) bool {
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		fmt.Println("Invalid regex pattern:", err)
+		os.Exit(1)
+	}
+
+	return re.MatchString(input)
 }

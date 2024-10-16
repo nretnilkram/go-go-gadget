@@ -93,6 +93,18 @@ var tfListResourcesCmd = &cobra.Command{
 	},
 }
 
+var isSemverCmd = &cobra.Command{
+	Use:                   "semver",
+	Short:                 "List Terraform resources from files",
+	Args:                  cobra.ExactArgs(1),
+	DisableFlagsInUseLine: true,
+	Run: func(cmd *cobra.Command, args []string) {
+		pattern := "^(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>0|[1-9]\\d*)(?:-(?P<prerelease>(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+
+		fmt.Println(utilities.RegexTest(args[0], pattern))
+	},
+}
+
 func init() {
 	utilCmd.AddCommand(gitQuickBranchCmd)
 
@@ -101,6 +113,8 @@ func init() {
 	utilCmd.AddCommand(gitEmptyCommitCmd)
 
 	utilCmd.AddCommand(tfListResourcesCmd)
+
+	utilCmd.AddCommand(isSemverCmd)
 
 	rootCmd.AddCommand(utilCmd)
 }

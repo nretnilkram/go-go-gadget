@@ -26,10 +26,10 @@ go-go-gadget completion zsh > (/path/to/completion/dir)/go_go_gadget_auto_comple
 You can run the app by simply typing `go-go-gadget` and following the prompts.  Or you can pass all the parameters at once.
 
 ```sh
-go-go-gadget
-go-go-gadget password --length 25
-go-go-gadget pw -l 64
-go-go-gadget words --count 1000
+go-go-gadget [help|--help|-h]
+
+go-go-gadget [password|pw] [--length|-l] 25
+go-go-gadget words [--count|-c] 1000
 go-go-gadget k8s "Nretnil Kram"
 
 go-go-gadget grit init
@@ -37,11 +37,12 @@ go-go-gadget grit add-all
 go-go-gadget grit reset
 go-go-gadget grit config
 go-go-gadget grit pull
+go-go-gadget grit [--help|-h]
 
-go-go-gadget utilities quick-branch
-go-go-gadget utilities quick-commit
-
-go-go-gadget utilities tf-list-resources
+go-go-gadget [utilities|u] quick-branch
+go-go-gadget [utilities|u] quick-commit
+go-go-gadget [utilities|u] tf-list-resources
+go-go-gadget [utilities|u] semver
 ```
 
 ## Run Locally
