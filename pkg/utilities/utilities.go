@@ -154,3 +154,16 @@ func RegexTest(input string, pattern string) bool {
 
 	return re.MatchString(input)
 }
+
+func WaitForConfirmationPrompt(s string) bool {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("%s [y/n]: ", s)
+	response, _ := reader.ReadString('\n')
+	response = strings.TrimSpace(response)
+
+	if response == "y" || response == "Y" {
+		return true
+	}
+	return false
+}

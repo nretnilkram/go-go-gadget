@@ -137,8 +137,10 @@ var gritResetCmd = &cobra.Command{
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 
-		var config grit.Config = grit.DefaultConfig()
-		grit.WriteConfig(config)
+		if utilities.WaitForConfirmationPrompt("Do you want to continue?") {
+			var config grit.Config = grit.DefaultConfig()
+			grit.WriteConfig(config)
+		}
 
 		grit.PrintTagLine(cmd.Root().Version)
 	},
