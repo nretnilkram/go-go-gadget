@@ -14,11 +14,11 @@ import (
 
 var GritDir = ".grit"
 var ConfigFile = GritDir + "/config.yml"
-var HisotryFile = GritDir + "/history.log"
+var HistoryFile = GritDir + "/history.log"
 
 func AppendHistory(command string) {
 	// Open the file in append mode
-	file, err := os.OpenFile(HisotryFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(HistoryFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	utilities.Check(err)
 	defer file.Close()
 

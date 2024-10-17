@@ -40,7 +40,10 @@ var reverseCmd = &cobra.Command{
 	Use:     "reverse",
 	Aliases: []string{"rev"},
 	Short:   "Reverses a string",
-	Args:    cobra.ExactArgs(1),
+	Long: `Takes a string a returns the characters in reverse.
+
+Aliases: reverse, rev`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		res := strtwist.Reverse(args[0])
 		fmt.Println(res)
@@ -50,8 +53,17 @@ var reverseCmd = &cobra.Command{
 var symSubCmd = &cobra.Command{
 	Use:     "symsub",
 	Aliases: []string{"sym", "sub"},
-	Short:   "Substitute symbols into a string",
-	Args:    cobra.ExactArgs(1),
+	Short:   "Substitute symbols",
+	Long: `Takes a string and returns the same string with a subset of characters substituted symbols.
+
+'a', 'A' -> '@'
+'e', 'E' -> '3'
+'i', 'I' -> '!'
+'o', 'O' -> '0'
+'s', 'S' -> '$'
+
+Aliases: symsub, sym, sub`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		res := strtwist.SymbolSubstitution(args[0])
 		fmt.Println(res)

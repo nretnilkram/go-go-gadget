@@ -14,6 +14,9 @@ var passwordCmd = &cobra.Command{
 	Use:     "password",
 	Aliases: []string{"p", "pw"},
 	Short:   "Generate a password",
+	Long: `Generate a password with customizable length and complexity.
+
+Aliases: password, p, pw`,
 	Run: func(cmd *cobra.Command, args []string) {
 		weight := pswd.PasswordWeight{Lower: 4, Upper: 3, Digit: 3, Symbol: 0}
 

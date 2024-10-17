@@ -18,7 +18,10 @@ var includeTime bool
 var nowCmd = &cobra.Command{
 	Use:     "now",
 	Aliases: []string{"today"},
-	Short:   "Show todays date",
+	Short:   "Print todays date",
+	Long: `Print out todays date with a number of formatting options including separators and time.
+
+Aliases: now, today`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if useUnix {
 			fmt.Println(time.Now().Unix())

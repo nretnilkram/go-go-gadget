@@ -13,6 +13,9 @@ var wordsCmd = &cobra.Command{
 	Use:     "words",
 	Aliases: []string{"w"},
 	Short:   "Create list of words",
+	Long: `Generate a list of random words including Adjectives, Animals, Colors, Nouns and Verbs.
+
+Aliases: words, w`,
 	Run: func(cmd *cobra.Command, args []string) {
 		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
 
