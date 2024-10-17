@@ -87,12 +87,18 @@ Flags:
 Use "go_go_gadget [command] --help" for more information about a command.
 ```
 
+### Generate Documentation
+
+```sh
+go-go-gadget docs [md|rest|yaml]
+```
+
 ## Testing
 
 ```sh
-PATH="$PATH:$HOME/go/bin" go test -v ./...
+go test -v ./...
 
-PATH="$PATH:$HOME/go/bin" go test -v ./pkg/...
+go test -v ./pkg/...
 
-PATH="$PATH:$HOME/go/bin" go test -v main_test.go
+go test -v main_test.go
 ```

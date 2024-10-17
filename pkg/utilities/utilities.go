@@ -11,6 +11,8 @@ import (
 	"unicode"
 )
 
+var SemverRegex = "^(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>0|[1-9]\\d*)(?:-(?P<prerelease>(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+
 // Check the error status
 func Check(e error) {
 	if e != nil {
@@ -57,24 +59,6 @@ func RunShellCommand(command string, path string) string {
 	return out.String() + stderr.String()
 }
 
-// Run Shell Command and return result as string
-func RunShellCommandv2(app string, args []string, path string) string {
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-
-	cmd := exec.Command(app, args...)
-	cmd.Dir = path
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
-	if err != nil {
-		return string(err.Error()) + "\n" + stderr.String() + "\n" + out.String()
-	}
-
-	return out.String() + stderr.String()
-}
-
 // FileDirExists returns whether the given file or directory exists
 func FileDirExists(path string) (bool, error) {
 	_, err := os.Stat(path)
@@ -89,9 +73,8 @@ func FileDirExists(path string) (bool, error) {
 
 // Test if current directory is a git repository
 func IsGitRepo(path string) bool {
-	doesGitDirExist, err := FileDirExists(path + "/.git")
-	Check(err)
-	return doesGitDirExist
+	gitCheck := RunShellCommand("git rev-parse", path)
+	return gitCheck == ""
 }
 
 // Get the Current Working Directory
