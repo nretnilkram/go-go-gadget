@@ -30,9 +30,10 @@ var gitQuickBranchCmd = &cobra.Command{
 
 Aliases: quick-branch, qb`,
 	Run: func(cmd *cobra.Command, args []string) {
-		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
 		today := now.ShowDateTime("dash", false)
-		name := words.Words(2, weight)
+		name := fmt.Sprintf("%s%s",
+			words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 1, Nouns: 0, Verbs: 0}),
+			words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 1, Colors: 0, Nouns: 0, Verbs: 0}))
 
 		if len(args) > 0 {
 			name = strings.Replace(strings.TrimSpace(strings.Join(args, " ")), " ", "-", -1)
