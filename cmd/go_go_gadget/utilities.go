@@ -31,6 +31,8 @@ var gitQuickBranchCmd = &cobra.Command{
 Aliases: quick-branch, qb`,
 	Run: func(cmd *cobra.Command, args []string) {
 		today := now.ShowDateTime("dash", false)
+
+		// Create a name with a color followed by an animal
 		name := fmt.Sprintf("%s%s",
 			words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 1, Nouns: 0, Verbs: 0}),
 			words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 1, Colors: 0, Nouns: 0, Verbs: 0}))

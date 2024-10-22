@@ -28,6 +28,7 @@ example:
 
 Aliases: words, w`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// If no types are passed in then use an equal weight across all types
 		if adjectiveWeight == 0 && animalWeight == 0 && colorWeight == 0 && nounWeight == 0 && verbWeight == 0 {
 			weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
 			fmt.Println(words.Words(wordCount, weight))
