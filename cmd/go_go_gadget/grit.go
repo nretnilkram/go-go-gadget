@@ -138,11 +138,11 @@ var gritHistoryCmd = &cobra.Command{
 
 var gritRemoveRepoCmd = &cobra.Command{
 	Use:     "remove-repo",
-	Aliases: []string{"remove"},
+	Aliases: []string{"remove", "rm"},
 	Short:   "Remove repository",
 	Long: `Remove a new repository to your grit configuration.
 
-Aliases: remove-repo, remove`,
+Aliases: remove-repo, remove, rm`,
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
