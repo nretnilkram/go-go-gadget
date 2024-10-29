@@ -19,6 +19,7 @@ type Config struct {
 	Ignore_Root  bool
 }
 
+// Generate and return Default Config
 func DefaultConfig() Config {
 	config := Config{
 		Root:        utilities.GetWorkingDir(),
@@ -28,6 +29,7 @@ func DefaultConfig() Config {
 	return config
 }
 
+// Load and return config from filesystem
 func LoadConfig() Config {
 	// Read the file content
 	data, err := os.ReadFile(ConfigFile)
@@ -43,6 +45,7 @@ func LoadConfig() Config {
 	return config
 }
 
+// Save passed config to filesystem
 func WriteConfig(config Config) {
 	// Marshal the data into YAML format with indentation
 	yamlData, err := yaml.Marshal(config)
@@ -54,6 +57,7 @@ func WriteConfig(config Config) {
 	utilities.Check(writeErr)
 }
 
+// Add passed repository to configuration
 func AddRepoToConfig(name string, path string) {
 	config := LoadConfig()
 	repo := Repository{
@@ -65,6 +69,7 @@ func AddRepoToConfig(name string, path string) {
 	WriteConfig(config)
 }
 
+// Remove passed repository from configuration
 func RemoveRepoFromConfig(name string) {
 	config := LoadConfig()
 

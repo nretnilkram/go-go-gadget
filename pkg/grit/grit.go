@@ -35,6 +35,7 @@ func AddAllRepos() {
 	entries, err := os.ReadDir(".")
 	utilities.Check(err)
 
+	// Loop over all directories and add to config
 	for _, entry := range entries {
 		if entry.IsDir() && utilities.IsGitRepo(filepath.Join(entry.Name())) {
 			gitDir := entry.Name()
@@ -46,7 +47,8 @@ func AddAllRepos() {
 func RunGitCommandParallel(args []string) {
 	// Create a map to store the parsed YAML data
 	var config Config = LoadConfig()
-	// Create WaitGroup for parallel runs
+
+	// Create WaitGroup for parallel runs in all repositories
 	var wg sync.WaitGroup
 	for _, repo := range config.Repositories {
 		wg.Add(1)
@@ -63,10 +65,10 @@ func RunGitCommandParallel(args []string) {
 }
 
 func RunGitCommandSynchronous(args []string) {
-
 	// Create a map to store the parsed YAML data
 	var config Config = LoadConfig()
 
+	// Run command in all repositories
 	for _, repo := range config.Repositories {
 		path := repo.Path
 		name := repo.Name
