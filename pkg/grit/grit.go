@@ -35,9 +35,10 @@ func AddAllRepos() {
 	entries, err := os.ReadDir(".")
 	utilities.Check(err)
 
-	// Loop over all directories and add to config
+	// Loop over all directories and add to config if Git repository
 	for _, entry := range entries {
-		if entry.IsDir() && utilities.IsGitRepo(filepath.Join(entry.Name())) {
+		dotGitExists, _ := utilities.FileDirExists(filepath.Join(entry.Name() + "/.git"))
+		if entry.IsDir() && dotGitExists {
 			gitDir := entry.Name()
 			AddRepoToConfig(gitDir, gitDir)
 		}
