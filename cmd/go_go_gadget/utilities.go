@@ -18,7 +18,7 @@ var utilCmd = &cobra.Command{
 
 Aliases: utilities, u, util, utils`,
 	Run: func(cmd *cobra.Command, args []string) {
-
+		cmd.Help()
 	},
 }
 
