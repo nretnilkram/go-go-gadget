@@ -2,6 +2,7 @@ package utilities
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -55,6 +56,30 @@ func TestRegexTest(t *testing.T) {
 		got := RegexTest(c.in, SemverRegex)
 		if got != c.want {
 			t.Errorf("K8s(%q) == %t, want %t", c.in, got, c.want)
+		}
+	}
+}
+
+func TestShowDateTime(t *testing.T) {
+	cases := []struct {
+		in          string
+		includeTime bool
+		want        string
+		minLength   int
+		maxLength   int
+	}{
+		{"colon", false, ":", 8, 10},
+		{"dash", false, "-", 8, 10},
+		{"dash", true, "-", 14, 19},
+		{"dot", false, ".", 8, 10},
+		{"dot", true, ".", 14, 19},
+		{"slash", false, "/", 8, 10},
+		{"slash", true, "/", 14, 19},
+	}
+	for _, c := range cases {
+		got := ShowDateTime(c.in, c.includeTime)
+		if !strings.Contains(got, c.want) || !(len(got) >= c.minLength && len(got) <= c.maxLength) {
+			t.Errorf("ShowDateTime(%q, %t) == %q, want %q", c.in, c.includeTime, got, c.want)
 		}
 	}
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nretnilkram/go-go-gadget/pkg/now"
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"github.com/nretnilkram/go-go-gadget/pkg/words"
 	"github.com/spf13/cobra"
@@ -30,7 +29,7 @@ var gitQuickBranchCmd = &cobra.Command{
 
 Aliases: quick-branch, qb`,
 	Run: func(cmd *cobra.Command, args []string) {
-		today := now.ShowDateTime("dash", false)
+		today := utilities.ShowDateTime("dash", false)
 
 		// Create a name with a color followed by an animal
 		color := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 1, Nouns: 0, Verbs: 0})

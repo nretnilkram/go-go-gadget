@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/nretnilkram/go-go-gadget/pkg/now"
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"github.com/spf13/cobra"
 )
 
@@ -26,15 +26,15 @@ Aliases: now, today`,
 		if useUnix {
 			fmt.Println(time.Now().Unix())
 		} else if useGoRawTime {
-			fmt.Println(now.ShowDateTime("raw", includeTime))
+			fmt.Println(utilities.ShowDateTime("raw", includeTime))
 		} else if useColons {
-			fmt.Println(now.ShowDateTime("colon", includeTime))
+			fmt.Println(utilities.ShowDateTime("colon", includeTime))
 		} else if useDots {
-			fmt.Println(now.ShowDateTime("dot", includeTime))
+			fmt.Println(utilities.ShowDateTime("dot", includeTime))
 		} else if useSlashes {
-			fmt.Println(now.ShowDateTime("slash", includeTime))
+			fmt.Println(utilities.ShowDateTime("slash", includeTime))
 		} else {
-			fmt.Println(now.ShowDateTime("dash", includeTime))
+			fmt.Println(utilities.ShowDateTime("dash", includeTime))
 		}
 	},
 }

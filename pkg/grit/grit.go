@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
@@ -22,11 +21,8 @@ func AppendHistory(command string) {
 	utilities.Check(err)
 	defer file.Close()
 
-	// Create timestamp
-	now := time.Now().Format("[2006-01-02 15:04:05]")
-
 	// Write the data to the file
-	if _, err := file.WriteString(now + " " + command + "\n"); err != nil {
+	if _, err := file.WriteString("[" + utilities.ShowDateTime("dash", true) + "] " + command + "\n"); err != nil {
 		log.Fatal(err)
 	}
 }

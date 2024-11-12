@@ -30,6 +30,7 @@ Will update all the of the repositories in the configuration.  Useful for updati
 		} else {
 			grit.RunGitCommandParallel(args)
 		}
+		fmt.Println("Finished Run @ " + utilities.ShowDateTime("dash", true))
 		grit.PrintTagLine(cmd.Root().Version)
 	},
 }
