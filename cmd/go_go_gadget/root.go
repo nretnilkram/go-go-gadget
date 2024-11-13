@@ -12,10 +12,10 @@ var version = "2024.11.12"
 var rootCmd = &cobra.Command{
 	Use:     "go_go_gadget",
 	Version: version,
-	Short:   "go_go_gadget - a simple CLI with useful tools",
+	Short:   "go_go_gadget - CLI with useful tools",
 	Long: `Go Go Gadget is a set of helpful CLI tools
 
-One can use go_go_gadget to run useful tools from the terminal`,
+You can use go_go_gadget to run useful tools from the terminal.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("\nGo Go Gadget...Help!\n\n* * * * * * * * * * * * *\n ")
 		cmd.Help()

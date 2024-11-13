@@ -115,11 +115,14 @@ Aliases: tf-list-resources, tflr`,
 }
 
 var isSemverCmd = &cobra.Command{
-	Use:   "semver",
-	Short: "Valid Semvar String",
+	Use:     "semver",
+	Aliases: []string{"sem"},
+	Short:   "Valid Semvar String",
 	Long: `Takes a string and returns true or false on whether the string is valid semver.
 
-e.g. 1.2.0`,
+e.g. 1.2.0
+
+Aliases: semver, sem`,
 	Args:                  cobra.ExactArgs(1),
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
