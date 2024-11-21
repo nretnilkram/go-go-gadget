@@ -21,6 +21,11 @@ func BreakOnSection(target string, separator string) string {
 		}
 		final = part + separator + final
 	}
+
+	if final == "" {
+		final = "long-image-name"
+	}
+
 	return strings.TrimRight(final, separator)
 }
 

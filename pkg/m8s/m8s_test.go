@@ -39,6 +39,7 @@ func TestM8sBreakOnSection(t *testing.T) {
 		{"555752902066xdkrxecrxusxeastx2xamazonawsxcomxdockerxhubxcurlimagesxcurlxlatest", "comxdockerxhubxcurlimagesxcurlxlatest", "x"},
 		{"curlimages-curl-latest", "curlimages-curl-latest", "-"},
 		{"curlimagesxcurlxlatest", "curlimagesxcurlxlatest", "x"},
+		{"curlimages-curl-verylongsupercalifragilisticexpialidocious", "long-image-name", "-"},
 	}
 	for _, c := range cases {
 		got := BreakOnSection(c.in, c.separator)
