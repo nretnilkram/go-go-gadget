@@ -37,7 +37,7 @@ Aliases: deployment, d`,
 		} else if useUbuntu {
 			image = "ubuntu"
 		}
-		fmt.Println(utilities.RunShellCommand(fmt.Sprintf("kubectl create deployment m8-%s --namespace %s --image %s -- tail -f /dev/null", image, namespace, image), "."))
+		fmt.Print(utilities.RunShellCommand(fmt.Sprintf("kubectl create deployment m8-%s --namespace %s --image %s -- tail -f /dev/null", image, namespace, image), "."))
 	},
 }
 
@@ -57,7 +57,7 @@ Aliases: pod, p`,
 		} else if useUbuntu {
 			image = "ubuntu"
 		}
-		fmt.Println(utilities.RunShellCommand(fmt.Sprintf("kubectl run m8-utility-%s --namespace %s --image %s -- tail -f /dev/null", image, namespace, image), "."))
+		fmt.Print(utilities.RunShellCommand(fmt.Sprintf("kubectl run m8-utility-%s --namespace %s --image %s -- tail -f /dev/null", image, namespace, image), "."))
 	},
 }
 
