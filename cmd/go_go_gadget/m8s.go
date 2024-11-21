@@ -10,6 +10,7 @@ import (
 var useAlpine bool
 var useBusyBox bool
 var useUbuntu bool
+var namespace string
 
 var m8sCmd = &cobra.Command{
 	Use:   "m8s",
@@ -36,7 +37,7 @@ Aliases: deployment, d`,
 		} else if useUbuntu {
 			image = "ubuntu"
 		}
-		fmt.Println(utilities.RunShellCommand(fmt.Sprintf("kubectl create deployment m8-%s --image %s -- tail -f /dev/null", image, image), "."))
+		fmt.Println(utilities.RunShellCommand(fmt.Sprintf("kubectl create deployment m8-%s --namespace %s --image %s -- tail -f /dev/null", image, namespace, image), "."))
 	},
 }
 
@@ -56,7 +57,7 @@ Aliases: pod, p`,
 		} else if useUbuntu {
 			image = "ubuntu"
 		}
-		fmt.Println(utilities.RunShellCommand(fmt.Sprintf("kubectl run m8-utility-%s --image %s -- tail -f /dev/null", image, image), "."))
+		fmt.Println(utilities.RunShellCommand(fmt.Sprintf("kubectl run m8-utility-%s --namespace %s --image %s -- tail -f /dev/null", image, namespace, image), "."))
 	},
 }
 
@@ -76,7 +77,7 @@ Aliases: connection, c, terminal, t`,
 		} else if useUbuntu {
 			image = "ubuntu"
 		}
-		utilities.RunShellCommandInteract("kubectl run -it --rm m8-utility --image="+image, ".")
+		utilities.RunShellCommandInteract(fmt.Sprintf("kubectl run -it --rm m8-tmp-utility-%s --namespace %s --image %s", image, namespace, image), ".")
 	},
 }
 
@@ -84,16 +85,19 @@ func init() {
 	m8sDeploymentCmd.Flags().BoolVarP(&useAlpine, "alpine", "a", false, "Use Alpine")
 	m8sDeploymentCmd.Flags().BoolVarP(&useBusyBox, "busybox", "b", false, "Use BusyBox")
 	m8sDeploymentCmd.Flags().BoolVarP(&useUbuntu, "ubuntu", "u", false, "Use Ubuntu")
+	m8sDeploymentCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Use Ubuntu")
 	m8sCmd.AddCommand(m8sDeploymentCmd)
 
 	m8sPodCmd.Flags().BoolVarP(&useAlpine, "alpine", "a", false, "Use Alpine")
 	m8sPodCmd.Flags().BoolVarP(&useBusyBox, "busybox", "b", false, "Use BusyBox")
 	m8sPodCmd.Flags().BoolVarP(&useUbuntu, "ubuntu", "u", false, "Use Ubuntu")
+	m8sPodCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Use Ubuntu")
 	m8sCmd.AddCommand(m8sPodCmd)
 
 	m8sConnectionCmd.Flags().BoolVarP(&useAlpine, "alpine", "a", false, "Use Alpine")
 	m8sConnectionCmd.Flags().BoolVarP(&useBusyBox, "busybox", "b", false, "Use BusyBox")
 	m8sConnectionCmd.Flags().BoolVarP(&useUbuntu, "ubuntu", "u", false, "Use Ubuntu")
+	m8sConnectionCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Use Ubuntu")
 	m8sCmd.AddCommand(m8sConnectionCmd)
 
 	rootCmd.AddCommand(m8sCmd)
