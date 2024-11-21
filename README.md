@@ -65,24 +65,26 @@ go-go-gadget --help
 ```sh
 Go Go Gadget is a set of helpful CLI tools
 
-One can use go_go_gadget to run useful tools from the terminal
+You can use go_go_gadget to run useful tools from the terminal.
 
 Usage:
   go_go_gadget [flags]
   go_go_gadget [command]
 
 Available Commands:
-  completion  Generate the autocompletion script for the specified shell
-  grit        Run git commands on multiple repositories at once
-  help        Help about any command
-  inspect     Inspects a string
-  k8s         Kubernetesify a string
-  now         Show todays date
-  password    Generate a password
-  reverse     Reverses a string
-  symsub      Substitute symbols into a string
-  utilities   Useful utility commands
-  words       Create list of words
+  completion             Generate the autocompletion script for the specified shell
+  generate-documentation Generate Documentation
+  grit                   Run git commands on multiple repositories
+  help                   Help about any command
+  inspect                Inspects a string
+  k8s                    Kubernetesify a string
+  m8s                    Useful k8s commands
+  now                    Print todays date
+  password               Generate a password
+  reverse                Reverses a string
+  symsub                 Substitute symbols
+  utilities              Useful utility commands
+  words                  Create list of words
 
 Flags:
   -h, --help      help for go_go_gadget
