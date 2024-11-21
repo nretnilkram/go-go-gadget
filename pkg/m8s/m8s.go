@@ -4,11 +4,11 @@ import (
 	"strings"
 )
 
-func ReverseStrArray(arr []string) []string {
-	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
-		arr[i], arr[j] = arr[j], arr[i]
+func ReverseStrArray(target []string) []string {
+	for front, back := 0, len(target)-1; front < back; front, back = front+1, back-1 {
+		target[front], target[back] = target[back], target[front]
 	}
-	return arr
+	return target
 }
 
 func BreakOnSection(target string, separator string) string {
@@ -25,15 +25,16 @@ func BreakOnSection(target string, separator string) string {
 }
 
 // Replace punctuation and truncate image to be used in the pod name
-func Image2Name(imageName string) string {
+func Image2Name(imageName string, separator string) string {
 	finalName := imageName
 
-	finalName = strings.Replace(finalName, ".", "-", -1)
-	finalName = strings.Replace(finalName, "/", "-", -1)
-	finalName = strings.Replace(finalName, ":", "-", -1)
+	finalName = strings.Replace(finalName, ".", separator, -1)
+	finalName = strings.Replace(finalName, "/", separator, -1)
+	finalName = strings.Replace(finalName, ":", separator, -1)
+	finalName = strings.Replace(finalName, "-", separator, -1)
 
 	if len(finalName) > 40 {
-		finalName = BreakOnSection(finalName, "-")
+		finalName = BreakOnSection(finalName, separator)
 	}
 
 	return finalName
