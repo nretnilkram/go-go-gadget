@@ -60,6 +60,24 @@ func RunShellCommand(command string, path string) string {
 	return out.String() + stderr.String()
 }
 
+func RunShellCommandInteract(command string, path string) {
+	commandArray := strings.FieldsFunc(command, f)
+
+	app := commandArray[0]
+	args := commandArray[1:]
+
+	cmd := exec.Command(app, args...)
+	cmd.Dir = path
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+}
+
 // FileDirExists returns whether the given file or directory exists
 func FileDirExists(path string) (bool, error) {
 	_, err := os.Stat(path)
