@@ -43,6 +43,10 @@ go-go-gadget [utilities|u] quick-branch
 go-go-gadget [utilities|u] quick-commit
 go-go-gadget [utilities|u] tf-list-resources
 go-go-gadget [utilities|u] semver
+
+go-go-gadget m8s deployment
+go-go-gadget m8s pod -u -n shared
+go-go-gadget m8s connection -i debian
 ```
 
 ## Run Locally
