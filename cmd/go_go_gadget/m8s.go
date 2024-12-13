@@ -38,16 +38,23 @@ Some Image Options:
 Aliases: deployment, d`,
 	Run: func(cmd *cobra.Command, args []string) {
 		image := "alpine"
+		pkgManager := "apk"
 		if containerImage != "" {
 			image = containerImage
+			pkgManager = "unknown"
 		} else if useAlpine {
 			image = "alpine"
+			pkgManager = "apk"
 		} else if useBusyBox {
 			image = "busybox"
+			pkgManager = "none"
 		} else if useUbuntu {
 			image = "ubuntu"
+			pkgManager = "apt"
 		}
-		fmt.Print(utilities.RunShellCommand(fmt.Sprintf("kubectl create deployment m8-%s --namespace %s --image %s -- tail -f /dev/null", m8s.Image2Name(image, "-"), namespace, image), "."))
+		resourceName := "m8-" + m8s.Image2Name(image, "-")
+		m8s.PrintInfo("deployment", image, pkgManager, resourceName)
+		fmt.Print(utilities.RunShellCommand(fmt.Sprintf("kubectl create deployment %s --namespace %s --image %s -- tail -f /dev/null", resourceName, namespace, image), "."))
 	},
 }
 
@@ -66,16 +73,23 @@ Some Image Options:
 Aliases: pod, p`,
 	Run: func(cmd *cobra.Command, args []string) {
 		image := "alpine"
+		pkgManager := "apk"
 		if containerImage != "" {
 			image = containerImage
+			pkgManager = "unknown"
 		} else if useAlpine {
 			image = "alpine"
+			pkgManager = "apk"
 		} else if useBusyBox {
 			image = "busybox"
+			pkgManager = "none"
 		} else if useUbuntu {
 			image = "ubuntu"
+			pkgManager = "apt"
 		}
-		fmt.Print(utilities.RunShellCommand(fmt.Sprintf("kubectl run m8-utility-%s --namespace %s --image %s -- tail -f /dev/null", m8s.Image2Name(image, "-"), namespace, image), "."))
+		resourceName := "m8-utility-" + m8s.Image2Name(image, "-")
+		m8s.PrintInfo("pod", image, pkgManager, resourceName)
+		fmt.Print(utilities.RunShellCommand(fmt.Sprintf("kubectl run %s --namespace %s --image %s -- tail -f /dev/null", resourceName, namespace, image), "."))
 	},
 }
 
@@ -94,16 +108,23 @@ Some Image Options:
 Aliases: connection, c, terminal, t`,
 	Run: func(cmd *cobra.Command, args []string) {
 		image := "alpine"
+		pkgManager := "apk"
 		if containerImage != "" {
 			image = containerImage
+			pkgManager = "unknown"
 		} else if useAlpine {
 			image = "alpine"
+			pkgManager = "apk"
 		} else if useBusyBox {
 			image = "busybox"
+			pkgManager = "none"
 		} else if useUbuntu {
 			image = "ubuntu"
+			pkgManager = "apt"
 		}
-		utilities.RunShellCommandInteract(fmt.Sprintf("kubectl run -it --rm m8-tmp-utility-%s --namespace %s --image %s", m8s.Image2Name(image, "-"), namespace, image), ".")
+		resourceName := "m8-tmp-utility-" + m8s.Image2Name(image, "-")
+		m8s.PrintInfo("connection", image, pkgManager, resourceName)
+		utilities.RunShellCommandInteract(fmt.Sprintf("kubectl run -it --rm %s --namespace %s --image %s", resourceName, namespace, image), ".")
 	},
 }
 

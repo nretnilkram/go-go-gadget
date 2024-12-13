@@ -1,6 +1,7 @@
 package m8s
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -9,6 +10,15 @@ func ReverseStrArray(target []string) []string {
 		target[front], target[back] = target[back], target[front]
 	}
 	return target
+}
+
+func PrintInfo(k8sType string, imageName string, pkgManager string, resourceName string) {
+	fmt.Println("\n##############")
+	fmt.Printf("# Type: %s\n", k8sType)
+	fmt.Printf("# Image: %s\n", imageName)
+	fmt.Printf("# Pkg Manager: %s\n", pkgManager)
+	fmt.Printf("# Name: %s\n", resourceName)
+	fmt.Printf("##############\n\n")
 }
 
 func BreakOnSection(target string, separator string) string {
