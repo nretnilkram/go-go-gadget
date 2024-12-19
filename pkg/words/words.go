@@ -1,6 +1,7 @@
 package words
 
 import (
+	_ "embed"
 	"encoding/json"
 	"math/rand"
 )
@@ -21,9 +22,12 @@ type WordSetWeight struct {
 	Verbs      int
 }
 
+//go:embed english_words.json
+var englishWords []byte
+
 func LoadJsonWords() WordSet {
 	var wordSet WordSet
-	err := json.Unmarshal([]byte(words), &wordSet)
+	err := json.Unmarshal([]byte(englishWords), &wordSet)
 	if err != nil {
 		panic(err)
 	}
