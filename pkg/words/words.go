@@ -1,9 +1,9 @@
 package words
 
 import (
+	_ "embed"
 	"encoding/json"
 	"math/rand"
-	"os"
 )
 
 type WordSet struct {
@@ -22,9 +22,12 @@ type WordSetWeight struct {
 	Verbs      int
 }
 
-func LoadJsonWords(filename string) WordSet {
+//go:embed english_words.json
+var englishWords []byte
+
+func LoadJsonWords() WordSet {
 	var wordSet WordSet
-	err := json.Unmarshal([]byte(words), &wordSet)
+	err := json.Unmarshal([]byte(englishWords), &wordSet)
 	if err != nil {
 		panic(err)
 	}
@@ -35,21 +38,12 @@ func randomItem(list []string) string {
 	return list[rand.Intn(len(list))]
 }
 
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
-
 func Words(length int, weight WordSetWeight) string {
 	if length == 0 {
 		return ""
 	}
 
-	words_file := getEnv("GO_GO_GADGET_WORDS_FILE", "NOT DEFINED")
-
-	englishWords := LoadJsonWords(words_file)
+	englishWords := LoadJsonWords()
 
 	var weighted []int
 	for i := 0; i < weight.Adjectives; i++ {
