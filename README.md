@@ -55,6 +55,12 @@ go-go-gadget m8s connection -i debian
 go run main.go
 ```
 
+## Update Dependencies
+
+```sh
+go get -u ./...
+```
+
 ## Help
 
 ```sh
