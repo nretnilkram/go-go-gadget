@@ -18,3 +18,5 @@ test.tf
 # Grit
 .grit
 docs
+
+.DS_Store
