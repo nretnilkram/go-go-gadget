@@ -61,8 +61,13 @@ var gitQuickCommitCmd = &cobra.Command{
 
 Aliases: quick-commit, qc`,
 	Run: func(cmd *cobra.Command, args []string) {
-		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
-		message := strings.TrimSpace(words.Words(5, weight))
+		adjective := words.Words(1, words.WordSetWeight{Adjectives: 1, Animals: 0, Colors: 0, Nouns: 0, Verbs: 0})
+		animal := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 1, Colors: 0, Nouns: 0, Verbs: 0})
+		color := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 1, Nouns: 0, Verbs: 0})
+		noun := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 0, Nouns: 1, Verbs: 0})
+		verb := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 0, Nouns: 0, Verbs: 1})
+
+		message := strings.TrimSpace(fmt.Sprintf(`%s%s%s%s%s`, adjective, color, animal, verb, noun))
 
 		command := fmt.Sprintf(`git commit -am "%s"`, message)
 		path := utilities.GetWorkingDir()
@@ -84,8 +89,11 @@ var gitEmptyCommitCmd = &cobra.Command{
 
 Aliases: empty-commit, ec`,
 	Run: func(cmd *cobra.Command, args []string) {
-		weight := words.WordSetWeight{Adjectives: 1, Animals: 1, Colors: 1, Nouns: 1, Verbs: 1}
-		message := strings.TrimSpace(words.Words(3, weight))
+		adjective := words.Words(1, words.WordSetWeight{Adjectives: 1, Animals: 0, Colors: 0, Nouns: 0, Verbs: 0})
+		animal := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 1, Colors: 0, Nouns: 0, Verbs: 0})
+		color := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 1, Nouns: 0, Verbs: 0})
+
+		message := strings.TrimSpace(fmt.Sprintf(`%s%s%s`, adjective, color, animal))
 		command := fmt.Sprintf(`git commit --allow-empty -m "empty commit %s"`, message)
 		path := utilities.GetWorkingDir()
 
