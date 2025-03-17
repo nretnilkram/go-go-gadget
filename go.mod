@@ -1,6 +1,6 @@
 module github.com/nretnilkram/go-go-gadget
 
-go 1.22
+go 1.24
 
 require (
 	github.com/nretnilkram/pswd v1.0.1
