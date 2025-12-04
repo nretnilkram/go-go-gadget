@@ -28,23 +28,40 @@ You can run the app by simply typing `go-go-gadget` and following the prompts.  
 ```sh
 go-go-gadget [help|--help|-h]
 
-go-go-gadget [password|pw] [--length|-l] 25
-go-go-gadget words [--count|-c] 1000
+# Password generation
+go-go-gadget [password|pw|p] [--length|-l] 25 [--symbols|-s]
+
+# String manipulation
 go-go-gadget k8s "Nretnil Kram"
+go-go-gadget reverse "hello world"
+go-go-gadget symsub "password"
+go-go-gadget inspect "test123" [--digits|-d]
 
+# Words and dates
+go-go-gadget words [--count|-c] 1000
+go-go-gadget now [--time|-t] [--colon|-c|--dots|-d|--slashes|-s|--unix|-u|--raw|-r]
+
+# Grit - Git repository management
 go-go-gadget grit init
-go-go-gadget grit add-all
-go-go-gadget grit reset
+go-go-gadget grit add-repo <path>
+go-go-gadget grit add-all-repos
+go-go-gadget grit remove-repo <name>
 go-go-gadget grit config
+go-go-gadget grit history
+go-go-gadget grit reset
+go-go-gadget grit destroy
 go-go-gadget grit pull
-go-go-gadget grit [--help|-h]
+go-go-gadget grit [--help|-h] [--synchronous|-s]
 
-go-go-gadget [utilities|u] quick-branch
-go-go-gadget [utilities|u] quick-commit
-go-go-gadget [utilities|u] tf-list-resources
-go-go-gadget [utilities|u] semver
+# Utilities
+go-go-gadget [utilities|u|util|utils] quick-branch [name]
+go-go-gadget [utilities|u|util|utils] quick-commit
+go-go-gadget [utilities|u|util|utils] empty-commit
+go-go-gadget [utilities|u|util|utils] tf-list-resources <file1> [file2...]
+go-go-gadget [utilities|u|util|utils] semver "1.2.0"
 
-go-go-gadget m8s deployment
+# Kubernetes (m8s)
+go-go-gadget m8s deployment [--alpine|-a|--busybox|-b|--ubuntu|-u] [--namespace|-n default] [--image|-i <image>]
 go-go-gadget m8s pod -u -n shared
 go-go-gadget m8s connection -i debian
 ```
@@ -102,7 +119,7 @@ Use "go_go_gadget [command] --help" for more information about a command.
 ### Generate Documentation
 
 ```sh
-go-go-gadget docs [md|rest|yaml]
+go-go-gadget [generate-documentation|docs|documentation] [md|rest|yaml]
 ```
 
 ## Testing
