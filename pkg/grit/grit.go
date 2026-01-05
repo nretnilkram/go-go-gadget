@@ -55,7 +55,7 @@ func RunGitCommandParallel(args []string) {
 			name := repo.Name
 			command := "git " + strings.Join(args, " ")
 			repoDir := config.Root + "/" + path
-			fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+command) + "\n" + utilities.RunShellCommand(command, repoDir) + GritFooter())
+			fmt.Println(GritHeader(strings.ToUpper(name)+" -- ["+command+"]") + "\n\n" + utilities.RunShellCommand(command, repoDir) + "\n" + GritFooter(strings.ToUpper(name)))
 		}(repo)
 	}
 	wg.Wait()
