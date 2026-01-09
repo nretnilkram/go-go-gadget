@@ -56,7 +56,6 @@ go-go-gadget grit [--help|-h] [--synchronous|-s]
 # Limit concurrent async grit actions (default: unlimited)
 export GRIT_MAX_CONCURRENT=10
 
-
 # Utilities
 go-go-gadget [utilities|u|util|utils] quick-branch [name]
 go-go-gadget [utilities|u|util|utils] quick-commit
