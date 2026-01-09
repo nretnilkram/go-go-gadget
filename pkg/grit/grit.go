@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -45,12 +46,34 @@ func RunGitCommandParallel(args []string) {
 	// Create a map to store the parsed YAML data
 	var config Config = LoadConfig()
 
+	// Check for max concurrent limit from environment variable
+	maxConcurrent := 0
+	if maxConcurrentStr := os.Getenv("GRIT_MAX_CONCURRENT"); maxConcurrentStr != "" {
+		if parsed, err := strconv.Atoi(maxConcurrentStr); err == nil && parsed > 0 {
+			maxConcurrent = parsed
+		}
+	}
+
 	// Create WaitGroup for parallel runs in all repositories
 	var wg sync.WaitGroup
+
+	// Create semaphore channel if maxConcurrent is set
+	var semaphore chan struct{}
+	if maxConcurrent > 0 {
+		semaphore = make(chan struct{}, maxConcurrent)
+	}
+
 	for _, repo := range config.Repositories {
 		wg.Add(1)
 		go func(repo Repository) {
 			defer wg.Done()
+
+			// Acquire semaphore if concurrency limit is set
+			if semaphore != nil {
+				semaphore <- struct{}{}
+				defer func() { <-semaphore }()
+			}
+
 			path := repo.Path
 			name := repo.Name
 			command := "git " + strings.Join(args, " ")
