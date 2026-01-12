@@ -76,9 +76,11 @@ func RunGitCommandParallel(args []string) {
 
 			path := repo.Path
 			name := repo.Name
-			command := "git " + strings.Join(args, " ")
+			// Use RunCommand to safely pass args without shell interpretation, preventing command injection
+			commandDisplay := "git " + strings.Join(args, " ")
 			repoDir := config.Root + "/" + path
-			fmt.Println(GritHeader(strings.ToUpper(name)+" -- ["+command+"]") + "\n\n" + utilities.RunShellCommand(command, repoDir) + "\n" + GritFooter(strings.ToUpper(name)))
+			output := utilities.RunCommand("git", args, repoDir)
+			fmt.Println(GritHeader(strings.ToUpper(name)+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + GritFooter(strings.ToUpper(name)))
 		}(repo)
 	}
 	wg.Wait()
@@ -92,9 +94,11 @@ func RunGitCommandSynchronous(args []string) {
 	for _, repo := range config.Repositories {
 		path := repo.Path
 		name := repo.Name
-		command := "git " + strings.Join(args, " ")
+		// Use RunCommand to safely pass args without shell interpretation, preventing command injection
+		commandDisplay := "git " + strings.Join(args, " ")
 		repoDir := config.Root + "/" + path
-		fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+command) + "\n" + utilities.RunShellCommand(command, repoDir) + GritFooter())
+		output := utilities.RunCommand("git", args, repoDir)
+		fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+commandDisplay) + "\n" + output + GritFooter())
 	}
 
 }

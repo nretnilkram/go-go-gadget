@@ -37,6 +37,26 @@ var f = func(c rune) bool {
 	}
 }
 
+// RunCommand runs a command with the given name and arguments safely, without shell interpretation.
+// This prevents command injection by passing arguments directly to exec.Command.
+// Returns the combined stdout and stderr output as a string.
+func RunCommand(commandName string, args []string, path string) string {
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+
+	cmd := exec.Command(commandName, args...)
+	cmd.Dir = path
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	if err != nil {
+		return string(err.Error()) + "\n" + stderr.String() + "\n" + out.String()
+	}
+
+	return out.String() + stderr.String()
+}
+
 // Run Shell Command and return result as string
 func RunShellCommand(command string, path string) string {
 	commandArray := strings.FieldsFunc(command, f)
