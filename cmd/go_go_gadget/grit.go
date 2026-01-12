@@ -3,6 +3,7 @@ package go_go_gadget
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/nretnilkram/go-go-gadget/pkg/grit"
@@ -85,7 +86,16 @@ Aliases: config, conf`,
 		yamlData, err := yaml.Marshal(config)
 		utilities.Check(err)
 
+		fmt.Println("--------")
 		fmt.Println(string(yamlData))
+		fmt.Println("--------")
+		fmt.Println("")
+		fmt.Println("Repositories Count: " + strconv.Itoa(len(config.Repositories)))
+		fmt.Println("Grit Directory: " + utilities.GetWorkingDir() + "/" + grit.GritDir)
+		fmt.Println("Config File: " + utilities.GetWorkingDir() + "/" + grit.GritDir + "/" + grit.ConfigFile)
+		fmt.Println("History File: " + utilities.GetWorkingDir() + "/" + grit.GritDir + "/" + grit.HistoryFile)
+		fmt.Println("Working Directory: " + utilities.GetWorkingDir())
+
 		grit.PrintTagLine(cmd.Root().Version)
 	},
 }
