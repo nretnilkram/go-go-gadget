@@ -20,9 +20,9 @@ func TestUtilities(t *testing.T) {
 		t.Errorf("FileDirExists not true.")
 	}
 
-	cmdTest := RunShellCommand("ls -lah", ".")
+	cmdTest := RunCommand("ls", []string{"-lah"}, ".")
 	if reflect.TypeOf(cmdTest).Kind() != reflect.String {
-		t.Errorf("RunShellCommand is not a string.")
+		t.Errorf("RunCommand is not a string.")
 	}
 
 	igr := IsGitRepo(".")

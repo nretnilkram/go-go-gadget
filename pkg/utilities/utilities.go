@@ -57,47 +57,6 @@ func RunCommand(commandName string, args []string, path string) string {
 	return out.String() + stderr.String()
 }
 
-// Run Shell Command and return result as string
-func RunShellCommand(command string, path string) string {
-	commandArray := strings.FieldsFunc(command, f)
-
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-
-	app := commandArray[0]
-	args := commandArray[1:]
-
-	cmd := exec.Command(app, args...)
-	cmd.Dir = path
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
-	if err != nil {
-		return string(err.Error()) + "\n" + stderr.String() + "\n" + out.String()
-	}
-
-	return out.String() + stderr.String()
-}
-
-func RunShellCommandInteract(command string, path string) {
-	commandArray := strings.FieldsFunc(command, f)
-
-	app := commandArray[0]
-	args := commandArray[1:]
-
-	cmd := exec.Command(app, args...)
-	cmd.Dir = path
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-}
-
 // FileDirExists returns whether the given file or directory exists
 func FileDirExists(path string) (bool, error) {
 	_, err := os.Stat(path)
@@ -112,7 +71,7 @@ func FileDirExists(path string) (bool, error) {
 
 // Test if current directory is a git repository
 func IsGitRepo(path string) bool {
-	gitCheck := RunShellCommand("git rev-parse", path)
+	gitCheck := RunCommand("git", []string{"rev-parse"}, path)
 	return gitCheck == ""
 }
 

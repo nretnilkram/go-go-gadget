@@ -42,11 +42,10 @@ Aliases: quick-branch, qb`,
 
 		branchName := "m8-" + today + "-" + strings.Replace(strings.TrimSpace(name), " ", "-", -1)
 
-		command := "git checkout -b " + branchName
 		path := utilities.GetWorkingDir()
 
 		if utilities.IsGitRepo(path) {
-			fmt.Print(utilities.RunShellCommand(command, path))
+			fmt.Print(utilities.RunCommand("git", []string{"checkout", "-b", branchName}, path))
 		} else {
 			fmt.Print("This is not a git repository.")
 		}
@@ -69,12 +68,11 @@ Aliases: quick-commit, qc`,
 
 		message := strings.TrimSpace(fmt.Sprintf(`%s%s%s%s%s`, adjective, color, animal, verb, noun))
 
-		command := fmt.Sprintf(`git commit -am "%s"`, message)
 		path := utilities.GetWorkingDir()
 
 		if utilities.IsGitRepo(path) {
-			fmt.Print(utilities.RunShellCommand(command, path))
-			fmt.Print(utilities.RunShellCommand("git push", path))
+			fmt.Print(utilities.RunCommand("git", []string{"commit", "-am", message}, path))
+			fmt.Print(utilities.RunCommand("git", []string{"push"}, path))
 		} else {
 			fmt.Print("This is not a git repository.")
 		}
@@ -94,12 +92,11 @@ Aliases: empty-commit, ec`,
 		color := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 1, Nouns: 0, Verbs: 0})
 
 		message := strings.TrimSpace(fmt.Sprintf(`%s%s%s`, adjective, color, animal))
-		command := fmt.Sprintf(`git commit --allow-empty -m "empty commit %s"`, message)
 		path := utilities.GetWorkingDir()
 
 		if utilities.IsGitRepo(path) {
-			fmt.Print(utilities.RunShellCommand(command, path))
-			fmt.Print(utilities.RunShellCommand("git push", path))
+			fmt.Print(utilities.RunCommand("git", []string{"commit", "--allow-empty", "-m", message}, path))
+			fmt.Print(utilities.RunCommand("git", []string{"push"}, path))
 		} else {
 			fmt.Print("This is not a git repository.")
 		}
