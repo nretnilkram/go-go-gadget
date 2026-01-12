@@ -54,7 +54,7 @@ Aliases: deployment, d`,
 		}
 		resourceName := "m8-" + m8s.Image2Name(image, "-")
 		m8s.PrintInfo("deployment", image, pkgManager, resourceName)
-		fmt.Print(utilities.RunShellCommand(fmt.Sprintf("kubectl create deployment %s --namespace %s --image %s -- tail -f /dev/null", resourceName, namespace, image), "."))
+		fmt.Print(utilities.RunCommand("kubectl", []string{"create", "deployment", resourceName, "--namespace", namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, "."))
 	},
 }
 
@@ -89,7 +89,7 @@ Aliases: pod, p`,
 		}
 		resourceName := "m8-utility-" + m8s.Image2Name(image, "-")
 		m8s.PrintInfo("pod", image, pkgManager, resourceName)
-		fmt.Print(utilities.RunShellCommand(fmt.Sprintf("kubectl run %s --namespace %s --image %s -- tail -f /dev/null", resourceName, namespace, image), "."))
+		fmt.Print(utilities.RunCommand("kubectl", []string{"run", resourceName, "--namespace", namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, "."))
 	},
 }
 
@@ -124,7 +124,7 @@ Aliases: connection, c, terminal, t`,
 		}
 		resourceName := "m8-tmp-utility-" + m8s.Image2Name(image, "-")
 		m8s.PrintInfo("connection", image, pkgManager, resourceName)
-		utilities.RunShellCommandInteract(fmt.Sprintf("kubectl run -it --rm %s --namespace %s --image %s", resourceName, namespace, image), ".")
+		utilities.RunCommand("kubectl", []string{"run", "-it", "--rm", resourceName, "--namespace", namespace, "--image", image}, ".")
 	},
 }
 
