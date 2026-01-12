@@ -41,7 +41,7 @@ var gritAddRepoCmd = &cobra.Command{
 	Short:   "Add repository",
 	Long: `Add a new repository to your grit configuration.
 
-Aliases: app-repo, add`,
+Aliases: add-repo, add`,
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
@@ -71,7 +71,7 @@ var gritConfigCmd = &cobra.Command{
 	Use:     "config",
 	Aliases: []string{"conf"},
 	Short:   "Show config",
-	Long: `Print the current grig configuration.
+	Long: `Print the current grit configuration.
 
 Aliases: config, conf`,
 	DisableFlagsInUseLine: true,
@@ -113,7 +113,7 @@ Aliases: initialize, init`,
 		var config grit.Config = grit.DefaultConfig()
 		grit.WriteConfig(config)
 
-		// Create Hisotry File
+		// Create History File
 		f, historyErr := os.Create(grit.HistoryFile)
 		utilities.Check(historyErr)
 		defer f.Close()
@@ -179,7 +179,7 @@ var gritDestroyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 
-		err := os.Remove(grit.GritDir)
+		err := os.RemoveAll(grit.GritDir)
 		utilities.Check(err)
 
 		grit.PrintTagLine(cmd.Root().Version)
