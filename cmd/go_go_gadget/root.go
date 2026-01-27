@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version = "2026.1.12"
+var version = "2026.1.27"
 
 var rootCmd = &cobra.Command{
 	Use:     "go_go_gadget",

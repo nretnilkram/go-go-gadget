@@ -60,7 +60,7 @@ func WriteConfig(config Config) {
 // Add passed repository to configuration
 func AddRepoToConfig(name string, path string) {
 	config := LoadConfig()
-	
+
 	// Check if repository already exists
 	for _, repo := range config.Repositories {
 		if name == repo.Name || path == repo.Path {
@@ -68,7 +68,7 @@ func AddRepoToConfig(name string, path string) {
 			return
 		}
 	}
-	
+
 	repo := Repository{
 		Name: name,
 		Path: path,
@@ -90,12 +90,12 @@ func RemoveRepoFromConfig(name string) {
 			break
 		}
 	}
-	
+
 	if !found {
 		fmt.Println("Repository " + name + " not found in configuration.")
 		return
 	}
-	
+
 	fmt.Println("Removing " + name)
 	WriteConfig(config)
 }
