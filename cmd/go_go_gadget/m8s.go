@@ -124,7 +124,7 @@ Aliases: connection, c, terminal, t`,
 		}
 		resourceName := "m8-tmp-utility-" + m8s.Image2Name(image, "-")
 		m8s.PrintInfo("connection", image, pkgManager, resourceName)
-		utilities.RunCommand("kubectl", []string{"run", "-it", "--rm", resourceName, "--namespace", namespace, "--image", image}, ".")
+		utilities.RunCommandInteractive("kubectl", []string{"run", "-it", "--rm", resourceName, "--namespace", namespace, "--image", image}, ".")
 	},
 }
 

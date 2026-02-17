@@ -57,6 +57,21 @@ func RunCommand(commandName string, args []string, path string) string {
 	return out.String() + stderr.String()
 }
 
+// RunCommandInteractive runs a command with the given name and arguments safely, with shell interpretation and interactive input.
+func RunCommandInteractive(commandName string, args []string, path string) {
+
+	cmd := exec.Command(commandName, args...)
+	cmd.Dir = path
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println(string(err.Error()))
+	}
+}
+
 // FileDirExists returns whether the given file or directory exists
 func FileDirExists(path string) (bool, error) {
 	_, err := os.Stat(path)
