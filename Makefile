@@ -1,4 +1,4 @@
-.PHONY: help fmt init upgrade install test run clean gambit
+.PHONY: help fmt init upgrade install test run clean gamut
 
 # Default target
 .DEFAULT_GOAL := help
@@ -32,7 +32,7 @@ run: ## Run Go Go Gadget
 clean: ## Clean Go Go Gadget
 	rm -f go-go-gadget
 
-gambit: ## Run the Gambit
+gumut: ## Run the Gumut
 	$(MAKE) fmt
 	$(MAKE) init
 	$(MAKE) upgrade
