@@ -32,7 +32,7 @@ run: ## Run Go Go Gadget
 clean: ## Clean Go Go Gadget
 	rm -f go-go-gadget
 
-gumut: ## Run the Gumut
+gamut: ## Run the Gamut
 	$(MAKE) fmt
 	$(MAKE) init
 	$(MAKE) upgrade
