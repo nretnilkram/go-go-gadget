@@ -128,7 +128,7 @@ func TestGoGoGadgetPassword(t *testing.T) {
 		got := len(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
 			fmt.Println(got, out, err)
-			t.Errorf("go-go-gadget password %q == %q, want %q", c.in, got, c.want)
+			t.Errorf("go-go-gadget password %d == %d, want %d", c.in, got, c.want)
 		}
 	}
 }
@@ -156,7 +156,7 @@ func TestGoGoGadgetWords(t *testing.T) {
 		got := WordCount(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
 			fmt.Println(got, out, err)
-			t.Errorf("go-go-gadget symsub %q == %q, want %q", c.in, got, c.want)
+			t.Errorf("go-go-gadget words %d == %d, want %d", c.in, got, c.want)
 		}
 	}
 }

@@ -22,7 +22,7 @@ func TestStringInspect(t *testing.T) {
 	for _, c := range cases {
 		gotCount, gotString := Inspect(c.inStr, c.inDigitBool)
 		if gotCount != c.wantCount || gotString != c.wantString {
-			t.Errorf("Inspect(%q, %t) == (%q, %q), want (%q, %q)", c.inStr, c.inDigitBool, c.wantString, c.wantCount, gotCount, gotString)
+			t.Errorf("Inspect(%q, %t) = (%d, %q), want (%d, %q)", c.inStr, c.inDigitBool, gotCount, gotString, c.wantCount, c.wantString)
 		}
 	}
 }

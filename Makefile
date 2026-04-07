@@ -14,7 +14,7 @@ fmt: ## Format Go code
 	gofmt -w -l $(GOFMT_FILES)
 
 init: ## Install Go
-	brew install go@1.25
+	brew install go@1.26
 
 upgrade: ## Upgrade Go dependencies
 	go get -u ./...
