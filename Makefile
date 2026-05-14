@@ -1,4 +1,4 @@
-.PHONY: help fmt init upgrade install test run clean gamut lint
+.PHONY: help fmt lint lint-fix init upgrade install test test-coverage run clean gamut
 
 # Default target
 .DEFAULT_GOAL := help
@@ -33,6 +33,9 @@ install: ## Install Go Go Gadget
 test: ## Run tests
 	go test -v ./...
 
+test-coverage: ## Run tests with coverage
+	go test -coverprofile=coverage.out ./...
+
 run: ## Run Go Go Gadget
 	go run main.go
 
@@ -46,4 +49,5 @@ gamut: ## Run the Gamut
 	$(MAKE) lint
 	$(MAKE) run
 	$(MAKE) test
+	$(MAKE) test-coverage
 	$(MAKE) install
