@@ -6,10 +6,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nretnilkram/go-go-gadget/pkg/grit"
-	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
+
+	"github.com/nretnilkram/go-go-gadget/pkg/grit"
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
 var gritSynchronous bool
@@ -80,7 +81,7 @@ Aliases: config, conf`,
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 
-		var config grit.Config = grit.LoadConfig()
+		var config = grit.LoadConfig()
 
 		// Marshal the data into YAML format with indentation
 		yamlData, err := yaml.Marshal(config)
@@ -120,7 +121,7 @@ Aliases: initialize, init`,
 		utilities.Check(dirErr)
 
 		// Create Default Config File
-		var config grit.Config = grit.DefaultConfig()
+		var config = grit.DefaultConfig()
 		grit.WriteConfig(config)
 
 		// Create History File
@@ -173,7 +174,7 @@ var gritResetCmd = &cobra.Command{
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 
 		if utilities.WaitForConfirmationPrompt("Do you want to continue?") {
-			var config grit.Config = grit.DefaultConfig()
+			var config = grit.DefaultConfig()
 			grit.WriteConfig(config)
 		}
 

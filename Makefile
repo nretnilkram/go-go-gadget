@@ -16,6 +16,9 @@ fmt: ## Format Go code
 lint: ## Run golangci-lint
 	golangci-lint run ./...
 
+lint-fix: ## Run golangci-lint and fix issues
+	golangci-lint run ./... --fix
+
 init: ## Install Go
 	brew install go@1.26
 	brew install golangci-lint

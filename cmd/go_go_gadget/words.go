@@ -3,8 +3,9 @@ package go_go_gadget
 import (
 	"fmt"
 
-	"github.com/nretnilkram/go-go-gadget/pkg/words"
 	"github.com/spf13/cobra"
+
+	"github.com/nretnilkram/go-go-gadget/pkg/words"
 )
 
 var wordCount int

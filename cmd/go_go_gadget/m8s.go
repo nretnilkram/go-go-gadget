@@ -3,9 +3,10 @@ package go_go_gadget
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/nretnilkram/go-go-gadget/pkg/m8s"
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
-	"github.com/spf13/cobra"
 )
 
 var useAlpine bool

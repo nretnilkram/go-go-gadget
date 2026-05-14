@@ -25,7 +25,7 @@ func TestGoGoGadgetReverse(t *testing.T) {
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
 		if err != nil || got != c.want {
-			fmt.Println(got, out, err)
+			fmt.Println(got, string(out), err)
 			t.Errorf("go-go-gadget reverse %q == %q, want %q", c.in, got, c.want)
 		}
 	}
@@ -44,7 +44,7 @@ func TestGoGoGadgetSymSub(t *testing.T) {
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
 		if err != nil || got != c.want {
-			fmt.Println(got, out, err)
+			fmt.Println(got, string(out), err)
 			t.Errorf("go-go-gadget symsub %q == %q, want %q", c.in, got, c.want)
 		}
 	}
@@ -64,7 +64,7 @@ func TestGoGoGadgetInspect(t *testing.T) {
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
 		if err != nil || got != c.want {
-			fmt.Println(got, out, err)
+			fmt.Println(got, string(out), err)
 			t.Errorf("go-go-gadget inspect %q == %q, want %q", c.in, got, c.want)
 		}
 	}
@@ -83,7 +83,7 @@ func TestGoGoGadgetInspectDigits(t *testing.T) {
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte
 		if err != nil || got != c.want {
-			fmt.Println(got, out, err)
+			fmt.Println(got, string(out), err)
 			t.Errorf("go-go-gadget inspect %q == %q, want %q", c.in, got, c.want)
 		}
 	}
@@ -108,7 +108,7 @@ func TestGoGoGadgetK8s(t *testing.T) {
 		out, err := cmd.CombinedOutput()
 		got := strings.TrimSuffix(string(out), "\n") // because out is []byte with a new line
 		if err != nil || got != c.want {
-			fmt.Println(got, out, err)
+			fmt.Println(got, string(out), err)
 			t.Errorf("go-go-gadget k8s %q == %q, want %q", c.in, got, c.want)
 		}
 	}
@@ -127,7 +127,7 @@ func TestGoGoGadgetPassword(t *testing.T) {
 		out, err := cmd.CombinedOutput()
 		got := len(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
-			fmt.Println(got, out, err)
+			fmt.Println(got, string(out), err)
 			t.Errorf("go-go-gadget password %d == %d, want %d", c.in, got, c.want)
 		}
 	}
@@ -155,7 +155,7 @@ func TestGoGoGadgetWords(t *testing.T) {
 		out, err := cmd.CombinedOutput()
 		got := WordCount(strings.TrimSuffix(string(out), "\n")) // because out is []byte
 		if err != nil || got != c.want {
-			fmt.Println(got, out, err)
+			fmt.Println(got, string(out), err)
 			t.Errorf("go-go-gadget words %d == %d, want %d", c.in, got, c.want)
 		}
 	}

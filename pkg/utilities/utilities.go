@@ -122,10 +122,10 @@ func GrepFileForTFResources(filename string) []string {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if re.MatchString(line) {
-			line = strings.Replace(line, "resource \"", "--target=", -1)
-			line = strings.Replace(line, "module \"", "--target=module.", -1)
-			line = strings.Replace(line, "\" \"", ".", -1)
-			line = strings.Replace(line, "\" {", " \\", -1)
+			line = strings.ReplaceAll(line, "resource \"", "--target=")
+			line = strings.ReplaceAll(line, "module \"", "--target=module.")
+			line = strings.ReplaceAll(line, "\" \"", ".")
+			line = strings.ReplaceAll(line, "\" {", " \\")
 			resources = append(resources, line)
 		}
 	}

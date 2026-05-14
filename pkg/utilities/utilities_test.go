@@ -78,7 +78,7 @@ func TestShowDateTime(t *testing.T) {
 	}
 	for _, c := range cases {
 		got := ShowDateTime(c.in, c.includeTime)
-		if !strings.Contains(got, c.want) || !(len(got) >= c.minLength && len(got) <= c.maxLength) {
+		if !strings.Contains(got, c.want) || (len(got) < c.minLength || len(got) > c.maxLength) {
 			t.Errorf("ShowDateTime(%q, %t) == %q, want %q", c.in, c.includeTime, got, c.want)
 		}
 	}

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"github.com/spf13/cobra"
+
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
 var useColons bool

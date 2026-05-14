@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"gopkg.in/yaml.v2"
+
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
 type Repository struct {

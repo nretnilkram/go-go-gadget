@@ -55,7 +55,7 @@ func AddAllRepos() {
 
 func RunGitCommandParallel(args []string) {
 	// Create a map to store the parsed YAML data
-	var config Config = LoadConfig()
+	var config = LoadConfig()
 
 	// Check for max concurrent limit from environment variable
 	maxConcurrent := 0
@@ -99,7 +99,7 @@ func RunGitCommandParallel(args []string) {
 
 func RunGitCommandSynchronous(args []string) {
 	// Create a map to store the parsed YAML data
-	var config Config = LoadConfig()
+	var config = LoadConfig()
 
 	// Run command in all repositories
 	for _, repo := range config.Repositories {

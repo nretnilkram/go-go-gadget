@@ -3,9 +3,10 @@ package go_go_gadget
 import (
 	"os"
 
-	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
+
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
 var genDocsCmd = &cobra.Command{

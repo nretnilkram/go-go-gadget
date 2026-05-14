@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 	"github.com/nretnilkram/go-go-gadget/pkg/words"
-	"github.com/spf13/cobra"
 )
 
 var utilCmd = &cobra.Command{
@@ -37,10 +38,10 @@ Aliases: quick-branch, qb`,
 		name := fmt.Sprintf("%s%s", color, animal)
 
 		if len(args) > 0 {
-			name = strings.Replace(strings.TrimSpace(strings.Join(args, " ")), " ", "-", -1)
+			name = strings.ReplaceAll(strings.TrimSpace(strings.Join(args, " ")), " ", "-")
 		}
 
-		branchName := "m8-" + today + "-" + strings.Replace(strings.TrimSpace(name), " ", "-", -1)
+		branchName := "m8-" + today + "-" + strings.ReplaceAll(strings.TrimSpace(name), " ", "-")
 
 		path := utilities.GetWorkingDir()
 

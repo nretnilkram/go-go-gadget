@@ -43,10 +43,10 @@ func BreakOnSection(target string, separator string) string {
 func Image2Name(imageName string, separator string) string {
 	finalName := imageName
 
-	finalName = strings.Replace(finalName, ".", separator, -1)
-	finalName = strings.Replace(finalName, "/", separator, -1)
-	finalName = strings.Replace(finalName, ":", separator, -1)
-	finalName = strings.Replace(finalName, "-", separator, -1)
+	finalName = strings.ReplaceAll(finalName, ".", separator)
+	finalName = strings.ReplaceAll(finalName, "/", separator)
+	finalName = strings.ReplaceAll(finalName, ":", separator)
+	finalName = strings.ReplaceAll(finalName, "-", separator)
 
 	if len(finalName) > 40 {
 		finalName = BreakOnSection(finalName, separator)

@@ -36,9 +36,9 @@ func k8s_transform(s string) string {
 	if len(s) == 0 {
 		return s
 	}
-	var first string = string(s[0])
-	var length int = len(s)
-	var last string = string(s[length-1])
+	var first = string(s[0])
+	var length = len(s)
+	var last = string(s[length-1])
 	if len(s) > 2 {
 		return first + fmt.Sprint(length-2) + last
 	}
