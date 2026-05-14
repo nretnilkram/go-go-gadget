@@ -2,6 +2,7 @@ package go_go_gadget
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -127,7 +128,11 @@ Aliases: initialize, init`,
 		// Create History File
 		f, historyErr := os.Create(grit.HistoryFile)
 		utilities.Check(historyErr)
-		defer f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				log.Println(err)
+			}
+		}()
 		grit.PrintTagLine(cmd.Root().Version)
 	},
 }

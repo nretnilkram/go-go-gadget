@@ -26,7 +26,11 @@ func AppendHistory(command string) {
 	// Open the file in append mode
 	file, err := os.OpenFile(HistoryFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	utilities.Check(err)
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Println(err)
+		}
+	}()
 
 	// Write the data to the file
 	if _, err := file.WriteString("[" + utilities.ShowDateTime("dash", true) + "] " + command + "\n"); err != nil {
