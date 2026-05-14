@@ -7,8 +7,10 @@ import (
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
-// WorkingDir holds the working directory at process startup.
-var WorkingDir = utilities.GetWorkingDir()
+// GetWorkingDir returns the current working directory at the time of the call.
+func GetWorkingDir() string {
+	return utilities.GetWorkingDir()
+}
 
 // TestGritDir checks if the current directory contains a grit dir and config, exiting if not.
 func TestGritDir() {
