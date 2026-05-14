@@ -27,15 +27,15 @@ func TestUtilities(t *testing.T) {
 
 	igr := IsGitRepo(".")
 	if reflect.TypeOf(igr).Kind() != reflect.Bool {
-		t.Errorf("GetWorkingDir did not return a boolean.")
+		t.Errorf("IsGitRepo did not return a boolean.")
 	}
 	if !igr {
-		t.Errorf("Did not return that this is a git repo.")
+		t.Errorf("IsGitRepo did not return true for a git repo.")
 	}
 
-	igr2 := IsGitRepo("../../..")
+	igr2 := IsGitRepo(t.TempDir())
 	if igr2 {
-		t.Errorf("Did not return that parent directory is not a git repo.")
+		t.Errorf("IsGitRepo did not return false for a non-git directory.")
 	}
 }
 

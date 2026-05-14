@@ -84,10 +84,13 @@ func FileDirExists(path string) (bool, error) {
 	return false, err
 }
 
-// Test if current directory is a git repository
+// IsGitRepo returns true only when the given path is inside a git repository.
+// It checks the exit code rather than scanning output, which avoids false
+// positives from error messages that themselves contain ".git".
 func IsGitRepo(path string) bool {
-	gitCheck := RunCommand("git", []string{"rev-parse"}, path)
-	return gitCheck == ""
+	cmd := exec.Command("git", "rev-parse", "--git-dir")
+	cmd.Dir = path
+	return cmd.Run() == nil
 }
 
 // Get the Current Working Directory
