@@ -166,7 +166,7 @@ func ShowDateTime(format string, showTime bool) (dateTime string) {
 	var hour = current_time.Hour()
 	var minute = current_time.Minute()
 	var second = current_time.Second()
-	var separator = "-"
+	var separator string
 
 	switch format {
 	case "colon":
