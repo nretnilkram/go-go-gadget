@@ -12,10 +12,16 @@ import (
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
+// GritDir is the name of the grit metadata directory.
 var GritDir = ".grit"
+
+// ConfigFile is the path to the grit configuration file within GritDir.
 var ConfigFile = GritDir + "/config.yml"
+
+// HistoryFile is the path to the grit command history log within GritDir.
 var HistoryFile = GritDir + "/history.log"
 
+// AppendHistory appends a timestamped command entry to the grit history log.
 func AppendHistory(command string) {
 	// Open the file in append mode
 	file, err := os.OpenFile(HistoryFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -28,6 +34,7 @@ func AppendHistory(command string) {
 	}
 }
 
+// AddAllRepos scans the current directory for git repositories and adds any not already in config.
 func AddAllRepos() {
 	entries, err := os.ReadDir(".")
 	utilities.Check(err)
@@ -53,6 +60,7 @@ func AddAllRepos() {
 	}
 }
 
+// RunGitCommandParallel runs the given git command concurrently across all configured repositories.
 func RunGitCommandParallel(args []string) {
 	// Create a map to store the parsed YAML data
 	var config = LoadConfig()
@@ -97,6 +105,7 @@ func RunGitCommandParallel(args []string) {
 	wg.Wait()
 }
 
+// RunGitCommandSynchronous runs the given git command sequentially across all configured repositories.
 func RunGitCommandSynchronous(args []string) {
 	// Create a map to store the parsed YAML data
 	var config = LoadConfig()

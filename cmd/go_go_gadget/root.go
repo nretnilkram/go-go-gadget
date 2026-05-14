@@ -22,6 +22,7 @@ You can use go_go_gadget to run useful tools from the terminal.`,
 	},
 }
 
+// Execute runs the root cobra command and exits on error.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "Whoops. There was an error while executing your CLI '%s'", err)

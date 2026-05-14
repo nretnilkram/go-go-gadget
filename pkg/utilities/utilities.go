@@ -9,31 +9,15 @@ import (
 	"regexp"
 	"strings"
 	"time"
-	"unicode"
 )
 
+// SemverRegex is a regular expression pattern for validating semantic version strings.
 var SemverRegex = "^(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>0|[1-9]\\d*)(?:-(?P<prerelease>(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
 
 // Check the error status
 func Check(e error) {
 	if e != nil {
 		panic(e)
-	}
-}
-
-var lastQuote = rune(0)
-var f = func(c rune) bool {
-	switch {
-	case c == lastQuote:
-		lastQuote = rune(0)
-		return false
-	case lastQuote != rune(0):
-		return false
-	case unicode.In(c, unicode.Quotation_Mark):
-		lastQuote = c
-		return false
-	default:
-		return unicode.IsSpace(c)
 	}
 }
 
@@ -93,13 +77,15 @@ func IsGitRepo(path string) bool {
 	return cmd.Run() == nil
 }
 
-// Get the Current Working Directory
+// GetWorkingDir returns the current working directory, panicking on error.
 func GetWorkingDir() string {
 	dir, err := os.Getwd()
 	Check(err)
 	return dir
 }
 
+// GrepFileForTFResources scans a Terraform file and returns a slice of --target flags
+// for all resource and module blocks found.
 func GrepFileForTFResources(filename string) []string {
 	pattern := "^(resource |module)"
 
@@ -138,12 +124,14 @@ func GrepFileForTFResources(filename string) []string {
 	return (resources)
 }
 
+// ListTFResources prints the Terraform resource targets found in each of the given files.
 func ListTFResources(files []string) {
 	for _, file := range files {
 		fmt.Println(strings.Join(GrepFileForTFResources(file), "\n"))
 	}
 }
 
+// RegexTest reports whether input matches the given regular expression pattern.
 func RegexTest(input string, pattern string) bool {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -154,6 +142,7 @@ func RegexTest(input string, pattern string) bool {
 	return re.MatchString(input)
 }
 
+// WaitForConfirmationPrompt displays a [y/n] prompt and returns true if the user confirms.
 func WaitForConfirmationPrompt(s string) bool {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -167,7 +156,8 @@ func WaitForConfirmationPrompt(s string) bool {
 	return false
 }
 
-// Return the String format of Date Time as requested
+// ShowDateTime returns the current date/time as a formatted string using the given separator style.
+// Pass showTime as true to include the time component.
 func ShowDateTime(format string, showTime bool) (dateTime string) {
 	current_time := time.Now()
 	var year = current_time.Year()

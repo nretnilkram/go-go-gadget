@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// ReverseStrArray reverses the given string slice in place and returns it.
 func ReverseStrArray(target []string) []string {
 	for front, back := 0, len(target)-1; front < back; front, back = front+1, back-1 {
 		target[front], target[back] = target[back], target[front]
@@ -12,6 +13,7 @@ func ReverseStrArray(target []string) []string {
 	return target
 }
 
+// PrintInfo prints a formatted summary of the Kubernetes resource details.
 func PrintInfo(k8sType string, imageName string, pkgManager string, resourceName string) {
 	fmt.Println("\n##############")
 	fmt.Printf("# Type: %s\n", k8sType)
@@ -21,6 +23,8 @@ func PrintInfo(k8sType string, imageName string, pkgManager string, resourceName
 	fmt.Printf("##############\n\n")
 }
 
+// BreakOnSection truncates target by splitting on separator and keeping only the trailing
+// sections that fit within 40 characters.
 func BreakOnSection(target string, separator string) string {
 	parts := strings.Split(target, separator)
 	final := ""
@@ -39,7 +43,8 @@ func BreakOnSection(target string, separator string) string {
 	return strings.TrimRight(final, separator)
 }
 
-// Replace punctuation and truncate image to be used in the pod name
+// Image2Name sanitizes a container image name for use as a Kubernetes pod name by replacing
+// punctuation with the given separator and truncating to 40 characters.
 func Image2Name(imageName string, separator string) string {
 	finalName := imageName
 

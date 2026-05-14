@@ -6,6 +6,7 @@ import (
 	"math/rand"
 )
 
+// WordSet holds categorized lists of English words loaded from the embedded JSON file.
 type WordSet struct {
 	Adjectives []string `json:"adjectives"`
 	Animals    []string `json:"animals"`
@@ -14,6 +15,7 @@ type WordSet struct {
 	Verbs      []string `json:"verbs"`
 }
 
+// WordSetWeight controls how many words from each category are included in the weighted selection pool.
 type WordSetWeight struct {
 	Adjectives int
 	Animals    int
@@ -25,6 +27,7 @@ type WordSetWeight struct {
 //go:embed english_words.json
 var englishWords []byte
 
+// LoadJsonWords unmarshals the embedded English word list JSON and returns it as a WordSet.
 func LoadJsonWords() WordSet {
 	var wordSet WordSet
 	err := json.Unmarshal([]byte(englishWords), &wordSet)
@@ -38,6 +41,8 @@ func randomItem(list []string) string {
 	return list[rand.Intn(len(list))]
 }
 
+// Words returns a space-separated string of randomly selected words. The number of words
+// is controlled by length, and the category distribution is determined by weight.
 func Words(length int, weight WordSetWeight) string {
 	if length == 0 {
 		return ""

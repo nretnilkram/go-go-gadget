@@ -7,9 +7,10 @@ import (
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
+// WorkingDir holds the working directory at process startup.
 var WorkingDir = utilities.GetWorkingDir()
 
-// Check if directory contains a grit dir and config
+// TestGritDir checks if the current directory contains a grit dir and config, exiting if not.
 func TestGritDir() {
 	gritDirExists, _ := utilities.FileDirExists(GritDir)
 	configFileExists, _ := utilities.FileDirExists(ConfigFile)
@@ -20,7 +21,7 @@ func TestGritDir() {
 	}
 }
 
-// Add header of dashes with optional header string
+// GritHeader returns a dashed header line with an optional header string appended.
 func GritHeader(headerString ...string) string {
 	if len(headerString) > 0 {
 		return "----------------------------------------\n>> " + headerString[0]
@@ -28,7 +29,7 @@ func GritHeader(headerString ...string) string {
 	return "----------------------------------------\n"
 }
 
-// Add footer of dashes with optional footer string
+// GritFooter returns a dashed footer line with an optional footer string prepended.
 func GritFooter(footerString ...string) string {
 	if len(footerString) > 0 {
 		return "<< " + footerString[0] + "\n" + "----------------------------------------\n"
@@ -36,17 +37,17 @@ func GritFooter(footerString ...string) string {
 	return "----------------------------------------\n"
 }
 
-// Print Header with optional header string
+// PrintHeader prints a grit header line with an optional header string.
 func PrintHeader(headerString ...string) {
 	fmt.Println(GritHeader(headerString...))
 }
 
-// Print Footer with optional footer string
+// PrintFooter prints a grit footer line with an optional footer string.
 func PrintFooter(footerString ...string) {
 	fmt.Println(GritFooter(footerString...))
 }
 
-// Print version tag line
+// PrintTagLine prints the grit version tag line.
 func PrintTagLine(version string) {
 	fmt.Println("\n--------\ngo-go-gadget grit v" + version + "\n")
 }

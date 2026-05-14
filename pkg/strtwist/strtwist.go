@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Revere string
+// Reverse returns the input string with its characters in reversed order.
 func Reverse(input string) (result string) {
 	for _, c := range input {
 		result = string(c) + result
@@ -45,7 +45,7 @@ func k8s_transform(s string) string {
 	return s
 }
 
-// Kubernetes returns input string in the Kubernetes k8s shortened version.
+// K8s returns the input string with each word shortened using Kubernetes-style numeronym notation.
 func K8s(s string) string {
 	list := strings.Split(s, " ")
 	for i := 0; i < len(list); i++ {

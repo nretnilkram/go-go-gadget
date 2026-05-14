@@ -9,18 +9,20 @@ import (
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
+// Repository represents a single git repository entry in the grit config.
 type Repository struct {
 	Name string
 	Path string
 }
 
+// Config holds the root path and list of repositories managed by grit.
 type Config struct {
 	Root         string
 	Repositories []Repository
 	Ignore_Root  bool
 }
 
-// Generate and return Default Config
+// DefaultConfig returns a Config populated with default values.
 func DefaultConfig() Config {
 	config := Config{
 		Root:        utilities.GetWorkingDir(),
@@ -30,7 +32,7 @@ func DefaultConfig() Config {
 	return config
 }
 
-// Load and return config from filesystem
+// LoadConfig reads and unmarshals the grit config file from the filesystem.
 func LoadConfig() Config {
 	// Read the file content
 	data, err := os.ReadFile(ConfigFile)
@@ -46,7 +48,7 @@ func LoadConfig() Config {
 	return config
 }
 
-// Save passed config to filesystem
+// WriteConfig marshals the given config and writes it to the grit config file.
 func WriteConfig(config Config) {
 	// Marshal the data into YAML format with indentation
 	yamlData, err := yaml.Marshal(config)
@@ -58,7 +60,7 @@ func WriteConfig(config Config) {
 	utilities.Check(writeErr)
 }
 
-// Add passed repository to configuration
+// AddRepoToConfig adds a repository with the given name and path to the grit config.
 func AddRepoToConfig(name string, path string) {
 	config := LoadConfig()
 
@@ -79,7 +81,7 @@ func AddRepoToConfig(name string, path string) {
 	WriteConfig(config)
 }
 
-// Remove passed repository from configuration
+// RemoveRepoFromConfig removes the repository with the given name from the grit config.
 func RemoveRepoFromConfig(name string) {
 	config := LoadConfig()
 
