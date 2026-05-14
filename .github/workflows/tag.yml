@@ -11,7 +11,7 @@ jobs:
     tag:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Create Tag
               id: createtag
@@ -58,7 +58,7 @@ jobs:
             - name: Create Release
               if: steps.createtag.outputs.isnewtag == 'true'
               id: createrelease
-              uses: nretnilkram/create-release@v1
+              uses: nretnilkram/create-release@v2
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
