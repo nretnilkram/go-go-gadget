@@ -1,6 +1,8 @@
 package utilities
 
 import (
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -37,6 +39,68 @@ func TestUtilities(t *testing.T) {
 	if igr2 {
 		t.Errorf("IsGitRepo did not return false for a non-git directory.")
 	}
+}
+
+func TestFileDirExistsNonExistent(t *testing.T) {
+	missing := filepath.Join(t.TempDir(), "does-not-exist")
+	exists, err := FileDirExists(missing)
+	if err != nil {
+		t.Errorf("FileDirExists returned unexpected error: %v", err)
+	}
+	if exists {
+		t.Errorf("FileDirExists returned true for a path that does not exist")
+	}
+}
+
+func TestRunCommandError(t *testing.T) {
+	result := RunCommand("/nonexistent/binary-xyz", []string{}, ".")
+	if result == "" {
+		t.Errorf("RunCommand should return a non-empty string on error")
+	}
+}
+
+func TestShowDateTimeDefault(t *testing.T) {
+	got := ShowDateTime("bogus", false)
+	if got == "" {
+		t.Errorf("ShowDateTime with unknown format returned empty string")
+	}
+}
+
+func TestGrepFileForTFResources(t *testing.T) {
+	content := `resource "aws_s3_bucket" "my_bucket" {
+module "my_module" {
+  source = "./modules/foo"
+}
+`
+	tmp := filepath.Join(t.TempDir(), "main.tf")
+	if err := os.WriteFile(tmp, []byte(content), 0600); err != nil {
+		t.Fatalf("failed to write temp file: %v", err)
+	}
+
+	got := GrepFileForTFResources(tmp)
+
+	if len(got) != 2 {
+		t.Fatalf("expected 2 targets, got %d: %v", len(got), got)
+	}
+
+	cases := []string{
+		"--target=aws_s3_bucket.my_bucket",
+		"--target=module.my_module",
+	}
+	for i, want := range cases {
+		if !strings.Contains(got[i], want) {
+			t.Errorf("got[%d] = %q, want it to contain %q", i, got[i], want)
+		}
+	}
+}
+
+func TestListTFResources(t *testing.T) {
+	content := "resource \"aws_instance\" \"web\" {\n"
+	tmp := filepath.Join(t.TempDir(), "main.tf")
+	if err := os.WriteFile(tmp, []byte(content), 0600); err != nil {
+		t.Fatalf("failed to write temp file: %v", err)
+	}
+	ListTFResources([]string{tmp})
 }
 
 func TestRegexTest(t *testing.T) {
