@@ -1,7 +1,6 @@
 package utilities
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -96,7 +95,7 @@ module "my_module" {
 }
 
 func TestListTFResources(t *testing.T) {
-	content := fmt.Sprintf("resource \"aws_instance\" \"web\" {\n")
+	content := "resource \"aws_instance\" \"web\" {\n"
 	tmp := filepath.Join(t.TempDir(), "main.tf")
 	if err := os.WriteFile(tmp, []byte(content), 0600); err != nil {
 		t.Fatalf("failed to write temp file: %v", err)
