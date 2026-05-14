@@ -24,6 +24,7 @@ var gritCmd = &cobra.Command{
 e.g. go-go-gadget grit pull
 
 Will update all the of the repositories in the configuration.  Useful for updating all repositories in the morning.`,
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
@@ -46,6 +47,7 @@ var gritAddRepoCmd = &cobra.Command{
 
 Aliases: add-repo, add`,
 	DisableFlagsInUseLine: true,
+	Args:                  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
@@ -161,6 +163,7 @@ var gritRemoveRepoCmd = &cobra.Command{
 
 Aliases: remove-repo, remove, rm`,
 	DisableFlagsInUseLine: true,
+	Args:                  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))

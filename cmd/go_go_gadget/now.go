@@ -45,7 +45,7 @@ func init() {
 	nowCmd.Flags().BoolVarP(&useDots, "dots", "d", false, "Use dots")
 	nowCmd.Flags().BoolVarP(&useGoRawTime, "raw", "r", false, "Raw go time")
 	nowCmd.Flags().BoolVarP(&useSlashes, "slashes", "s", false, "Use Slases")
-	nowCmd.Flags().BoolVarP(&useUnix, "unix", "u", false, "Include time")
+	nowCmd.Flags().BoolVarP(&useUnix, "unix", "u", false, "Print Unix timestamp")
 	nowCmd.Flags().BoolVarP(&includeTime, "time", "t", false, "Include time")
 	rootCmd.AddCommand(nowCmd)
 }

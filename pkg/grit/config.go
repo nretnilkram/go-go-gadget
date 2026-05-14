@@ -19,14 +19,14 @@ type Repository struct {
 type Config struct {
 	Root         string
 	Repositories []Repository
-	Ignore_Root  bool
+	IgnoreRoot   bool `yaml:"ignore_root"`
 }
 
 // DefaultConfig returns a Config populated with default values.
 func DefaultConfig() Config {
 	config := Config{
-		Root:        utilities.GetWorkingDir(),
-		Ignore_Root: true,
+		Root:       utilities.GetWorkingDir(),
+		IgnoreRoot: true,
 	}
 
 	return config
