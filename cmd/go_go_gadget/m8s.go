@@ -19,8 +19,8 @@ var m8sCmd = &cobra.Command{
 	Use:   "m8s",
 	Short: "Useful k8s commands",
 	Long:  `Set of useful kubernetes utilities.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Help()
 	},
 }
 

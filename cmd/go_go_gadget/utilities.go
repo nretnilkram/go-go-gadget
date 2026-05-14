@@ -17,8 +17,8 @@ var utilCmd = &cobra.Command{
 	Long: `Set of useful cli utilities.
 
 Aliases: utilities, u, util, utils`,
-	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Help()
 	},
 }
 

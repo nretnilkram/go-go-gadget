@@ -16,9 +16,9 @@ var rootCmd = &cobra.Command{
 	Long: `Go Go Gadget is a set of helpful CLI tools
 
 You can use go_go_gadget to run useful tools from the terminal.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("\nGo Go Gadget...Help!\n\n* * * * * * * * * * * * *\n ")
-		cmd.Help()
+		return cmd.Help()
 	},
 }
 
