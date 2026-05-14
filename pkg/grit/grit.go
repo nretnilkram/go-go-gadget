@@ -99,7 +99,7 @@ func RunGitCommandParallel(args []string) {
 			commandDisplay := "git " + strings.Join(args, " ")
 			repoDir := config.Root + "/" + path
 			output := utilities.RunCommand("git", args, repoDir)
-			fmt.Println(GritHeader(strings.ToUpper(name)+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + GritFooter(strings.ToUpper(name)))
+			fmt.Println(Header(strings.ToUpper(name)+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + Footer(strings.ToUpper(name)))
 		}(repo)
 	}
 	wg.Wait()
@@ -118,7 +118,7 @@ func RunGitCommandSynchronous(args []string) {
 		commandDisplay := "git " + strings.Join(args, " ")
 		repoDir := config.Root + "/" + path
 		output := utilities.RunCommand("git", args, repoDir)
-		fmt.Println(GritHeader(strings.ToUpper(name)+" -- "+commandDisplay) + "\n" + output + GritFooter())
+		fmt.Println(Header(strings.ToUpper(name)+" -- "+commandDisplay) + "\n" + output + Footer())
 	}
 
 }

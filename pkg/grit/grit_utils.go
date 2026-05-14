@@ -21,16 +21,16 @@ func TestGritDir() {
 	}
 }
 
-// GritHeader returns a dashed header line with an optional header string appended.
-func GritHeader(headerString ...string) string {
+// Header returns a dashed header line with an optional header string appended.
+func Header(headerString ...string) string {
 	if len(headerString) > 0 {
 		return "----------------------------------------\n>> " + headerString[0]
 	}
 	return "----------------------------------------\n"
 }
 
-// GritFooter returns a dashed footer line with an optional footer string prepended.
-func GritFooter(footerString ...string) string {
+// Footer returns a dashed footer line with an optional footer string prepended.
+func Footer(footerString ...string) string {
 	if len(footerString) > 0 {
 		return "<< " + footerString[0] + "\n" + "----------------------------------------\n"
 	}
@@ -39,12 +39,12 @@ func GritFooter(footerString ...string) string {
 
 // PrintHeader prints a grit header line with an optional header string.
 func PrintHeader(headerString ...string) {
-	fmt.Println(GritHeader(headerString...))
+	fmt.Println(Header(headerString...))
 }
 
 // PrintFooter prints a grit footer line with an optional footer string.
 func PrintFooter(footerString ...string) {
-	fmt.Println(GritFooter(footerString...))
+	fmt.Println(Footer(footerString...))
 }
 
 // PrintTagLine prints the grit version tag line.
