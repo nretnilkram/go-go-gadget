@@ -1,4 +1,4 @@
-.PHONY: help fmt init upgrade install test run clean gamut
+.PHONY: help fmt init upgrade install test run clean gamut lint
 
 # Default target
 .DEFAULT_GOAL := help
@@ -13,8 +13,12 @@ GOFMT_FILES?=$$(find . -name '*.go')
 fmt: ## Format Go code
 	gofmt -w -l $(GOFMT_FILES)
 
+lint: ## Run golangci-lint
+	golangci-lint run ./...
+
 init: ## Install Go
 	brew install go@1.26
+	brew install golangci-lint
 
 upgrade: ## Upgrade Go dependencies
 	go get -u ./...
@@ -36,6 +40,7 @@ gamut: ## Run the Gamut
 	$(MAKE) fmt
 	$(MAKE) init
 	$(MAKE) upgrade
+	$(MAKE) lint
 	$(MAKE) run
 	$(MAKE) test
 	$(MAKE) install
