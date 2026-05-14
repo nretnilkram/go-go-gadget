@@ -30,17 +30,27 @@ jobs:
                 git fetch --tags
 
                 if ! git tag | grep "${TAG}"; then
-                git config user.name ${GIT_USER_NAME}
-                git config user.email ${GIT_USER_EMAIL}
+                  git config user.name ${GIT_USER_NAME}
+                  git config user.email ${GIT_USER_EMAIL}
 
-                git tag -a ${TAG} -m ${TAG}
-                git push --follow-tags
+                  git tag -a ${TAG} -m ${TAG}
+                  git push --follow-tags
 
-                echo "version=${TAG}" >> $GITHUB_OUTPUT
-                echo "isnewtag=true" >> $GITHUB_OUTPUT
+                  echo "version=${TAG}" >> $GITHUB_OUTPUT
+                  echo "isnewtag=true" >> $GITHUB_OUTPUT
                 else
-                echo "'${TAG}' already exists. No action taken."
-                echo "isnewtag=false" >> $GITHUB_OUTPUT
+                  echo "'${TAG}' already exists. Moving tag to current commit."
+                  git config user.name ${GIT_USER_NAME}
+                  git config user.email ${GIT_USER_EMAIL}
+
+                  git tag -d ${TAG}
+                  git push origin :refs/tags/${TAG}
+
+                  git tag -a ${TAG} -m ${TAG}
+                  git push --follow-tags
+                  
+                  echo "version=${TAG}" >> $GITHUB_OUTPUT
+                  echo "isnewtag=false" >> $GITHUB_OUTPUT
                 fi
               env:
                 GIT_USER_NAME: ${{ github.event.head_commit.author.username }}
