@@ -24,6 +24,7 @@ jobs:
     - name: Lint
       uses: golangci/golangci-lint-action@v6
       with:
+        go-version: '1.26'
         version: latest
 
     - name: Build
