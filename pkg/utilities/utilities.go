@@ -18,7 +18,8 @@ var SemverRegex = "^(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>
 // Check the error status
 func Check(e error) {
 	if e != nil {
-		panic(e)
+		fmt.Fprintf(os.Stderr, "Error: %v\n", e)
+		os.Exit(1)
 	}
 }
 
