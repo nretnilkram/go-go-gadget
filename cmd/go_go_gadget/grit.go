@@ -23,7 +23,10 @@ var gritCmd = &cobra.Command{
 
 e.g. go-go-gadget grit pull
 
-Will update all the of the repositories in the configuration.  Useful for updating all repositories in the morning.`,
+Will update all the of the repositories in the configuration.  Useful for updating all repositories in the morning.
+
+Environment Variables:
+  GRIT_MAX_CONCURRENT  Maximum number of repositories to process in parallel (default: unlimited).`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()

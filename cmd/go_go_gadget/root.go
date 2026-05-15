@@ -10,12 +10,12 @@ import (
 var version = "2026.5.14"
 
 var rootCmd = &cobra.Command{
-	Use:     "go_go_gadget",
+	Use:     "go-go-gadget",
 	Version: version,
-	Short:   "go_go_gadget - CLI with useful tools",
+	Short:   "go-go-gadget - CLI with useful tools",
 	Long: `Go Go Gadget is a set of helpful CLI tools
 
-You can use go_go_gadget to run useful tools from the terminal.`,
+You can use go-go-gadget to run useful tools from the terminal.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("\nGo Go Gadget...Help!\n\n* * * * * * * * * * * * *\n ")
 		return cmd.Help()
