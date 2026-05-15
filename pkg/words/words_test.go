@@ -3,6 +3,7 @@ package words
 import (
 	"encoding/json"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -99,5 +100,104 @@ func TestWords(t *testing.T) {
 		if got != c.want {
 			t.Errorf("WordCount(Words(%d, %v)) == %d, want %d", c.length, c.weight, got, c.want)
 		}
+	}
+}
+
+// TestWordsWeightAllZeroReturnsEmpty confirms the zero-weight boundary: when every
+// category weight is 0 the weighted pool is empty and Words must return "".
+func TestWordsWeightAllZeroReturnsEmpty(t *testing.T) {
+	result := Words(100, WordSetWeight{})
+	if result != "" {
+		t.Errorf("Words(100, WordSetWeight{}) = %q, want empty string", result)
+	}
+}
+
+// TestWordsWeightSingleCategory confirms that when exactly one category carries a
+// non-zero weight every word in the output belongs to that category.
+func TestWordsWeightSingleCategory(t *testing.T) {
+	ws := LoadJsonWords()
+
+	cases := []struct {
+		name     string
+		weight   WordSetWeight
+		validSet []string
+	}{
+		{"adjectives only", WordSetWeight{Adjectives: 1}, ws.Adjectives},
+		{"animals only", WordSetWeight{Animals: 1}, ws.Animals},
+		{"colors only", WordSetWeight{Colors: 1}, ws.Colors},
+		{"nouns only", WordSetWeight{Nouns: 1}, ws.Nouns},
+		{"verbs only", WordSetWeight{Verbs: 1}, ws.Verbs},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			valid := make(map[string]bool, len(c.validSet))
+			for _, w := range c.validSet {
+				valid[w] = true
+			}
+
+			for _, word := range strings.Fields(Words(50, c.weight)) {
+				if !valid[word] {
+					t.Errorf("word %q is not in the expected category", word)
+				}
+			}
+		})
+	}
+}
+
+// TestWordsWeightExcludesZeroWeightCategories confirms that categories with a zero
+// weight never contribute words to the output, even when other categories are active.
+// To avoid false positives from words that appear in multiple categories, only words
+// that are exclusively in excluded categories (not present in any included category)
+// are checked.
+func TestWordsWeightExcludesZeroWeightCategories(t *testing.T) {
+	ws := LoadJsonWords()
+
+	cases := []struct {
+		name     string
+		weight   WordSetWeight
+		included [][]string
+		excluded [][]string
+	}{
+		{
+			name:     "only adjectives and nouns active",
+			weight:   WordSetWeight{Adjectives: 1, Nouns: 1},
+			included: [][]string{ws.Adjectives, ws.Nouns},
+			excluded: [][]string{ws.Animals, ws.Colors, ws.Verbs},
+		},
+		{
+			name:     "only animals active",
+			weight:   WordSetWeight{Animals: 5},
+			included: [][]string{ws.Animals},
+			excluded: [][]string{ws.Adjectives, ws.Colors, ws.Nouns, ws.Verbs},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			// Build a set of words present in at least one included category.
+			includedSet := make(map[string]bool)
+			for _, list := range c.included {
+				for _, w := range list {
+					includedSet[w] = true
+				}
+			}
+
+			// Words that appear only in excluded categories (never in included ones).
+			exclusivelyExcluded := make(map[string]bool)
+			for _, list := range c.excluded {
+				for _, w := range list {
+					if !includedSet[w] {
+						exclusivelyExcluded[w] = true
+					}
+				}
+			}
+
+			for _, word := range strings.Fields(Words(200, c.weight)) {
+				if exclusivelyExcluded[word] {
+					t.Errorf("word %q from a zero-weight category appeared in output", word)
+				}
+			}
+		})
 	}
 }
