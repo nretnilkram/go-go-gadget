@@ -29,7 +29,8 @@ You can run the app by simply typing `go-go-gadget` and following the prompts.  
 go-go-gadget [help|--help|-h]
 
 # Password generation
-go-go-gadget [password|pw|p] [--length|-l] 25 [--symbols|-s]
+go-go-gadget [password|pw|p] [--length|-l] 25                  # symbols included by default
+go-go-gadget [password|pw|p] [--length|-l] 25 --symbols=false  # disable symbols
 
 # String manipulation
 go-go-gadget k8s "Nretnil Kram"
