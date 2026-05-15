@@ -89,13 +89,17 @@ go-go-gadget --help
 ```
 
 ```sh
+Go Go Gadget...Help!
+
+* * * * * * * * * * * * *
+ 
 Go Go Gadget is a set of helpful CLI tools
 
-You can use go_go_gadget to run useful tools from the terminal.
+You can use go-go-gadget to run useful tools from the terminal.
 
 Usage:
-  go_go_gadget [flags]
-  go_go_gadget [command]
+  go-go-gadget [flags]
+  go-go-gadget [command]
 
 Available Commands:
   completion             Generate the autocompletion script for the specified shell
@@ -113,10 +117,10 @@ Available Commands:
   words                  Create list of words
 
 Flags:
-  -h, --help      help for go_go_gadget
-  -v, --version   version for go_go_gadget
+  -h, --help      help for go-go-gadget
+  -v, --version   version for go-go-gadget
 
-Use "go_go_gadget [command] --help" for more information about a command.
+Use "go-go-gadget [command] --help" for more information about a command.
 ```
 
 ### Generate Documentation
