@@ -3,7 +3,9 @@ package words
 import (
 	_ "embed"
 	"encoding/json"
+	"log"
 	"math/rand"
+	"sync"
 )
 
 // WordSet holds categorized lists of English words loaded from the embedded JSON file.
@@ -25,16 +27,22 @@ type WordSetWeight struct {
 }
 
 //go:embed english_words.json
-var englishWords []byte
+var embeddedWords []byte
+
+var (
+	loadOnce    sync.Once
+	cachedWords WordSet
+)
 
 // LoadJsonWords unmarshals the embedded English word list JSON and returns it as a WordSet.
+// The JSON is parsed only once; subsequent calls return the cached result.
 func LoadJsonWords() WordSet {
-	var wordSet WordSet
-	err := json.Unmarshal([]byte(englishWords), &wordSet)
-	if err != nil {
-		panic(err)
-	}
-	return wordSet
+	loadOnce.Do(func() {
+		if err := json.Unmarshal(embeddedWords, &cachedWords); err != nil {
+			log.Fatalf("failed to parse word list: %v", err)
+		}
+	})
+	return cachedWords
 }
 
 func randomItem(list []string) string {
@@ -48,7 +56,7 @@ func Words(length int, weight WordSetWeight) string {
 		return ""
 	}
 
-	englishWords := LoadJsonWords()
+	wordSet := LoadJsonWords()
 
 	var weighted []int
 	for i := 0; i < weight.Adjectives; i++ {
@@ -75,15 +83,15 @@ func Words(length int, weight WordSetWeight) string {
 	for i := 0; i < length; i++ {
 		switch weighted[rand.Intn(len(weighted))] {
 		case 0:
-			word_list += randomItem(englishWords.Adjectives) + " "
+			word_list += randomItem(wordSet.Adjectives) + " "
 		case 1:
-			word_list += randomItem(englishWords.Animals) + " "
+			word_list += randomItem(wordSet.Animals) + " "
 		case 2:
-			word_list += randomItem(englishWords.Colors) + " "
+			word_list += randomItem(wordSet.Colors) + " "
 		case 3:
-			word_list += randomItem(englishWords.Nouns) + " "
+			word_list += randomItem(wordSet.Nouns) + " "
 		case 4:
-			word_list += randomItem(englishWords.Verbs) + " "
+			word_list += randomItem(wordSet.Verbs) + " "
 		}
 	}
 
