@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/nretnilkram/go-go-gadget/pkg/grit"
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"

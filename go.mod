@@ -5,7 +5,7 @@ go 1.26
 require (
 	github.com/nretnilkram/pswd v1.0.1
 	github.com/spf13/cobra v1.10.2
-	gopkg.in/yaml.v2 v2.4.0
+	go.yaml.in/yaml/v3 v3.0.4
 )
 
 require (
@@ -13,5 +13,4 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
 )
