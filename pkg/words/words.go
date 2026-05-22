@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
+	"strings"
 	"sync"
 )
 
@@ -79,21 +80,21 @@ func Words(length int, weight WordSetWeight) string {
 		return ""
 	}
 
-	var wordList string
+	var sb strings.Builder
 	for i := 0; i < length; i++ {
 		switch weighted[rand.Intn(len(weighted))] {
 		case 0:
-			wordList += randomItem(wordSet.Adjectives) + " "
+			sb.WriteString(randomItem(wordSet.Adjectives) + " ")
 		case 1:
-			wordList += randomItem(wordSet.Animals) + " "
+			sb.WriteString(randomItem(wordSet.Animals) + " ")
 		case 2:
-			wordList += randomItem(wordSet.Colors) + " "
+			sb.WriteString(randomItem(wordSet.Colors) + " ")
 		case 3:
-			wordList += randomItem(wordSet.Nouns) + " "
+			sb.WriteString(randomItem(wordSet.Nouns) + " ")
 		case 4:
-			wordList += randomItem(wordSet.Verbs) + " "
+			sb.WriteString(randomItem(wordSet.Verbs) + " ")
 		}
 	}
 
-	return wordList
+	return sb.String()
 }

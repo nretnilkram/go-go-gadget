@@ -7,11 +7,12 @@ import (
 )
 
 // Reverse returns the input string with its characters in reversed order.
-func Reverse(input string) (result string) {
-	for _, c := range input {
-		result = string(c) + result
+func Reverse(input string) string {
+	r := []rune(input)
+	for i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
 	}
-	return result
+	return string(r)
 }
 
 func inspectNumbers(input string) (count int) {

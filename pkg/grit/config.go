@@ -42,7 +42,7 @@ func LoadConfig() Config {
 	var config Config
 
 	// Unmarshal the YAML string into the map
-	err = yaml.Unmarshal([]byte(data), &config)
+	err = yaml.Unmarshal(data, &config)
 	utilities.Check(err)
 
 	return config

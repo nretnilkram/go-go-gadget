@@ -15,6 +15,11 @@ import (
 // SemverRegex is a regular expression pattern for validating semantic version strings.
 var SemverRegex = "^(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>0|[1-9]\\d*)(?:-(?P<prerelease>(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
 
+var (
+	semverRe     = regexp.MustCompile(SemverRegex)
+	tfResourceRe = regexp.MustCompile(`^(resource |module)`)
+)
+
 // Check the error status
 func Check(e error) {
 	if e != nil {
@@ -89,15 +94,7 @@ func GetWorkingDir() string {
 // GrepFileForTFResources scans a Terraform file and returns a slice of --target flags
 // for all resource and module blocks found.
 func GrepFileForTFResources(filename string) []string {
-	pattern := "^(resource |module)"
-
 	resources := []string{}
-
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		fmt.Println("Invalid regex pattern:", err)
-		os.Exit(1)
-	}
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -113,7 +110,7 @@ func GrepFileForTFResources(filename string) []string {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if re.MatchString(line) {
+		if tfResourceRe.MatchString(line) {
 			line = strings.ReplaceAll(line, "resource \"", "--target=")
 			line = strings.ReplaceAll(line, "module \"", "--target=module.")
 			line = strings.ReplaceAll(line, "\" \"", ".")
