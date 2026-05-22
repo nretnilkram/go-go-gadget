@@ -134,6 +134,11 @@ func ListTFResources(files []string) {
 	}
 }
 
+// ValidateSemver reports whether the given string is a valid semantic version.
+func ValidateSemver(version string) bool {
+	return semverRe.MatchString(version)
+}
+
 // RegexTest reports whether input matches the given regular expression pattern.
 func RegexTest(input string, pattern string) bool {
 	re, err := regexp.Compile(pattern)

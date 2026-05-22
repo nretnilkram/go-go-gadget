@@ -105,21 +105,44 @@ func TestListTFResources(t *testing.T) {
 
 func TestRegexTest(t *testing.T) {
 	cases := []struct {
+		in      string
+		pattern string
+		want    bool
+	}{
+		{"hello world", `\w+`, true},
+		{"hello world", `^\d+$`, false},
+		{"abc123", `[a-z]+\d+`, true},
+		{"foo", `^foo$`, true},
+		{"foobar", `^foo$`, false},
+	}
+	for _, c := range cases {
+		got := RegexTest(c.in, c.pattern)
+		if got != c.want {
+			t.Errorf("RegexTest(%q, %q) == %t, want %t", c.in, c.pattern, got, c.want)
+		}
+	}
+}
+
+func TestValidateSemver(t *testing.T) {
+	cases := []struct {
 		in   string
 		want bool
 	}{
 		{"0.0.0", true},
+		{"1.0.0", true},
+		{"2024.10.17", true},
+		{"0.0.0-beta.1", true},
+		{"1.2.3+build.456", true},
+		{"0.0.0-go-go.RBTwed1HNVz6qtf59gO2WsdPVsRyGldAXxSv1P3ke0ogrjo6W71N5Zy5gzC8wy7J", true},
 		{"1", false},
 		{"1.0", false},
-		{"1.0.0", true},
-		{"0.0.0-beta.1", true},
-		{"0.0.0-go-go.RBTwed1HNVz6qtf59gO2WsdPVsRyGldAXxSv1P3ke0ogrjo6W71N5Zy5gzC8wy7J", true},
-		{"2024.10.17", true},
+		{"not-a-version", false},
+		{"", false},
 	}
 	for _, c := range cases {
-		got := RegexTest(c.in, SemverRegex)
+		got := ValidateSemver(c.in)
 		if got != c.want {
-			t.Errorf("K8s(%q) == %t, want %t", c.in, got, c.want)
+			t.Errorf("ValidateSemver(%q) == %t, want %t", c.in, got, c.want)
 		}
 	}
 }
