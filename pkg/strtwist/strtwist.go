@@ -32,7 +32,7 @@ func Inspect(input string, digits bool) (count int, kind string) {
 	return inspectNumbers(input), "digit"
 }
 
-func k8s_transform(s string) string {
+func k8sTransform(s string) string {
 	if len(s) == 0 {
 		return s
 	}
@@ -49,7 +49,7 @@ func k8s_transform(s string) string {
 func K8s(s string) string {
 	list := strings.Split(s, " ")
 	for i := 0; i < len(list); i++ {
-		list[i] = k8s_transform(list[i])
+		list[i] = k8sTransform(list[i])
 	}
 	return strings.Join(list, " ")
 }

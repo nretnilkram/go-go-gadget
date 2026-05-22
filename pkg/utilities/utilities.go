@@ -165,13 +165,13 @@ func WaitForConfirmationPrompt(s string) bool {
 // ShowDateTime returns the current date/time as a formatted string using the given separator style.
 // Pass showTime as true to include the time component.
 func ShowDateTime(format string, showTime bool) (dateTime string) {
-	current_time := time.Now()
-	var year = current_time.Year()
-	var month = int(current_time.Month())
-	var day = current_time.Day()
-	var hour = current_time.Hour()
-	var minute = current_time.Minute()
-	var second = current_time.Second()
+	currentTime := time.Now()
+	var year = currentTime.Year()
+	var month = int(currentTime.Month())
+	var day = currentTime.Day()
+	var hour = currentTime.Hour()
+	var minute = currentTime.Minute()
+	var second = currentTime.Second()
 	var separator string
 
 	switch format {
@@ -184,7 +184,7 @@ func ShowDateTime(format string, showTime bool) (dateTime string) {
 	case "slash":
 		separator = "/"
 	default:
-		return current_time.String()
+		return currentTime.String()
 	}
 
 	dateTime = fmt.Sprintf("%d%s%d%s%d", year, separator, month, separator, day)

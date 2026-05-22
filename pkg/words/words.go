@@ -79,21 +79,21 @@ func Words(length int, weight WordSetWeight) string {
 		return ""
 	}
 
-	var word_list string
+	var wordList string
 	for i := 0; i < length; i++ {
 		switch weighted[rand.Intn(len(weighted))] {
 		case 0:
-			word_list += randomItem(wordSet.Adjectives) + " "
+			wordList += randomItem(wordSet.Adjectives) + " "
 		case 1:
-			word_list += randomItem(wordSet.Animals) + " "
+			wordList += randomItem(wordSet.Animals) + " "
 		case 2:
-			word_list += randomItem(wordSet.Colors) + " "
+			wordList += randomItem(wordSet.Colors) + " "
 		case 3:
-			word_list += randomItem(wordSet.Nouns) + " "
+			wordList += randomItem(wordSet.Nouns) + " "
 		case 4:
-			word_list += randomItem(wordSet.Verbs) + " "
+			wordList += randomItem(wordSet.Verbs) + " "
 		}
 	}
 
-	return word_list
+	return wordList
 }
