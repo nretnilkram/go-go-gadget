@@ -13,13 +13,13 @@ import (
 )
 
 // GritDir is the name of the grit metadata directory.
-var GritDir = ".grit"
+const GritDir = ".grit"
 
 // ConfigFile is the path to the grit configuration file within GritDir.
-var ConfigFile = GritDir + "/config.yml"
+const ConfigFile = GritDir + "/config.yml"
 
 // HistoryFile is the path to the grit command history log within GritDir.
-var HistoryFile = GritDir + "/history.log"
+const HistoryFile = GritDir + "/history.log"
 
 // AppendHistory appends a timestamped command entry to the grit history log.
 func AppendHistory(command string) {

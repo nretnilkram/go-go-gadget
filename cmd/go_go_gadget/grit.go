@@ -28,10 +28,11 @@ Will update all the of the repositories in the configuration.  Useful for updati
 Environment Variables:
   GRIT_MAX_CONCURRENT  Maximum number of repositories to process in parallel (default: unlimited).`,
 	Args: cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
 		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
-
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		if gritSynchronous {
 			grit.RunGitCommandSynchronous(args)
 		} else {
@@ -52,8 +53,6 @@ Aliases: add-repo, add`,
 	DisableFlagsInUseLine: true,
 	Args:                  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
-		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 		grit.AddRepoToConfig(args[0], args[0])
 		grit.PrintTagLine(cmd.Root().Version)
 	},
@@ -68,8 +67,6 @@ var gritAddAllReposCmd = &cobra.Command{
 Aliases: add-all-repos, add-all`,
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
-		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 		grit.AddAllRepos()
 		grit.PrintTagLine(cmd.Root().Version)
 	},
@@ -84,9 +81,6 @@ var gritConfigCmd = &cobra.Command{
 Aliases: config, conf`,
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
-		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
-
 		var config = grit.LoadConfig()
 
 		// Marshal the data into YAML format with indentation
@@ -99,8 +93,8 @@ Aliases: config, conf`,
 		fmt.Println("")
 		fmt.Println("Repositories Count: " + strconv.Itoa(len(config.Repositories)))
 		fmt.Println("Grit Directory: " + utilities.GetWorkingDir() + "/" + grit.GritDir)
-		fmt.Println("Config File: " + utilities.GetWorkingDir() + "/" + grit.GritDir + "/" + grit.ConfigFile)
-		fmt.Println("History File: " + utilities.GetWorkingDir() + "/" + grit.GritDir + "/" + grit.HistoryFile)
+		fmt.Println("Config File: " + utilities.GetWorkingDir() + "/" + grit.ConfigFile)
+		fmt.Println("History File: " + utilities.GetWorkingDir() + "/" + grit.HistoryFile)
 		fmt.Println("Working Directory: " + utilities.GetWorkingDir())
 
 		grit.PrintTagLine(cmd.Root().Version)
@@ -115,6 +109,7 @@ var gritInitCmd = &cobra.Command{
 
 Aliases: initialize, init`,
 	DisableFlagsInUseLine: true,
+	PersistentPreRun:      func(cmd *cobra.Command, args []string) {},
 	Run: func(cmd *cobra.Command, args []string) {
 		configFileExists, _ := utilities.FileDirExists(grit.GritDir)
 		if configFileExists {
@@ -147,9 +142,10 @@ var gritHistoryCmd = &cobra.Command{
 	Short:                 "Show grit history",
 	Long:                  "Print the history of the current grit directory.",
 	DisableFlagsInUseLine: true,
-	Run: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
-
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		history, err := os.ReadFile(grit.HistoryFile)
 		utilities.Check(err)
 
@@ -168,8 +164,6 @@ Aliases: remove-repo, remove, rm`,
 	DisableFlagsInUseLine: true,
 	Args:                  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
-		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 		grit.RemoveRepoFromConfig(args[0])
 		grit.PrintTagLine(cmd.Root().Version)
 	},
@@ -181,9 +175,6 @@ var gritResetCmd = &cobra.Command{
 	Long:                  "Reset grit configuration to the default configuration.",
 	DisableFlagsInUseLine: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
-		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
-
 		if utilities.WaitForConfirmationPrompt("Do you want to continue?") {
 			var config = grit.DefaultConfig()
 			grit.WriteConfig(config)
@@ -198,9 +189,10 @@ var gritDestroyCmd = &cobra.Command{
 	Short:                 "Clean grit",
 	Long:                  "Cleanup the current grit setup by removing the .grit directory and contents.",
 	DisableFlagsInUseLine: true,
-	Run: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		grit.TestGritDir()
-
+	},
+	Run: func(cmd *cobra.Command, args []string) {
 		err := os.RemoveAll(grit.GritDir)
 		utilities.Check(err)
 
