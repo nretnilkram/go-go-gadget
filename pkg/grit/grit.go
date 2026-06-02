@@ -151,7 +151,7 @@ func printFailedRepos(failed []string) {
 		return
 	}
 
-	fmt.Println("\n" + Header("REPOSITORIES WITH ERRORS"))
+	fmt.Println(Header("REPOSITORIES WITH ERRORS"))
 	for _, name := range failed {
 		fmt.Println("  " + name)
 	}
