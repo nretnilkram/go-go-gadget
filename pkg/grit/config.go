@@ -3,6 +3,8 @@ package grit
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"go.yaml.in/yaml/v3"
 
@@ -81,24 +83,42 @@ func AddRepoToConfig(name string, path string) {
 	WriteConfig(config)
 }
 
-// RemoveRepoFromConfig removes the repository with the given name from the grit config.
-func RemoveRepoFromConfig(name string) {
-	config := LoadConfig()
+// normalizeRemovePattern converts shell-safe % wildcards to * for filepath.Match.
+// Use % instead of * on the command line so zsh/bash do not expand the pattern first.
+func normalizeRemovePattern(pattern string) string {
+	return strings.ReplaceAll(pattern, "%", "*")
+}
 
-	found := false
-	for i, repo := range config.Repositories {
-		if name == repo.Name {
-			config.Repositories = append(config.Repositories[:i], config.Repositories[i+1:]...)
-			found = true
-			break
+// RemoveRepoFromConfig removes repositories whose names match the given pattern from the grit config.
+// The pattern uses glob syntax. Prefer % over * on the command line (e.g. gg-phoenix-%)
+// because shells expand unquoted * before grit receives the argument.
+func RemoveRepoFromConfig(pattern string) {
+	config := LoadConfig()
+	glob := normalizeRemovePattern(pattern)
+
+	var removed []string
+	var kept []Repository
+	for _, repo := range config.Repositories {
+		matched, err := filepath.Match(glob, repo.Name)
+		if err != nil {
+			fmt.Println("Invalid pattern " + pattern + ": " + err.Error())
+			return
+		}
+		if matched {
+			removed = append(removed, repo.Name)
+		} else {
+			kept = append(kept, repo)
 		}
 	}
 
-	if !found {
-		fmt.Println("Repository " + name + " not found in configuration.")
+	if len(removed) == 0 {
+		fmt.Println("Repository " + pattern + " not found in configuration.")
 		return
 	}
 
-	fmt.Println("Removing " + name)
+	for _, name := range removed {
+		fmt.Println("Removing " + name)
+	}
+	config.Repositories = kept
 	WriteConfig(config)
 }

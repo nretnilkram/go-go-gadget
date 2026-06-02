@@ -313,6 +313,54 @@ func TestRemoveRepoFromConfig_NotFound(t *testing.T) {
 	}
 }
 
+func TestRemoveRepoFromConfig_Wildcard(t *testing.T) {
+	setupGritEnv(t)
+
+	AddRepoToConfig("gg-phoenix-api", "gg-phoenix-api")
+	AddRepoToConfig("gg-phoenix-web", "gg-phoenix-web")
+	AddRepoToConfig("other-repo", "other-repo")
+
+	RemoveRepoFromConfig("gg-phoenix-*")
+
+	config := LoadConfig()
+	if len(config.Repositories) != 1 {
+		t.Fatalf("expected 1 repo after wildcard removal, got %d", len(config.Repositories))
+	}
+	if config.Repositories[0].Name != "other-repo" {
+		t.Errorf("remaining repo should be other-repo, got %q", config.Repositories[0].Name)
+	}
+}
+
+func TestRemoveRepoFromConfig_ShellSafeWildcard(t *testing.T) {
+	setupGritEnv(t)
+
+	AddRepoToConfig("gg-phoenix-api", "gg-phoenix-api")
+	AddRepoToConfig("gg-phoenix-web", "gg-phoenix-web")
+	AddRepoToConfig("other-repo", "other-repo")
+
+	RemoveRepoFromConfig("gg-phoenix-%")
+
+	config := LoadConfig()
+	if len(config.Repositories) != 1 {
+		t.Fatalf("expected 1 repo after %% wildcard removal, got %d", len(config.Repositories))
+	}
+	if config.Repositories[0].Name != "other-repo" {
+		t.Errorf("remaining repo should be other-repo, got %q", config.Repositories[0].Name)
+	}
+}
+
+func TestRemoveRepoFromConfig_InvalidPattern(t *testing.T) {
+	setupGritEnv(t)
+
+	AddRepoToConfig("alpha", "alpha")
+	RemoveRepoFromConfig("[")
+
+	config := LoadConfig()
+	if len(config.Repositories) != 1 {
+		t.Errorf("config should be unchanged after invalid pattern, got %d repos", len(config.Repositories))
+	}
+}
+
 // --- AppendHistory ---
 
 func TestAppendHistory_Appends(t *testing.T) {

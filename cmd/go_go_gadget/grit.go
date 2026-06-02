@@ -158,11 +158,18 @@ var gritRemoveRepoCmd = &cobra.Command{
 	Use:     "remove-repo",
 	Aliases: []string{"remove", "rm"},
 	Short:   "Remove repository",
-	Long: `Remove a new repository to your grit configuration.
+	Long: `Remove repositories from your grit configuration.
+
+The argument is a glob pattern matched against repository names.
+Use % as the wildcard (e.g. gg-phoenix-%) because shells expand unquoted *
+before grit runs. Quoted * also works (e.g. 'gg-phoenix-*').
 
 Aliases: remove-repo, remove, rm`,
 	DisableFlagsInUseLine: true,
 	Args:                  cobra.ExactArgs(1),
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		grit.TestGritDir()
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		grit.RemoveRepoFromConfig(args[0])
 		grit.PrintTagLine(cmd.Root().Version)
