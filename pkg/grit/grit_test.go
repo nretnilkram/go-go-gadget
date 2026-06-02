@@ -609,10 +609,13 @@ func TestRunGitCommandSynchronous_ReportsFailedRepos(t *testing.T) {
 	if !strings.Contains(out, "REPOSITORIES WITH ERRORS") {
 		t.Fatalf("expected error summary in output, got:\n%s", out)
 	}
-	if !strings.Contains(out, "repo-missing") {
+	if !strings.Contains(out, "repo-missing:") {
 		t.Fatalf("expected repo-missing in error summary, got:\n%s", out)
 	}
-	if strings.Contains(out, "  repo-ok") {
+	if !strings.Contains(out, "    ") {
+		t.Fatalf("expected indented error lines in summary, got:\n%s", out)
+	}
+	if strings.Contains(out, "  repo-ok:") {
 		t.Fatalf("repo-ok should not appear in error summary, got:\n%s", out)
 	}
 }
@@ -638,10 +641,13 @@ func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
 	if !strings.Contains(out, "REPOSITORIES WITH ERRORS") {
 		t.Fatalf("expected error summary in output, got:\n%s", out)
 	}
-	if !strings.Contains(out, "repo-missing") {
+	if !strings.Contains(out, "repo-missing:") {
 		t.Fatalf("expected repo-missing in error summary, got:\n%s", out)
 	}
-	if strings.Contains(out, "  repo-ok") {
+	if !strings.Contains(out, "    ") {
+		t.Fatalf("expected indented error lines in summary, got:\n%s", out)
+	}
+	if strings.Contains(out, "  repo-ok:") {
 		t.Fatalf("repo-ok should not appear in error summary, got:\n%s", out)
 	}
 }

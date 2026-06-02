@@ -79,7 +79,12 @@ func RunGitCommandSynchronous(args []string) {
 	printFailedRepos(failed)
 }
 
-func runGitCommandParallel(config Config, args []string) []string {
+type repoFailure struct {
+	Name   string
+	Output string
+}
+
+func runGitCommandParallel(config Config, args []string) []repoFailure {
 	maxConcurrent := 0
 	if maxConcurrentStr := os.Getenv("GRIT_MAX_CONCURRENT"); maxConcurrentStr != "" {
 		if parsed, err := strconv.Atoi(maxConcurrentStr); err == nil && parsed > 0 {
@@ -89,7 +94,7 @@ func runGitCommandParallel(config Config, args []string) []string {
 
 	var wg sync.WaitGroup
 	var failedMu sync.Mutex
-	var failed []string
+	var failed []repoFailure
 
 	var semaphore chan struct{}
 	if maxConcurrent > 0 {
@@ -106,32 +111,34 @@ func runGitCommandParallel(config Config, args []string) []string {
 				defer func() { <-semaphore }()
 			}
 
-			if runGitInRepo(config, repo, args, false) {
+			if failure := runGitInRepo(config, repo, args, false); failure != nil {
 				failedMu.Lock()
-				failed = append(failed, repo.Name)
+				failed = append(failed, *failure)
 				failedMu.Unlock()
 			}
 		}(repo)
 	}
 	wg.Wait()
 
-	sort.Strings(failed)
+	sort.Slice(failed, func(i, j int) bool {
+		return failed[i].Name < failed[j].Name
+	})
 	return failed
 }
 
-func runGitCommandSynchronous(config Config, args []string) []string {
-	var failed []string
+func runGitCommandSynchronous(config Config, args []string) []repoFailure {
+	var failed []repoFailure
 
 	for _, repo := range config.Repositories {
-		if runGitInRepo(config, repo, args, true) {
-			failed = append(failed, repo.Name)
+		if failure := runGitInRepo(config, repo, args, true); failure != nil {
+			failed = append(failed, *failure)
 		}
 	}
 
 	return failed
 }
 
-func runGitInRepo(config Config, repo Repository, args []string, synchronous bool) bool {
+func runGitInRepo(config Config, repo Repository, args []string, synchronous bool) *repoFailure {
 	commandDisplay := "git " + strings.Join(args, " ")
 	repoDir := config.Root + "/" + repo.Path
 	output, err := utilities.RunCommandWithError("git", args, repoDir)
@@ -143,17 +150,23 @@ func runGitInRepo(config Config, repo Repository, args []string, synchronous boo
 		fmt.Println(Header(name+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + Footer(name))
 	}
 
-	return err != nil
+	if err != nil {
+		return &repoFailure{Name: repo.Name, Output: output}
+	}
+	return nil
 }
 
-func printFailedRepos(failed []string) {
+func printFailedRepos(failed []repoFailure) {
 	if len(failed) == 0 {
 		return
 	}
 
 	fmt.Println(Header("REPOSITORIES WITH ERRORS"))
-	for _, name := range failed {
-		fmt.Println("  " + name)
+	for _, f := range failed {
+		fmt.Println("  " + f.Name + ":")
+		for _, line := range strings.Split(strings.TrimRight(f.Output, "\n"), "\n") {
+			fmt.Println("    " + line)
+		}
 	}
 	fmt.Print(Footer() + "\n")
 }
