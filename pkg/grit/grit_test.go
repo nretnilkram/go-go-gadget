@@ -1,6 +1,7 @@
 package grit
 
 import (
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -587,6 +588,64 @@ func TestRunGitCommandSynchronous_EmptyRepos(t *testing.T) {
 	RunGitCommandSynchronous([]string{"status"})
 }
 
+func TestRunGitCommandSynchronous_ReportsFailedRepos(t *testing.T) {
+	setupGritEnv(t)
+
+	cwd := mustGetwd(t)
+	makeRealGitRepo(t, "repo-ok")
+
+	WriteConfig(Config{
+		Root: cwd,
+		Repositories: []Repository{
+			{Name: "repo-ok", Path: "repo-ok"},
+			{Name: "repo-missing", Path: "does-not-exist"},
+		},
+	})
+
+	out := captureStdout(t, func() {
+		RunGitCommandSynchronous([]string{"status"})
+	})
+
+	if !strings.Contains(out, "REPOSITORIES WITH ERRORS") {
+		t.Fatalf("expected error summary in output, got:\n%s", out)
+	}
+	if !strings.Contains(out, "repo-missing") {
+		t.Fatalf("expected repo-missing in error summary, got:\n%s", out)
+	}
+	if strings.Contains(out, "  repo-ok") {
+		t.Fatalf("repo-ok should not appear in error summary, got:\n%s", out)
+	}
+}
+
+func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
+	setupGritEnv(t)
+
+	cwd := mustGetwd(t)
+	makeRealGitRepo(t, "repo-ok")
+
+	WriteConfig(Config{
+		Root: cwd,
+		Repositories: []Repository{
+			{Name: "repo-ok", Path: "repo-ok"},
+			{Name: "repo-missing", Path: "does-not-exist"},
+		},
+	})
+
+	out := captureStdout(t, func() {
+		RunGitCommandParallel([]string{"status"})
+	})
+
+	if !strings.Contains(out, "REPOSITORIES WITH ERRORS") {
+		t.Fatalf("expected error summary in output, got:\n%s", out)
+	}
+	if !strings.Contains(out, "repo-missing") {
+		t.Fatalf("expected repo-missing in error summary, got:\n%s", out)
+	}
+	if strings.Contains(out, "  repo-ok") {
+		t.Fatalf("repo-ok should not appear in error summary, got:\n%s", out)
+	}
+}
+
 // --- helpers ---
 
 func mustGetwd(t *testing.T) string {
@@ -605,4 +664,31 @@ func repoNameSet(t *testing.T) map[string]bool {
 		names[r.Name] = true
 	}
 	return names
+}
+
+func captureStdout(t *testing.T, fn func()) string {
+	t.Helper()
+
+	oldStdout := os.Stdout
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.Stdout = w
+
+	fn()
+
+	if err := w.Close(); err != nil {
+		t.Fatal(err)
+	}
+	os.Stdout = oldStdout
+
+	var buf strings.Builder
+	if _, err := io.Copy(&buf, r); err != nil {
+		t.Fatal(err)
+	}
+	if err := r.Close(); err != nil {
+		t.Fatal(err)
+	}
+	return buf.String()
 }

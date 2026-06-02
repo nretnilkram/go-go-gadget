@@ -28,10 +28,10 @@ func Check(e error) {
 	}
 }
 
-// RunCommand runs a command with the given name and arguments safely, without shell interpretation.
+// RunCommandWithError runs a command with the given name and arguments safely, without shell interpretation.
 // This prevents command injection by passing arguments directly to exec.Command.
-// Returns the combined stdout and stderr output as a string.
-func RunCommand(commandName string, args []string, path string) string {
+// Returns the combined stdout and stderr output as a string, and any error from cmd.Run().
+func RunCommandWithError(commandName string, args []string, path string) (string, error) {
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 
@@ -42,10 +42,18 @@ func RunCommand(commandName string, args []string, path string) string {
 
 	err := cmd.Run()
 	if err != nil {
-		return string(err.Error()) + "\n" + stderr.String() + "\n" + out.String()
+		return err.Error() + "\n" + stderr.String() + "\n" + out.String(), err
 	}
 
-	return out.String() + stderr.String()
+	return out.String() + stderr.String(), nil
+}
+
+// RunCommand runs a command with the given name and arguments safely, without shell interpretation.
+// This prevents command injection by passing arguments directly to exec.Command.
+// Returns the combined stdout and stderr output as a string.
+func RunCommand(commandName string, args []string, path string) string {
+	output, _ := RunCommandWithError(commandName, args, path)
+	return output
 }
 
 // RunCommandInteractive runs a command with the given name and arguments safely, with shell interpretation and interactive input.

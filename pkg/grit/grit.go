@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -66,10 +67,19 @@ func AddAllRepos() {
 
 // RunGitCommandParallel runs the given git command concurrently across all configured repositories.
 func RunGitCommandParallel(args []string) {
-	// Create a map to store the parsed YAML data
-	var config = LoadConfig()
+	config := LoadConfig()
+	failed := runGitCommandParallel(config, args)
+	printFailedRepos(failed)
+}
 
-	// Check for max concurrent limit from environment variable
+// RunGitCommandSynchronous runs the given git command sequentially across all configured repositories.
+func RunGitCommandSynchronous(args []string) {
+	config := LoadConfig()
+	failed := runGitCommandSynchronous(config, args)
+	printFailedRepos(failed)
+}
+
+func runGitCommandParallel(config Config, args []string) []string {
 	maxConcurrent := 0
 	if maxConcurrentStr := os.Getenv("GRIT_MAX_CONCURRENT"); maxConcurrentStr != "" {
 		if parsed, err := strconv.Atoi(maxConcurrentStr); err == nil && parsed > 0 {
@@ -77,10 +87,10 @@ func RunGitCommandParallel(args []string) {
 		}
 	}
 
-	// Create WaitGroup for parallel runs in all repositories
 	var wg sync.WaitGroup
+	var failedMu sync.Mutex
+	var failed []string
 
-	// Create semaphore channel if maxConcurrent is set
 	var semaphore chan struct{}
 	if maxConcurrent > 0 {
 		semaphore = make(chan struct{}, maxConcurrent)
@@ -91,38 +101,59 @@ func RunGitCommandParallel(args []string) {
 		go func(repo Repository) {
 			defer wg.Done()
 
-			// Acquire semaphore if concurrency limit is set
 			if semaphore != nil {
 				semaphore <- struct{}{}
 				defer func() { <-semaphore }()
 			}
 
-			path := repo.Path
-			name := repo.Name
-			// Use RunCommand to safely pass args without shell interpretation, preventing command injection
-			commandDisplay := "git " + strings.Join(args, " ")
-			repoDir := config.Root + "/" + path
-			output := utilities.RunCommand("git", args, repoDir)
-			fmt.Println(Header(strings.ToUpper(name)+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + Footer(strings.ToUpper(name)))
+			if runGitInRepo(config, repo, args, false) {
+				failedMu.Lock()
+				failed = append(failed, repo.Name)
+				failedMu.Unlock()
+			}
 		}(repo)
 	}
 	wg.Wait()
+
+	sort.Strings(failed)
+	return failed
 }
 
-// RunGitCommandSynchronous runs the given git command sequentially across all configured repositories.
-func RunGitCommandSynchronous(args []string) {
-	// Create a map to store the parsed YAML data
-	var config = LoadConfig()
+func runGitCommandSynchronous(config Config, args []string) []string {
+	var failed []string
 
-	// Run command in all repositories
 	for _, repo := range config.Repositories {
-		path := repo.Path
-		name := repo.Name
-		// Use RunCommand to safely pass args without shell interpretation, preventing command injection
-		commandDisplay := "git " + strings.Join(args, " ")
-		repoDir := config.Root + "/" + path
-		output := utilities.RunCommand("git", args, repoDir)
-		fmt.Println(Header(strings.ToUpper(name)+" -- "+commandDisplay) + "\n" + output + Footer())
+		if runGitInRepo(config, repo, args, true) {
+			failed = append(failed, repo.Name)
+		}
 	}
 
+	return failed
+}
+
+func runGitInRepo(config Config, repo Repository, args []string, synchronous bool) bool {
+	commandDisplay := "git " + strings.Join(args, " ")
+	repoDir := config.Root + "/" + repo.Path
+	output, err := utilities.RunCommandWithError("git", args, repoDir)
+
+	name := strings.ToUpper(repo.Name)
+	if synchronous {
+		fmt.Println(Header(name+" -- "+commandDisplay) + "\n" + output + Footer())
+	} else {
+		fmt.Println(Header(name+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + Footer(name))
+	}
+
+	return err != nil
+}
+
+func printFailedRepos(failed []string) {
+	if len(failed) == 0 {
+		return
+	}
+
+	fmt.Println("\n" + Header("REPOSITORIES WITH ERRORS"))
+	for _, name := range failed {
+		fmt.Println("  " + name)
+	}
+	fmt.Print(Footer() + "\n")
 }
