@@ -57,42 +57,41 @@ func Words(length int, weight WordSetWeight) string {
 		return ""
 	}
 
+	total := weight.Adjectives + weight.Animals + weight.Colors + weight.Nouns + weight.Verbs
+	if total == 0 {
+		return ""
+	}
+
 	wordSet := LoadJsonWords()
 
-	var weighted []int
-	for i := 0; i < weight.Adjectives; i++ {
-		weighted = append(weighted, 0)
+	// Cumulative upper-bound for each category. A random value n in [0, total)
+	// maps to the first category whose threshold exceeds n, giving O(1) selection
+	// instead of the O(totalWeight) slice that the previous implementation built
+	// on every call.
+	thresholds := [5]int{
+		weight.Adjectives,
+		weight.Adjectives + weight.Animals,
+		weight.Adjectives + weight.Animals + weight.Colors,
+		weight.Adjectives + weight.Animals + weight.Colors + weight.Nouns,
+		total,
 	}
-	for i := 0; i < weight.Animals; i++ {
-		weighted = append(weighted, 1)
-	}
-	for i := 0; i < weight.Colors; i++ {
-		weighted = append(weighted, 2)
-	}
-	for i := 0; i < weight.Nouns; i++ {
-		weighted = append(weighted, 3)
-	}
-	for i := 0; i < weight.Verbs; i++ {
-		weighted = append(weighted, 4)
-	}
-
-	if len(weighted) == 0 {
-		return ""
+	categories := [5][]string{
+		wordSet.Adjectives,
+		wordSet.Animals,
+		wordSet.Colors,
+		wordSet.Nouns,
+		wordSet.Verbs,
 	}
 
 	var sb strings.Builder
 	for i := 0; i < length; i++ {
-		switch weighted[rand.Intn(len(weighted))] {
-		case 0:
-			sb.WriteString(randomItem(wordSet.Adjectives) + " ")
-		case 1:
-			sb.WriteString(randomItem(wordSet.Animals) + " ")
-		case 2:
-			sb.WriteString(randomItem(wordSet.Colors) + " ")
-		case 3:
-			sb.WriteString(randomItem(wordSet.Nouns) + " ")
-		case 4:
-			sb.WriteString(randomItem(wordSet.Verbs) + " ")
+		n := rand.Intn(total)
+		for cat, threshold := range thresholds {
+			if n < threshold {
+				sb.WriteString(randomItem(categories[cat]))
+				sb.WriteByte(' ')
+				break
+			}
 		}
 	}
 

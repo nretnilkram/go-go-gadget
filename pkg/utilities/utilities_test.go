@@ -25,9 +25,9 @@ func TestUtilities(t *testing.T) {
 		t.Errorf("FileDirExists not true.")
 	}
 
-	cmdTest := RunCommand("ls", []string{"-lah"}, ".")
+	cmdTest, _ := RunCommandWithError("ls", []string{"-lah"}, ".")
 	if reflect.TypeOf(cmdTest).Kind() != reflect.String {
-		t.Errorf("RunCommand is not a string.")
+		t.Errorf("RunCommandWithError did not return a string.")
 	}
 
 	igr := IsGitRepo(".")
@@ -55,10 +55,10 @@ func TestFileDirExistsNonExistent(t *testing.T) {
 	}
 }
 
-func TestRunCommandError(t *testing.T) {
-	result := RunCommand("/nonexistent/binary-xyz", []string{}, ".")
-	if result == "" {
-		t.Errorf("RunCommand should return a non-empty string on error")
+func TestRunCommandWithError_ReturnsErrorForMissingBinary(t *testing.T) {
+	_, err := RunCommandWithError("/nonexistent/binary-xyz", []string{}, ".")
+	if err == nil {
+		t.Error("RunCommandWithError should return an error for a nonexistent binary")
 	}
 }
 

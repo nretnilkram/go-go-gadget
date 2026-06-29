@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -18,6 +19,7 @@ var SemverRegex = "^(?P<major>0|[1-9]\\d*)\\.(?P<minor>0|[1-9]\\d*)\\.(?P<patch>
 var (
 	semverRe     = regexp.MustCompile(SemverRegex)
 	tfResourceRe = regexp.MustCompile(`^(resource |module)`)
+	regexCache   sync.Map // map[string]*regexp.Regexp
 )
 
 // Check the error status
@@ -46,14 +48,6 @@ func RunCommandWithError(commandName string, args []string, path string) (string
 	}
 
 	return out.String() + stderr.String(), nil
-}
-
-// RunCommand runs a command with the given name and arguments safely, without shell interpretation.
-// This prevents command injection by passing arguments directly to exec.Command.
-// Returns the combined stdout and stderr output as a string.
-func RunCommand(commandName string, args []string, path string) string {
-	output, _ := RunCommandWithError(commandName, args, path)
-	return output
 }
 
 // RunCommandInteractive runs a command with the given name and arguments safely, with shell interpretation and interactive input.
@@ -149,12 +143,20 @@ func ValidateSemver(version string) bool {
 }
 
 // RegexTest reports whether input matches the given regular expression pattern.
+// Compiled regexes are cached by pattern string so each unique pattern is
+// compiled at most once across the lifetime of the process.
 func RegexTest(input string, pattern string) (bool, error) {
+	if cached, ok := regexCache.Load(pattern); ok {
+		return cached.(*regexp.Regexp).MatchString(input), nil
+	}
 	re, err := regexp.Compile(pattern)
 	if err != nil {
 		return false, fmt.Errorf("invalid regex %q: %w", pattern, err)
 	}
-	return re.MatchString(input), nil
+	// LoadOrStore handles the rare race where two callers compile the same
+	// pattern simultaneously; the winner's value is used by both.
+	actual, _ := regexCache.LoadOrStore(pattern, re)
+	return actual.(*regexp.Regexp).MatchString(input), nil
 }
 
 // WaitForConfirmationPrompt displays a [y/n] prompt and returns true if the user confirms.

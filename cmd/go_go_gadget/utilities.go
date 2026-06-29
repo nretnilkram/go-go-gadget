@@ -49,10 +49,11 @@ Aliases: quick-branch, qb`,
 		}
 
 		if utilities.IsGitRepo(path) {
-			fmt.Print(utilities.RunCommand("git", []string{"checkout", "-b", branchName}, path))
-		} else {
-			fmt.Print("This is not a git repository.")
+			output, err := utilities.RunCommandWithError("git", []string{"checkout", "-b", branchName}, path)
+			fmt.Print(output)
+			return err
 		}
+		fmt.Println("This is not a git repository.")
 		return nil
 	},
 }
@@ -79,11 +80,16 @@ Aliases: quick-commit, qc`,
 		}
 
 		if utilities.IsGitRepo(path) {
-			fmt.Print(utilities.RunCommand("git", []string{"commit", "-am", message}, path))
-			fmt.Print(utilities.RunCommand("git", []string{"push"}, path))
-		} else {
-			fmt.Print("This is not a git repository.")
+			commitOut, err := utilities.RunCommandWithError("git", []string{"commit", "-am", message}, path)
+			fmt.Print(commitOut)
+			if err != nil {
+				return err
+			}
+			pushOut, err := utilities.RunCommandWithError("git", []string{"push"}, path)
+			fmt.Print(pushOut)
+			return err
 		}
+		fmt.Println("This is not a git repository.")
 		return nil
 	},
 }
@@ -107,11 +113,16 @@ Aliases: empty-commit, ec`,
 		}
 
 		if utilities.IsGitRepo(path) {
-			fmt.Print(utilities.RunCommand("git", []string{"commit", "--allow-empty", "-m", message}, path))
-			fmt.Print(utilities.RunCommand("git", []string{"push"}, path))
-		} else {
-			fmt.Print("This is not a git repository.")
+			commitOut, err := utilities.RunCommandWithError("git", []string{"commit", "--allow-empty", "-m", message}, path)
+			fmt.Print(commitOut)
+			if err != nil {
+				return err
+			}
+			pushOut, err := utilities.RunCommandWithError("git", []string{"push"}, path)
+			fmt.Print(pushOut)
+			return err
 		}
+		fmt.Println("This is not a git repository.")
 		return nil
 	},
 }

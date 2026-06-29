@@ -24,6 +24,19 @@ var m8sCmd = &cobra.Command{
 	},
 }
 
+func resolveImage() (image, pkgManager string) {
+	switch {
+	case containerImage != "":
+		return containerImage, "unknown"
+	case useBusyBox:
+		return "busybox", "none"
+	case useUbuntu:
+		return "ubuntu", "apt"
+	default:
+		return "alpine", "apk"
+	}
+}
+
 var m8sDeploymentCmd = &cobra.Command{
 	Use:     "deployment",
 	Aliases: []string{"d"},
@@ -37,25 +50,13 @@ Some Image Options:
 * debian
 
 Aliases: deployment, d`,
-	Run: func(cmd *cobra.Command, args []string) {
-		image := "alpine"
-		pkgManager := "apk"
-		if containerImage != "" {
-			image = containerImage
-			pkgManager = "unknown"
-		} else if useAlpine {
-			image = "alpine"
-			pkgManager = "apk"
-		} else if useBusyBox {
-			image = "busybox"
-			pkgManager = "none"
-		} else if useUbuntu {
-			image = "ubuntu"
-			pkgManager = "apt"
-		}
+	RunE: func(cmd *cobra.Command, args []string) error {
+		image, pkgManager := resolveImage()
 		resourceName := "m8-" + m8s.Image2Name(image, "-")
 		m8s.PrintInfo("deployment", image, pkgManager, resourceName)
-		fmt.Print(utilities.RunCommand("kubectl", []string{"create", "deployment", resourceName, "--namespace", namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, "."))
+		output, err := utilities.RunCommandWithError("kubectl", []string{"create", "deployment", resourceName, "--namespace", namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, ".")
+		fmt.Print(output)
+		return err
 	},
 }
 
@@ -72,25 +73,13 @@ Some Image Options:
 * debian
 
 Aliases: pod, p`,
-	Run: func(cmd *cobra.Command, args []string) {
-		image := "alpine"
-		pkgManager := "apk"
-		if containerImage != "" {
-			image = containerImage
-			pkgManager = "unknown"
-		} else if useAlpine {
-			image = "alpine"
-			pkgManager = "apk"
-		} else if useBusyBox {
-			image = "busybox"
-			pkgManager = "none"
-		} else if useUbuntu {
-			image = "ubuntu"
-			pkgManager = "apt"
-		}
+	RunE: func(cmd *cobra.Command, args []string) error {
+		image, pkgManager := resolveImage()
 		resourceName := "m8-utility-" + m8s.Image2Name(image, "-")
 		m8s.PrintInfo("pod", image, pkgManager, resourceName)
-		fmt.Print(utilities.RunCommand("kubectl", []string{"run", resourceName, "--namespace", namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, "."))
+		output, err := utilities.RunCommandWithError("kubectl", []string{"run", resourceName, "--namespace", namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, ".")
+		fmt.Print(output)
+		return err
 	},
 }
 
@@ -108,21 +97,7 @@ Some Image Options:
 
 Aliases: connection, c, terminal, t`,
 	Run: func(cmd *cobra.Command, args []string) {
-		image := "alpine"
-		pkgManager := "apk"
-		if containerImage != "" {
-			image = containerImage
-			pkgManager = "unknown"
-		} else if useAlpine {
-			image = "alpine"
-			pkgManager = "apk"
-		} else if useBusyBox {
-			image = "busybox"
-			pkgManager = "none"
-		} else if useUbuntu {
-			image = "ubuntu"
-			pkgManager = "apt"
-		}
+		image, pkgManager := resolveImage()
 		resourceName := "m8-tmp-utility-" + m8s.Image2Name(image, "-")
 		m8s.PrintInfo("connection", image, pkgManager, resourceName)
 		utilities.RunCommandInteractive("kubectl", []string{"run", "-it", "--rm", resourceName, "--namespace", namespace, "--image", image}, ".")
