@@ -18,7 +18,13 @@ func setupGritEnv(t *testing.T) {
 	if err := os.Mkdir(GritDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	WriteConfig(DefaultConfig())
+	cfg, err := DefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := WriteConfig(cfg); err != nil {
+		t.Fatal(err)
+	}
 
 	f, err := os.Create(HistoryFile)
 	if err != nil {
@@ -90,7 +96,10 @@ func TestFooter_WithArg(t *testing.T) {
 func TestDefaultConfig(t *testing.T) {
 	t.Chdir(t.TempDir())
 
-	config := DefaultConfig()
+	config, err := DefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
@@ -120,8 +129,13 @@ func TestWriteLoadConfigRoundTrip(t *testing.T) {
 			{Name: "beta", Path: "beta"},
 		},
 	}
-	WriteConfig(want)
-	got := LoadConfig()
+	if err := WriteConfig(want); err != nil {
+		t.Fatal(err)
+	}
+	got, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if got.Root != want.Root {
 		t.Errorf("Root: got %q, want %q", got.Root, want.Root)
@@ -142,7 +156,13 @@ func TestWriteLoadConfigRoundTrip(t *testing.T) {
 func TestWriteConfigYAMLHeader(t *testing.T) {
 	setupGritEnv(t)
 
-	WriteConfig(DefaultConfig())
+	cfg, err := DefaultConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := WriteConfig(cfg); err != nil {
+		t.Fatal(err)
+	}
 
 	data, err := os.ReadFile(ConfigFile)
 	if err != nil {
@@ -156,8 +176,13 @@ func TestWriteConfigYAMLHeader(t *testing.T) {
 func TestWriteLoadConfigEmptyRepositories(t *testing.T) {
 	setupGritEnv(t)
 
-	WriteConfig(Config{Root: "/tmp", IgnoreRoot: true})
-	got := LoadConfig()
+	if err := WriteConfig(Config{Root: "/tmp", IgnoreRoot: true}); err != nil {
+		t.Fatal(err)
+	}
+	got, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if len(got.Repositories) != 0 {
 		t.Errorf("expected empty repositories after round-trip, got %d", len(got.Repositories))
@@ -169,9 +194,14 @@ func TestWriteLoadConfigEmptyRepositories(t *testing.T) {
 func TestAddRepoToConfig_New(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("myrepo", "myrepo")
+	if err := AddRepoToConfig("myrepo", "myrepo"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(config.Repositories) != 1 {
 		t.Fatalf("expected 1 repo, got %d", len(config.Repositories))
 	}
@@ -186,13 +216,23 @@ func TestAddRepoToConfig_New(t *testing.T) {
 func TestAddRepoToConfig_FirstEntry(t *testing.T) {
 	setupGritEnv(t)
 
-	if len(LoadConfig().Repositories) != 0 {
+	initial, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(initial.Repositories) != 0 {
 		t.Fatal("expected 0 repos initially")
 	}
 
-	AddRepoToConfig("first", "first")
+	if err := AddRepoToConfig("first", "first"); err != nil {
+		t.Fatal(err)
+	}
 
-	if len(LoadConfig().Repositories) != 1 {
+	after, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(after.Repositories) != 1 {
 		t.Fatal("expected 1 repo after first add")
 	}
 }
@@ -200,10 +240,17 @@ func TestAddRepoToConfig_FirstEntry(t *testing.T) {
 func TestAddRepoToConfig_DuplicateName(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("myrepo", "path-a")
-	AddRepoToConfig("myrepo", "path-b") // same name, different path
+	if err := AddRepoToConfig("myrepo", "path-a"); err != nil {
+		t.Fatal(err)
+	}
+	if err := AddRepoToConfig("myrepo", "path-b"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(config.Repositories) != 1 {
 		t.Errorf("expected 1 repo after duplicate-name add, got %d", len(config.Repositories))
 	}
@@ -212,10 +259,17 @@ func TestAddRepoToConfig_DuplicateName(t *testing.T) {
 func TestAddRepoToConfig_DuplicatePath(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("name-a", "shared/path")
-	AddRepoToConfig("name-b", "shared/path") // same path, different name
+	if err := AddRepoToConfig("name-a", "shared/path"); err != nil {
+		t.Fatal(err)
+	}
+	if err := AddRepoToConfig("name-b", "shared/path"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(config.Repositories) != 1 {
 		t.Errorf("expected 1 repo after duplicate-path add, got %d", len(config.Repositories))
 	}
@@ -224,11 +278,16 @@ func TestAddRepoToConfig_DuplicatePath(t *testing.T) {
 func TestAddRepoToConfig_MultipleDistinct(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("alpha", "alpha")
-	AddRepoToConfig("beta", "beta")
-	AddRepoToConfig("gamma", "gamma")
+	for _, name := range []string{"alpha", "beta", "gamma"} {
+		if err := AddRepoToConfig(name, name); err != nil {
+			t.Fatal(err)
+		}
+	}
 
-	config := LoadConfig()
+	config, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(config.Repositories) != 3 {
 		t.Errorf("expected 3 repos, got %d", len(config.Repositories))
 	}
@@ -236,16 +295,34 @@ func TestAddRepoToConfig_MultipleDistinct(t *testing.T) {
 
 // --- RemoveRepoFromConfig ---
 
+func mustAddRepo(t *testing.T, name, path string) {
+	t.Helper()
+	if err := AddRepoToConfig(name, path); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func mustLoadConfig(t *testing.T) Config {
+	t.Helper()
+	cfg, err := LoadConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return cfg
+}
+
 func TestRemoveRepoFromConfig_Middle(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("alpha", "alpha")
-	AddRepoToConfig("beta", "beta")
-	AddRepoToConfig("gamma", "gamma")
+	mustAddRepo(t, "alpha", "alpha")
+	mustAddRepo(t, "beta", "beta")
+	mustAddRepo(t, "gamma", "gamma")
 
-	RemoveRepoFromConfig("beta")
+	if err := RemoveRepoFromConfig("beta"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config := mustLoadConfig(t)
 	if len(config.Repositories) != 2 {
 		t.Fatalf("expected 2 repos after removal, got %d", len(config.Repositories))
 	}
@@ -259,12 +336,14 @@ func TestRemoveRepoFromConfig_Middle(t *testing.T) {
 func TestRemoveRepoFromConfig_First(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("alpha", "alpha")
-	AddRepoToConfig("beta", "beta")
+	mustAddRepo(t, "alpha", "alpha")
+	mustAddRepo(t, "beta", "beta")
 
-	RemoveRepoFromConfig("alpha")
+	if err := RemoveRepoFromConfig("alpha"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config := mustLoadConfig(t)
 	if len(config.Repositories) != 1 {
 		t.Fatalf("expected 1 repo, got %d", len(config.Repositories))
 	}
@@ -276,12 +355,14 @@ func TestRemoveRepoFromConfig_First(t *testing.T) {
 func TestRemoveRepoFromConfig_Last(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("alpha", "alpha")
-	AddRepoToConfig("beta", "beta")
+	mustAddRepo(t, "alpha", "alpha")
+	mustAddRepo(t, "beta", "beta")
 
-	RemoveRepoFromConfig("beta")
+	if err := RemoveRepoFromConfig("beta"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config := mustLoadConfig(t)
 	if len(config.Repositories) != 1 {
 		t.Fatalf("expected 1 repo, got %d", len(config.Repositories))
 	}
@@ -293,10 +374,12 @@ func TestRemoveRepoFromConfig_Last(t *testing.T) {
 func TestRemoveRepoFromConfig_OnlyEntry(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("solo", "solo")
-	RemoveRepoFromConfig("solo")
+	mustAddRepo(t, "solo", "solo")
+	if err := RemoveRepoFromConfig("solo"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config := mustLoadConfig(t)
 	if len(config.Repositories) != 0 {
 		t.Errorf("expected empty repos after removing only entry, got %d", len(config.Repositories))
 	}
@@ -305,10 +388,12 @@ func TestRemoveRepoFromConfig_OnlyEntry(t *testing.T) {
 func TestRemoveRepoFromConfig_NotFound(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("alpha", "alpha")
-	RemoveRepoFromConfig("nonexistent")
+	mustAddRepo(t, "alpha", "alpha")
+	if err := RemoveRepoFromConfig("nonexistent"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config := mustLoadConfig(t)
 	if len(config.Repositories) != 1 {
 		t.Errorf("config should be unchanged after removing nonexistent repo, got %d repos", len(config.Repositories))
 	}
@@ -317,13 +402,15 @@ func TestRemoveRepoFromConfig_NotFound(t *testing.T) {
 func TestRemoveRepoFromConfig_Wildcard(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("gg-phoenix-api", "gg-phoenix-api")
-	AddRepoToConfig("gg-phoenix-web", "gg-phoenix-web")
-	AddRepoToConfig("other-repo", "other-repo")
+	mustAddRepo(t, "gg-phoenix-api", "gg-phoenix-api")
+	mustAddRepo(t, "gg-phoenix-web", "gg-phoenix-web")
+	mustAddRepo(t, "other-repo", "other-repo")
 
-	RemoveRepoFromConfig("gg-phoenix-*")
+	if err := RemoveRepoFromConfig("gg-phoenix-*"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config := mustLoadConfig(t)
 	if len(config.Repositories) != 1 {
 		t.Fatalf("expected 1 repo after wildcard removal, got %d", len(config.Repositories))
 	}
@@ -335,13 +422,15 @@ func TestRemoveRepoFromConfig_Wildcard(t *testing.T) {
 func TestRemoveRepoFromConfig_ShellSafeWildcard(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("gg-phoenix-api", "gg-phoenix-api")
-	AddRepoToConfig("gg-phoenix-web", "gg-phoenix-web")
-	AddRepoToConfig("other-repo", "other-repo")
+	mustAddRepo(t, "gg-phoenix-api", "gg-phoenix-api")
+	mustAddRepo(t, "gg-phoenix-web", "gg-phoenix-web")
+	mustAddRepo(t, "other-repo", "other-repo")
 
-	RemoveRepoFromConfig("gg-phoenix-%")
+	if err := RemoveRepoFromConfig("gg-phoenix-%"); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config := mustLoadConfig(t)
 	if len(config.Repositories) != 1 {
 		t.Fatalf("expected 1 repo after %% wildcard removal, got %d", len(config.Repositories))
 	}
@@ -353,10 +442,12 @@ func TestRemoveRepoFromConfig_ShellSafeWildcard(t *testing.T) {
 func TestRemoveRepoFromConfig_InvalidPattern(t *testing.T) {
 	setupGritEnv(t)
 
-	AddRepoToConfig("alpha", "alpha")
-	RemoveRepoFromConfig("[")
+	mustAddRepo(t, "alpha", "alpha")
+	if err := RemoveRepoFromConfig("["); err != nil {
+		t.Fatal(err)
+	}
 
-	config := LoadConfig()
+	config := mustLoadConfig(t)
 	if len(config.Repositories) != 1 {
 		t.Errorf("config should be unchanged after invalid pattern, got %d repos", len(config.Repositories))
 	}
@@ -367,8 +458,12 @@ func TestRemoveRepoFromConfig_InvalidPattern(t *testing.T) {
 func TestAppendHistory_Appends(t *testing.T) {
 	setupGritEnv(t)
 
-	AppendHistory("grit pull")
-	AppendHistory("grit status")
+	if err := AppendHistory("grit pull"); err != nil {
+		t.Fatal(err)
+	}
+	if err := AppendHistory("grit status"); err != nil {
+		t.Fatal(err)
+	}
 
 	data, err := os.ReadFile(HistoryFile)
 	if err != nil {
@@ -386,8 +481,12 @@ func TestAppendHistory_Appends(t *testing.T) {
 func TestAppendHistory_DoesNotOverwrite(t *testing.T) {
 	setupGritEnv(t)
 
-	AppendHistory("first command")
-	AppendHistory("second command")
+	if err := AppendHistory("first command"); err != nil {
+		t.Fatal(err)
+	}
+	if err := AppendHistory("second command"); err != nil {
+		t.Fatal(err)
+	}
 
 	data, err := os.ReadFile(HistoryFile)
 	if err != nil {
@@ -402,7 +501,9 @@ func TestAppendHistory_DoesNotOverwrite(t *testing.T) {
 func TestAppendHistory_Format(t *testing.T) {
 	setupGritEnv(t)
 
-	AppendHistory("grit pull")
+	if err := AppendHistory("grit pull"); err != nil {
+		t.Fatal(err)
+	}
 
 	data, err := os.ReadFile(HistoryFile)
 	if err != nil {
@@ -424,8 +525,9 @@ func TestAppendHistory_CreatesFileIfNotExists(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// O_CREATE flag should re-create the file.
-	AppendHistory("test command")
+	if err := AppendHistory("test command"); err != nil {
+		t.Fatal(err)
+	}
 
 	data, err := os.ReadFile(HistoryFile)
 	if err != nil {
@@ -447,7 +549,9 @@ func TestAddAllRepos_AddsGitDirs(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	AddAllRepos()
+	if err := AddAllRepos(); err != nil {
+		t.Fatal(err)
+	}
 
 	names := repoNameSet(t)
 	if !names["repo-a"] {
@@ -465,12 +569,15 @@ func TestAddAllRepos_SkipsExistingRepos(t *testing.T) {
 	setupGritEnv(t)
 
 	makeFakeGitDir(t, "repo-a")
-	AddRepoToConfig("repo-a", "repo-a")
+	mustAddRepo(t, "repo-a", "repo-a")
 
-	AddAllRepos()
+	if err := AddAllRepos(); err != nil {
+		t.Fatal(err)
+	}
 
+	config := mustLoadConfig(t)
 	count := 0
-	for _, r := range LoadConfig().Repositories {
+	for _, r := range config.Repositories {
 		if r.Name == "repo-a" {
 			count++
 		}
@@ -483,9 +590,12 @@ func TestAddAllRepos_SkipsExistingRepos(t *testing.T) {
 func TestAddAllRepos_SkipsGritDir(t *testing.T) {
 	setupGritEnv(t)
 
-	AddAllRepos()
+	if err := AddAllRepos(); err != nil {
+		t.Fatal(err)
+	}
 
-	for _, r := range LoadConfig().Repositories {
+	config := mustLoadConfig(t)
+	for _, r := range config.Repositories {
 		if r.Name == GritDir || r.Path == GritDir {
 			t.Errorf("grit dir %q should not be added as a repo", GritDir)
 		}
@@ -494,6 +604,13 @@ func TestAddAllRepos_SkipsGritDir(t *testing.T) {
 
 // --- RunGitCommandParallel ---
 
+func mustWriteConfig(t *testing.T, cfg Config) {
+	t.Helper()
+	if err := WriteConfig(cfg); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestRunGitCommandParallel_Completes(t *testing.T) {
 	setupGritEnv(t)
 
@@ -501,7 +618,7 @@ func TestRunGitCommandParallel_Completes(t *testing.T) {
 	makeRealGitRepo(t, "repo-a")
 	makeRealGitRepo(t, "repo-b")
 
-	WriteConfig(Config{
+	mustWriteConfig(t, Config{
 		Root: cwd,
 		Repositories: []Repository{
 			{Name: "repo-a", Path: "repo-a"},
@@ -527,7 +644,7 @@ func TestRunGitCommandParallel_SemaphoreLimitOne(t *testing.T) {
 	makeRealGitRepo(t, "repo-b")
 	makeRealGitRepo(t, "repo-c")
 
-	WriteConfig(Config{
+	mustWriteConfig(t, Config{
 		Root: cwd,
 		Repositories: []Repository{
 			{Name: "repo-a", Path: "repo-a"},
@@ -547,7 +664,7 @@ func TestRunGitCommandParallel_InvalidSemaphoreValues(t *testing.T) {
 
 	cwd := mustGetwd(t)
 	makeRealGitRepo(t, "repo-a")
-	WriteConfig(Config{
+	mustWriteConfig(t, Config{
 		Root:         cwd,
 		Repositories: []Repository{{Name: "repo-a", Path: "repo-a"}},
 	})
@@ -571,7 +688,7 @@ func TestRunGitCommandSynchronous_Completes(t *testing.T) {
 	makeRealGitRepo(t, "repo-a")
 	makeRealGitRepo(t, "repo-b")
 
-	WriteConfig(Config{
+	mustWriteConfig(t, Config{
 		Root: cwd,
 		Repositories: []Repository{
 			{Name: "repo-a", Path: "repo-a"},
@@ -594,7 +711,7 @@ func TestRunGitCommandSynchronous_ReportsFailedRepos(t *testing.T) {
 	cwd := mustGetwd(t)
 	makeRealGitRepo(t, "repo-ok")
 
-	WriteConfig(Config{
+	mustWriteConfig(t, Config{
 		Root: cwd,
 		Repositories: []Repository{
 			{Name: "repo-ok", Path: "repo-ok"},
@@ -626,7 +743,7 @@ func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
 	cwd := mustGetwd(t)
 	makeRealGitRepo(t, "repo-ok")
 
-	WriteConfig(Config{
+	mustWriteConfig(t, Config{
 		Root: cwd,
 		Repositories: []Repository{
 			{Name: "repo-ok", Path: "repo-ok"},
@@ -666,7 +783,7 @@ func mustGetwd(t *testing.T) string {
 func repoNameSet(t *testing.T) map[string]bool {
 	t.Helper()
 	names := make(map[string]bool)
-	for _, r := range LoadConfig().Repositories {
+	for _, r := range mustLoadConfig(t).Repositories {
 		names[r.Name] = true
 	}
 	return names

@@ -28,11 +28,13 @@ Will update all the of the repositories in the configuration.  Useful for updati
 Environment Variables:
   GRIT_MAX_CONCURRENT  Maximum number of repositories to process in parallel (default: unlimited).`,
 	Args: cobra.MinimumNArgs(1),
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
-		grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		if err := grit.TestGritDir(); err != nil {
+			return err
+		}
+		return grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if gritSynchronous {
 			grit.RunGitCommandSynchronous(args)
 		} else {
@@ -40,6 +42,7 @@ Environment Variables:
 		}
 		fmt.Println("Finished Run @ " + utilities.ShowDateTime("dash", true))
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 
@@ -52,9 +55,12 @@ var gritAddRepoCmd = &cobra.Command{
 Aliases: add-repo, add`,
 	DisableFlagsInUseLine: true,
 	Args:                  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
-		grit.AddRepoToConfig(args[0], args[0])
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := grit.AddRepoToConfig(args[0], args[0]); err != nil {
+			return err
+		}
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 
@@ -66,9 +72,12 @@ var gritAddAllReposCmd = &cobra.Command{
 
 Aliases: add-all-repos, add-all`,
 	DisableFlagsInUseLine: true,
-	Run: func(cmd *cobra.Command, args []string) {
-		grit.AddAllRepos()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := grit.AddAllRepos(); err != nil {
+			return err
+		}
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 
@@ -80,24 +89,34 @@ var gritConfigCmd = &cobra.Command{
 
 Aliases: config, conf`,
 	DisableFlagsInUseLine: true,
-	Run: func(cmd *cobra.Command, args []string) {
-		var config = grit.LoadConfig()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		config, err := grit.LoadConfig()
+		if err != nil {
+			return err
+		}
 
-		// Marshal the data into YAML format with indentation
 		yamlData, err := yaml.Marshal(config)
-		utilities.Check(err)
+		if err != nil {
+			return err
+		}
+
+		cwd, err := utilities.GetWorkingDir()
+		if err != nil {
+			return err
+		}
 
 		fmt.Println("--------")
 		fmt.Println(string(yamlData))
 		fmt.Println("--------")
 		fmt.Println("")
 		fmt.Println("Repositories Count: " + strconv.Itoa(len(config.Repositories)))
-		fmt.Println("Grit Directory: " + utilities.GetWorkingDir() + "/" + grit.GritDir)
-		fmt.Println("Config File: " + utilities.GetWorkingDir() + "/" + grit.ConfigFile)
-		fmt.Println("History File: " + utilities.GetWorkingDir() + "/" + grit.HistoryFile)
-		fmt.Println("Working Directory: " + utilities.GetWorkingDir())
+		fmt.Println("Grit Directory: " + cwd + "/" + grit.GritDir)
+		fmt.Println("Config File: " + cwd + "/" + grit.ConfigFile)
+		fmt.Println("History File: " + cwd + "/" + grit.HistoryFile)
+		fmt.Println("Working Directory: " + cwd)
 
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 
@@ -109,31 +128,38 @@ var gritInitCmd = &cobra.Command{
 
 Aliases: initialize, init`,
 	DisableFlagsInUseLine: true,
-	PersistentPreRun:      func(cmd *cobra.Command, args []string) {},
-	Run: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE:     func(cmd *cobra.Command, args []string) error { return nil },
+	RunE: func(cmd *cobra.Command, args []string) error {
 		configFileExists, _ := utilities.FileDirExists(grit.GritDir)
 		if configFileExists {
 			fmt.Println("Grit is already initialized.")
-			return
+			return nil
 		}
 
-		// Create .grit Dir
-		dirErr := os.Mkdir(grit.GritDir, 0755)
-		utilities.Check(dirErr)
+		if err := os.Mkdir(grit.GritDir, 0755); err != nil {
+			return err
+		}
 
-		// Create Default Config File
-		var config = grit.DefaultConfig()
-		grit.WriteConfig(config)
+		config, err := grit.DefaultConfig()
+		if err != nil {
+			return err
+		}
+		if err := grit.WriteConfig(config); err != nil {
+			return err
+		}
 
-		// Create History File
-		f, historyErr := os.Create(grit.HistoryFile)
-		utilities.Check(historyErr)
+		f, err := os.Create(grit.HistoryFile)
+		if err != nil {
+			return err
+		}
 		defer func() {
 			if err := f.Close(); err != nil {
 				log.Println(err)
 			}
 		}()
+
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 
@@ -142,15 +168,17 @@ var gritHistoryCmd = &cobra.Command{
 	Short:                 "Show grit history",
 	Long:                  "Print the history of the current grit directory.",
 	DisableFlagsInUseLine: true,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		return grit.TestGritDir()
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		history, err := os.ReadFile(grit.HistoryFile)
-		utilities.Check(err)
-
+		if err != nil {
+			return err
+		}
 		fmt.Println(string(history))
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 
@@ -167,12 +195,15 @@ before grit runs. Quoted * also works (e.g. 'gg-phoenix-*').
 Aliases: remove-repo, remove, rm`,
 	DisableFlagsInUseLine: true,
 	Args:                  cobra.ExactArgs(1),
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		return grit.TestGritDir()
 	},
-	Run: func(cmd *cobra.Command, args []string) {
-		grit.RemoveRepoFromConfig(args[0])
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := grit.RemoveRepoFromConfig(args[0]); err != nil {
+			return err
+		}
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 
@@ -181,13 +212,18 @@ var gritResetCmd = &cobra.Command{
 	Short:                 "Reset grit",
 	Long:                  "Reset grit configuration to the default configuration.",
 	DisableFlagsInUseLine: true,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		if utilities.WaitForConfirmationPrompt("Do you want to continue?") {
-			var config = grit.DefaultConfig()
-			grit.WriteConfig(config)
+			config, err := grit.DefaultConfig()
+			if err != nil {
+				return err
+			}
+			if err := grit.WriteConfig(config); err != nil {
+				return err
+			}
 		}
-
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 
@@ -196,14 +232,15 @@ var gritDestroyCmd = &cobra.Command{
 	Short:                 "Clean grit",
 	Long:                  "Cleanup the current grit setup by removing the .grit directory and contents.",
 	DisableFlagsInUseLine: true,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		grit.TestGritDir()
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		return grit.TestGritDir()
 	},
-	Run: func(cmd *cobra.Command, args []string) {
-		err := os.RemoveAll(grit.GritDir)
-		utilities.Check(err)
-
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := os.RemoveAll(grit.GritDir); err != nil {
+			return err
+		}
 		grit.PrintTagLine(cmd.Root().Version)
+		return nil
 	},
 }
 

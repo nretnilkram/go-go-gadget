@@ -1,26 +1,27 @@
 package grit
 
 import (
+	"errors"
 	"fmt"
-	"os"
 
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
 // GetWorkingDir returns the current working directory at the time of the call.
-func GetWorkingDir() string {
+func GetWorkingDir() (string, error) {
 	return utilities.GetWorkingDir()
 }
 
-// TestGritDir checks if the current directory contains a grit dir and config, exiting if not.
-func TestGritDir() {
+// TestGritDir checks if the current directory contains a grit dir and config.
+// Returns an error if either is missing.
+func TestGritDir() error {
 	gritDirExists, _ := utilities.FileDirExists(GritDir)
 	configFileExists, _ := utilities.FileDirExists(ConfigFile)
 
 	if !gritDirExists || !configFileExists {
-		fmt.Println("This is not a grit directory.")
-		os.Exit(1)
+		return errors.New("this is not a grit directory")
 	}
+	return nil
 }
 
 // Header returns a dashed header line with an optional header string appended.
