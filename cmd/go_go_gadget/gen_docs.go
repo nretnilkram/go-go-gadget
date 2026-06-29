@@ -19,26 +19,27 @@ Aliases: documentation, docs`,
 	DisableFlagsInUseLine: true,
 	Args:                  cobra.ExactArgs(1),
 	ValidArgs:             []string{"md", "rest", "yaml"},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		doesDocsDirExist, err := utilities.FileDirExists("./docs")
-		utilities.Check(err)
+		if err != nil {
+			return err
+		}
 
-		if !(doesDocsDirExist) {
-			dirErr := os.Mkdir("./docs", 0755)
-			utilities.Check(dirErr)
+		if !doesDocsDirExist {
+			if err := os.Mkdir("./docs", 0755); err != nil {
+				return err
+			}
 		}
 
 		switch args[0] {
 		case "md":
-			genErr := doc.GenMarkdownTree(rootCmd, "./docs")
-			utilities.Check(genErr)
+			return doc.GenMarkdownTree(rootCmd, "./docs")
 		case "rest":
-			genErr := doc.GenReSTTree(rootCmd, "./docs")
-			utilities.Check(genErr)
+			return doc.GenReSTTree(rootCmd, "./docs")
 		case "yaml":
-			genErr := doc.GenYamlTree(rootCmd, "./docs")
-			utilities.Check(genErr)
+			return doc.GenYamlTree(rootCmd, "./docs")
 		}
+		return nil
 	},
 }
 

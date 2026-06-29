@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // Reverse returns the input string with its characters in reversed order.
@@ -28,20 +29,18 @@ func inspectNumbers(input string) (count int) {
 // Inspect a string and return character count
 func Inspect(input string, digits bool) (count int, kind string) {
 	if !digits {
-		return len(input), "char"
+		return utf8.RuneCountInString(input), "char"
 	}
 	return inspectNumbers(input), "digit"
 }
 
 func k8sTransform(s string) string {
-	if len(s) == 0 {
+	r := []rune(s)
+	if len(r) == 0 {
 		return s
 	}
-	var first = string(s[0])
-	var length = len(s)
-	var last = string(s[length-1])
-	if len(s) > 2 {
-		return first + fmt.Sprint(length-2) + last
+	if len(r) > 2 {
+		return string(r[0]) + fmt.Sprint(len(r)-2) + string(r[len(r)-1])
 	}
 	return s
 }

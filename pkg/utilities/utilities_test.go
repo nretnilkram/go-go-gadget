@@ -9,7 +9,10 @@ import (
 )
 
 func TestUtilities(t *testing.T) {
-	gwd := GetWorkingDir()
+	gwd, err := GetWorkingDir()
+	if err != nil {
+		t.Fatalf("GetWorkingDir returned unexpected error: %v", err)
+	}
 	if reflect.TypeOf(gwd).Kind() != reflect.String {
 		t.Errorf("GetWorkingDir did not return a string.")
 	}
@@ -77,7 +80,10 @@ module "my_module" {
 		t.Fatalf("failed to write temp file: %v", err)
 	}
 
-	got := GrepFileForTFResources(tmp)
+	got, err := GrepFileForTFResources(tmp)
+	if err != nil {
+		t.Fatalf("GrepFileForTFResources returned unexpected error: %v", err)
+	}
 
 	if len(got) != 2 {
 		t.Fatalf("expected 2 targets, got %d: %v", len(got), got)
@@ -100,7 +106,9 @@ func TestListTFResources(t *testing.T) {
 	if err := os.WriteFile(tmp, []byte(content), 0600); err != nil {
 		t.Fatalf("failed to write temp file: %v", err)
 	}
-	ListTFResources([]string{tmp})
+	if err := ListTFResources([]string{tmp}); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestRegexTest(t *testing.T) {
@@ -116,7 +124,11 @@ func TestRegexTest(t *testing.T) {
 		{"foobar", `^foo$`, false},
 	}
 	for _, c := range cases {
-		got := RegexTest(c.in, c.pattern)
+		got, err := RegexTest(c.in, c.pattern)
+		if err != nil {
+			t.Errorf("RegexTest(%q, %q) returned unexpected error: %v", c.in, c.pattern, err)
+			continue
+		}
 		if got != c.want {
 			t.Errorf("RegexTest(%q, %q) == %t, want %t", c.in, c.pattern, got, c.want)
 		}

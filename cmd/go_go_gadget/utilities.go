@@ -29,7 +29,7 @@ var gitQuickBranchCmd = &cobra.Command{
 	Long: `Create a git branch using the today's date and user input or random words.
 
 Aliases: quick-branch, qb`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		today := utilities.ShowDateTime("dash", false)
 
 		// Create a name with a color followed by an animal
@@ -43,13 +43,17 @@ Aliases: quick-branch, qb`,
 
 		branchName := "m8-" + today + "-" + strings.ReplaceAll(strings.TrimSpace(name), " ", "-")
 
-		path := utilities.GetWorkingDir()
+		path, err := utilities.GetWorkingDir()
+		if err != nil {
+			return err
+		}
 
 		if utilities.IsGitRepo(path) {
 			fmt.Print(utilities.RunCommand("git", []string{"checkout", "-b", branchName}, path))
 		} else {
 			fmt.Print("This is not a git repository.")
 		}
+		return nil
 	},
 }
 
@@ -60,7 +64,7 @@ var gitQuickCommitCmd = &cobra.Command{
 	Long: `Commit  and push current changes using a random 5 word commit message.
 
 Aliases: quick-commit, qc`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		adjective := words.Words(1, words.WordSetWeight{Adjectives: 1, Animals: 0, Colors: 0, Nouns: 0, Verbs: 0})
 		animal := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 1, Colors: 0, Nouns: 0, Verbs: 0})
 		color := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 1, Nouns: 0, Verbs: 0})
@@ -69,7 +73,10 @@ Aliases: quick-commit, qc`,
 
 		message := strings.TrimSpace(fmt.Sprintf(`%s%s%s%s%s`, adjective, color, animal, verb, noun))
 
-		path := utilities.GetWorkingDir()
+		path, err := utilities.GetWorkingDir()
+		if err != nil {
+			return err
+		}
 
 		if utilities.IsGitRepo(path) {
 			fmt.Print(utilities.RunCommand("git", []string{"commit", "-am", message}, path))
@@ -77,6 +84,7 @@ Aliases: quick-commit, qc`,
 		} else {
 			fmt.Print("This is not a git repository.")
 		}
+		return nil
 	},
 }
 
@@ -87,13 +95,16 @@ var gitEmptyCommitCmd = &cobra.Command{
 	Long: `Create and push an empty commit with random 3 word commit message.
 
 Aliases: empty-commit, ec`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		adjective := words.Words(1, words.WordSetWeight{Adjectives: 1, Animals: 0, Colors: 0, Nouns: 0, Verbs: 0})
 		animal := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 1, Colors: 0, Nouns: 0, Verbs: 0})
 		color := words.Words(1, words.WordSetWeight{Adjectives: 0, Animals: 0, Colors: 1, Nouns: 0, Verbs: 0})
 
 		message := strings.TrimSpace(fmt.Sprintf(`%s%s%s`, adjective, color, animal))
-		path := utilities.GetWorkingDir()
+		path, err := utilities.GetWorkingDir()
+		if err != nil {
+			return err
+		}
 
 		if utilities.IsGitRepo(path) {
 			fmt.Print(utilities.RunCommand("git", []string{"commit", "--allow-empty", "-m", message}, path))
@@ -101,6 +112,7 @@ Aliases: empty-commit, ec`,
 		} else {
 			fmt.Print("This is not a git repository.")
 		}
+		return nil
 	},
 }
 
@@ -115,8 +127,8 @@ var tfListResourcesCmd = &cobra.Command{
 --target="aws_security_group.example_3 \
 
 Aliases: tf-list-resources, tflr`,
-	Run: func(cmd *cobra.Command, args []string) {
-		utilities.ListTFResources(args)
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return utilities.ListTFResources(args)
 	},
 }
 

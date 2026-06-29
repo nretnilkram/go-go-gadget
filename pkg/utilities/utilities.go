@@ -92,22 +92,19 @@ func IsGitRepo(path string) bool {
 	return cmd.Run() == nil
 }
 
-// GetWorkingDir returns the current working directory, panicking on error.
-func GetWorkingDir() string {
-	dir, err := os.Getwd()
-	Check(err)
-	return dir
+// GetWorkingDir returns the current working directory.
+func GetWorkingDir() (string, error) {
+	return os.Getwd()
 }
 
 // GrepFileForTFResources scans a Terraform file and returns a slice of --target flags
 // for all resource and module blocks found.
-func GrepFileForTFResources(filename string) []string {
-	resources := []string{}
+func GrepFileForTFResources(filename string) ([]string, error) {
+	var resources []string
 
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("open %s: %w", filename, err)
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
@@ -128,18 +125,22 @@ func GrepFileForTFResources(filename string) []string {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Error reading file:", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("read %s: %w", filename, err)
 	}
 
-	return (resources)
+	return resources, nil
 }
 
 // ListTFResources prints the Terraform resource targets found in each of the given files.
-func ListTFResources(files []string) {
+func ListTFResources(files []string) error {
 	for _, file := range files {
-		fmt.Println(strings.Join(GrepFileForTFResources(file), "\n"))
+		resources, err := GrepFileForTFResources(file)
+		if err != nil {
+			return err
+		}
+		fmt.Println(strings.Join(resources, "\n"))
 	}
+	return nil
 }
 
 // ValidateSemver reports whether the given string is a valid semantic version.
@@ -148,14 +149,12 @@ func ValidateSemver(version string) bool {
 }
 
 // RegexTest reports whether input matches the given regular expression pattern.
-func RegexTest(input string, pattern string) bool {
+func RegexTest(input string, pattern string) (bool, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
-		fmt.Println("Invalid regex pattern:", err)
-		os.Exit(1)
+		return false, fmt.Errorf("invalid regex %q: %w", pattern, err)
 	}
-
-	return re.MatchString(input)
+	return re.MatchString(input), nil
 }
 
 // WaitForConfirmationPrompt displays a [y/n] prompt and returns true if the user confirms.
