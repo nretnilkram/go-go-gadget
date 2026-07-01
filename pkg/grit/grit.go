@@ -124,6 +124,10 @@ func runGitCommandParallel(config Config, args []string) []repoFailure {
 			maxConcurrent = parsed
 		}
 	}
+	// Config value takes precedence over the environment variable.
+	if config.MaxConcurrent > 0 {
+		maxConcurrent = config.MaxConcurrent
+	}
 
 	var wg sync.WaitGroup
 	var printMu sync.Mutex

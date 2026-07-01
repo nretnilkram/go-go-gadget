@@ -17,9 +17,10 @@ type Repository struct {
 
 // Config holds the root path and list of repositories managed by grit.
 type Config struct {
-	Root         string
-	Repositories []Repository
-	IgnoreRoot   bool `yaml:"ignore_root"`
+	Root           string
+	Repositories   []Repository
+	IgnoreRoot     bool `yaml:"ignore_root"`
+	MaxConcurrent  int  `yaml:"max_concurrent"`
 }
 
 // DefaultConfig returns a Config populated with default values.

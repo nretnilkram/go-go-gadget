@@ -25,8 +25,13 @@ e.g. go-go-gadget grit pull
 
 Will update all the of the repositories in the configuration.  Useful for updating all repositories in the morning.
 
+Configuration (config.yml):
+  max_concurrent  Maximum number of repositories to process in parallel (default: unlimited).
+                  Takes precedence over the GRIT_MAX_CONCURRENT environment variable.
+
 Environment Variables:
-  GRIT_MAX_CONCURRENT  Maximum number of repositories to process in parallel (default: unlimited).`,
+  GRIT_MAX_CONCURRENT  Maximum number of repositories to process in parallel (default: unlimited).
+                       Overridden by max_concurrent in config.yml when set.`,
 	Args: cobra.MinimumNArgs(1),
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := grit.TestGritDir(); err != nil {
