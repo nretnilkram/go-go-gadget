@@ -679,63 +679,6 @@ func TestRunGitCommandParallel_InvalidSemaphoreValues(t *testing.T) {
 	}
 }
 
-// --- RunGitCommandSynchronous ---
-
-func TestRunGitCommandSynchronous_Completes(t *testing.T) {
-	setupGritEnv(t)
-
-	cwd := mustGetwd(t)
-	makeRealGitRepo(t, "repo-a")
-	makeRealGitRepo(t, "repo-b")
-
-	mustWriteConfig(t, Config{
-		Root: cwd,
-		Repositories: []Repository{
-			{Name: "repo-a", Path: "repo-a"},
-			{Name: "repo-b", Path: "repo-b"},
-		},
-	})
-
-	RunGitCommandSynchronous([]string{"status"})
-}
-
-func TestRunGitCommandSynchronous_EmptyRepos(t *testing.T) {
-	setupGritEnv(t)
-
-	RunGitCommandSynchronous([]string{"status"})
-}
-
-func TestRunGitCommandSynchronous_ReportsFailedRepos(t *testing.T) {
-	setupGritEnv(t)
-
-	cwd := mustGetwd(t)
-	makeRealGitRepo(t, "repo-ok")
-
-	mustWriteConfig(t, Config{
-		Root: cwd,
-		Repositories: []Repository{
-			{Name: "repo-ok", Path: "repo-ok"},
-			{Name: "repo-missing", Path: "does-not-exist"},
-		},
-	})
-
-	out := captureStdout(t, func() {
-		RunGitCommandSynchronous([]string{"status"})
-	})
-
-	if !strings.Contains(out, "REPOSITORIES WITH ERRORS") {
-		t.Fatalf("expected error summary in output, got:\n%s", out)
-	}
-	if !strings.Contains(out, "repo-missing:") {
-		t.Fatalf("expected repo-missing in error summary, got:\n%s", out)
-	}
-	if !strings.Contains(out, "    ") {
-		t.Fatalf("expected indented error lines in summary, got:\n%s", out)
-	}
-	if strings.Contains(out, "  repo-ok:") {
-		t.Fatalf("repo-ok should not appear in error summary, got:\n%s", out)
-	}
-}
 
 func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
 	setupGritEnv(t)

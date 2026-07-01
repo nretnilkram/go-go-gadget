@@ -82,17 +82,6 @@ func RunGitCommandParallel(args []string) {
 	printFailedRepos(failed)
 }
 
-// RunGitCommandSynchronous runs the given git command sequentially across all configured repositories.
-func RunGitCommandSynchronous(args []string) {
-	config, err := LoadConfig()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		return
-	}
-	failed := runGitCommandSynchronous(config, args)
-	printFailedRepos(failed)
-}
-
 type repoFailure struct {
 	Name   string
 	Output string
@@ -170,32 +159,6 @@ func runGitCommandParallel(config Config, args []string) []repoFailure {
 		return failed[i].Name < failed[j].Name
 	})
 	return failed
-}
-
-func runGitCommandSynchronous(config Config, args []string) []repoFailure {
-	var failed []repoFailure
-
-	for _, repo := range config.Repositories {
-		if failure := runGitInRepoSync(config, repo, args); failure != nil {
-			failed = append(failed, *failure)
-		}
-	}
-
-	return failed
-}
-
-func runGitInRepoSync(config Config, repo Repository, args []string) *repoFailure {
-	commandDisplay := "git " + strings.Join(args, " ")
-	repoDir := config.Root + "/" + repo.Path
-	output, err := utilities.RunCommandWithError("git", args, repoDir)
-
-	name := strings.ToUpper(repo.Name)
-	fmt.Println(Header(name+" -- "+commandDisplay) + "\n" + output + Footer())
-
-	if err != nil {
-		return &repoFailure{Name: repo.Name, Output: output}
-	}
-	return nil
 }
 
 func printFailedRepos(failed []repoFailure) {

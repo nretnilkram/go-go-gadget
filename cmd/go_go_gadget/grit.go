@@ -14,8 +14,6 @@ import (
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
-var gritSynchronous bool
-
 var gritCmd = &cobra.Command{
 	Use:   "grit",
 	Short: "Run git commands on multiple repositories",
@@ -40,11 +38,7 @@ Environment Variables:
 		return grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if gritSynchronous {
-			grit.RunGitCommandSynchronous(args)
-		} else {
-			grit.RunGitCommandParallel(args)
-		}
+		grit.RunGitCommandParallel(args)
 		fmt.Println("Finished Run @ " + utilities.ShowDateTime("dash", true))
 		grit.PrintTagLine(cmd.Root().Version)
 		return nil
@@ -266,6 +260,5 @@ func init() {
 
 	gritCmd.AddCommand(gritResetCmd)
 
-	gritCmd.Flags().BoolVarP(&gritSynchronous, "synchronous", "s", false, "Run Grit Command Synchronously")
 	rootCmd.AddCommand(gritCmd)
 }
