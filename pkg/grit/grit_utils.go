@@ -19,7 +19,8 @@ func TestGritDir() error {
 	configFileExists, _ := utilities.FileDirExists(ConfigFile)
 
 	if !gritDirExists || !configFileExists {
-		return errors.New("this is not a grit directory")
+		workingDir, _ := GetWorkingDir()
+		return errors.New(workingDir + " is not a grit directory")
 	}
 	return nil
 }
