@@ -679,7 +679,6 @@ func TestRunGitCommandParallel_InvalidSemaphoreValues(t *testing.T) {
 	}
 }
 
-
 func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
 	setupGritEnv(t)
 
