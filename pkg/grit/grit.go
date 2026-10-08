@@ -73,12 +73,17 @@ func AddAllRepos() error {
 
 // RunGitCommandParallel runs the given git command concurrently across all configured repositories.
 func RunGitCommandParallel(args []string) {
+	RunCommandParallel("git", args)
+}
+
+// RunCommandParallel runs the given command concurrently across all configured repositories.
+func RunCommandParallel(commandName string, args []string) {
 	config, err := LoadConfig()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		return
 	}
-	failed := runGitCommandParallel(config, args)
+	failed := runCommandParallel(config, commandName, args)
 	printFailedRepos(failed)
 }
 
@@ -93,10 +98,13 @@ type repoResult struct {
 	failure *repoFailure
 }
 
-func buildParallelRepoOutput(config Config, repo Repository, args []string) repoResult {
-	commandDisplay := "git " + strings.Join(args, " ")
+func buildParallelRepoOutput(config Config, repo Repository, commandName string, args []string) repoResult {
+	commandDisplay := commandName
+	if len(args) > 0 {
+		commandDisplay += " " + strings.Join(args, " ")
+	}
 	repoDir := config.Root + "/" + repo.Path
-	output, err := utilities.RunCommandWithError("git", args, repoDir)
+	output, err := utilities.RunCommandWithError(commandName, args, repoDir)
 	name := strings.ToUpper(repo.Name)
 	display := Header(name+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + Footer(name)
 	result := repoResult{display: display}
@@ -106,7 +114,7 @@ func buildParallelRepoOutput(config Config, repo Repository, args []string) repo
 	return result
 }
 
-func runGitCommandParallel(config Config, args []string) []repoFailure {
+func runCommandParallel(config Config, commandName string, args []string) []repoFailure {
 	maxConcurrent := 0
 	if maxConcurrentStr := os.Getenv("GRIT_MAX_CONCURRENT"); maxConcurrentStr != "" {
 		if parsed, err := strconv.Atoi(maxConcurrentStr); err == nil && parsed > 0 {
@@ -138,7 +146,7 @@ func runGitCommandParallel(config Config, args []string) []repoFailure {
 				defer func() { <-semaphore }()
 			}
 
-			result := buildParallelRepoOutput(config, repo, args)
+			result := buildParallelRepoOutput(config, repo, commandName, args)
 
 			// Print atomically so blocks from concurrent repos never interleave.
 			printMu.Lock()

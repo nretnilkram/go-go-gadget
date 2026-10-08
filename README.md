@@ -54,7 +54,12 @@ go-go-gadget grit destroy
 go-go-gadget grit pull
 go-go-gadget grit [--help|-h] [--synchronous|-s]
 
-# Limit concurrent async grit actions (default: unlimited)
+# Group - run any command in parallel across grit config directories
+go-go-gadget group ls -la
+go-go-gadget group npm install
+go-go-gadget group make test
+
+# Limit concurrent async grit/group actions (default: unlimited)
 export GRIT_MAX_CONCURRENT=10
 
 # Utilities
