@@ -697,7 +697,7 @@ func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
 		RunGitCommandParallel([]string{"status"})
 	})
 
-	if !strings.Contains(out, "REPOSITORIES WITH ERRORS") {
+	if !strings.Contains(out, "DIRECTORIES WITH ERRORS") {
 		t.Fatalf("expected error summary in output, got:\n%s", out)
 	}
 	if !strings.Contains(out, "repo-missing:") {
