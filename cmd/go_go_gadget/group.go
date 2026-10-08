@@ -11,7 +11,7 @@ import (
 
 var groupCmd = &cobra.Command{
 	Use:   "group [command] [args...]",
-	Short: "Run a command on multiple directories from grit config",
+	Short: "Run a command on multiple directories (uses grit config to determine directories)",
 	Long: `Run any command in parallel across all directories listed in the grit configuration.
 
 Uses the same .grit/config.yml and concurrency settings as grit
