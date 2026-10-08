@@ -697,7 +697,7 @@ func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
 		RunGitCommandParallel([]string{"status"})
 	})
 
-	if !strings.Contains(out, "REPOSITORIES WITH ERRORS") {
+	if !strings.Contains(out, "DIRECTORIES WITH ERRORS") {
 		t.Fatalf("expected error summary in output, got:\n%s", out)
 	}
 	if !strings.Contains(out, "repo-missing:") {
@@ -708,98 +708,6 @@ func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
 	}
 	if strings.Contains(out, "  repo-ok:") {
 		t.Fatalf("repo-ok should not appear in error summary, got:\n%s", out)
-	}
-}
-
-// --- RunCommandParallel ---
-
-func TestRunCommandParallel_Completes(t *testing.T) {
-	setupGritEnv(t)
-
-	cwd := mustGetwd(t)
-	if err := os.Mkdir("repo-a", 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Mkdir("repo-b", 0755); err != nil {
-		t.Fatal(err)
-	}
-
-	mustWriteConfig(t, Config{
-		Root: cwd,
-		Repositories: []Repository{
-			{Name: "repo-a", Path: "repo-a"},
-			{Name: "repo-b", Path: "repo-b"},
-		},
-	})
-
-	out := captureStdout(t, func() {
-		RunCommandParallel("pwd", nil)
-	})
-
-	if !strings.Contains(out, "REPO-A") {
-		t.Fatalf("expected REPO-A header in output, got:\n%s", out)
-	}
-	if !strings.Contains(out, "REPO-B") {
-		t.Fatalf("expected REPO-B header in output, got:\n%s", out)
-	}
-	if !strings.Contains(out, "[pwd]") {
-		t.Fatalf("expected [pwd] command display in output, got:\n%s", out)
-	}
-}
-
-func TestRunCommandParallel_WithArgs(t *testing.T) {
-	setupGritEnv(t)
-
-	cwd := mustGetwd(t)
-	if err := os.Mkdir("repo-a", 0755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join("repo-a", "hello.txt"), []byte("hi"), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	mustWriteConfig(t, Config{
-		Root:         cwd,
-		Repositories: []Repository{{Name: "repo-a", Path: "repo-a"}},
-	})
-
-	out := captureStdout(t, func() {
-		RunCommandParallel("ls", []string{"hello.txt"})
-	})
-
-	if !strings.Contains(out, "hello.txt") {
-		t.Fatalf("expected hello.txt in output, got:\n%s", out)
-	}
-	if !strings.Contains(out, "[ls hello.txt]") {
-		t.Fatalf("expected [ls hello.txt] command display, got:\n%s", out)
-	}
-}
-
-func TestRunCommandParallel_ReportsFailedRepos(t *testing.T) {
-	setupGritEnv(t)
-
-	cwd := mustGetwd(t)
-	if err := os.Mkdir("repo-ok", 0755); err != nil {
-		t.Fatal(err)
-	}
-
-	mustWriteConfig(t, Config{
-		Root: cwd,
-		Repositories: []Repository{
-			{Name: "repo-ok", Path: "repo-ok"},
-			{Name: "repo-missing", Path: "does-not-exist"},
-		},
-	})
-
-	out := captureStdout(t, func() {
-		RunCommandParallel("pwd", nil)
-	})
-
-	if !strings.Contains(out, "REPOSITORIES WITH ERRORS") {
-		t.Fatalf("expected error summary in output, got:\n%s", out)
-	}
-	if !strings.Contains(out, "repo-missing:") {
-		t.Fatalf("expected repo-missing in error summary, got:\n%s", out)
 	}
 }
 

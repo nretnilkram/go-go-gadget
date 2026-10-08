@@ -4,10 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
-	"strings"
-	"sync"
 
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
@@ -83,38 +80,19 @@ func RunCommandParallel(commandName string, args []string) {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		return
 	}
-	failed := runCommandParallel(config, commandName, args)
-	printFailedRepos(failed)
-}
 
-type repoFailure struct {
-	Name   string
-	Output string
-}
-
-// repoResult holds the display output and optional failure for one repo.
-type repoResult struct {
-	display string
-	failure *repoFailure
-}
-
-func buildParallelRepoOutput(config Config, repo Repository, commandName string, args []string) repoResult {
-	commandDisplay := commandName
-	if len(args) > 0 {
-		commandDisplay += " " + strings.Join(args, " ")
+	dirs := make([]utilities.ParallelDir, len(config.Repositories))
+	for i, repo := range config.Repositories {
+		dirs[i] = utilities.ParallelDir{
+			Name: repo.Name,
+			Path: config.Root + "/" + repo.Path,
+		}
 	}
-	repoDir := config.Root + "/" + repo.Path
-	output, err := utilities.RunCommandWithError(commandName, args, repoDir)
-	name := strings.ToUpper(repo.Name)
-	display := Header(name+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + Footer(name)
-	result := repoResult{display: display}
-	if err != nil {
-		result.failure = &repoFailure{Name: repo.Name, Output: output}
-	}
-	return result
+
+	utilities.RunCommandParallel(commandName, args, dirs, maxConcurrent(config))
 }
 
-func runCommandParallel(config Config, commandName string, args []string) []repoFailure {
+func maxConcurrent(config Config) int {
 	maxConcurrent := 0
 	if maxConcurrentStr := os.Getenv("GRIT_MAX_CONCURRENT"); maxConcurrentStr != "" {
 		if parsed, err := strconv.Atoi(maxConcurrentStr); err == nil && parsed > 0 {
@@ -125,61 +103,5 @@ func runCommandParallel(config Config, commandName string, args []string) []repo
 	if config.MaxConcurrent > 0 {
 		maxConcurrent = config.MaxConcurrent
 	}
-
-	var wg sync.WaitGroup
-	var printMu sync.Mutex
-	var failedMu sync.Mutex
-	var failed []repoFailure
-
-	var semaphore chan struct{}
-	if maxConcurrent > 0 {
-		semaphore = make(chan struct{}, maxConcurrent)
-	}
-
-	for _, repo := range config.Repositories {
-		wg.Add(1)
-		go func(repo Repository) {
-			defer wg.Done()
-
-			if semaphore != nil {
-				semaphore <- struct{}{}
-				defer func() { <-semaphore }()
-			}
-
-			result := buildParallelRepoOutput(config, repo, commandName, args)
-
-			// Print atomically so blocks from concurrent repos never interleave.
-			printMu.Lock()
-			fmt.Print(result.display)
-			printMu.Unlock()
-
-			if result.failure != nil {
-				failedMu.Lock()
-				failed = append(failed, *result.failure)
-				failedMu.Unlock()
-			}
-		}(repo)
-	}
-
-	wg.Wait()
-
-	sort.Slice(failed, func(i, j int) bool {
-		return failed[i].Name < failed[j].Name
-	})
-	return failed
-}
-
-func printFailedRepos(failed []repoFailure) {
-	if len(failed) == 0 {
-		return
-	}
-
-	fmt.Println(Header("REPOSITORIES WITH ERRORS"))
-	for _, f := range failed {
-		fmt.Println("  " + f.Name + ":")
-		for _, line := range strings.Split(strings.TrimRight(f.Output, "\n"), "\n") {
-			fmt.Println("    " + line)
-		}
-	}
-	fmt.Print(Footer() + "\n")
+	return maxConcurrent
 }
