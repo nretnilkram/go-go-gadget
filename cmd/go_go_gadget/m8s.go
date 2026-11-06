@@ -2,6 +2,7 @@ package go_go_gadget
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -14,6 +15,7 @@ var useBusyBox bool
 var useUbuntu bool
 var namespace string
 var containerImage string
+var containerCommand string
 
 var m8sCmd = &cobra.Command{
 	Use:   "m8s",
@@ -89,6 +91,14 @@ var m8sConnectionCmd = &cobra.Command{
 	Short:   "Create Connection",
 	Long: `Create a Connection in current kubernetes context
 
+Image selection (default: alpine):
+  --alpine|-a, --busybox|-b, --ubuntu|-u
+  --image|-i <image>   e.g. -i debian
+
+Command (default: /bin/sh):
+  --command|-c <command>   e.g. -c /bin/bash
+  m8s connection -i public.ecr.aws/aws-cli/aws-cli -c "aws --version"
+
 Some Image Options:
 * archlinux
 * rockylinux
@@ -100,7 +110,9 @@ Aliases: connection, c, terminal, t`,
 		image, pkgManager := resolveImage()
 		resourceName := "m8-tmp-utility-" + m8s.Image2Name(image, "-")
 		m8s.PrintInfo("connection", image, pkgManager, resourceName)
-		utilities.RunCommandInteractive("kubectl", []string{"run", "-it", "--rm", resourceName, "--namespace", namespace, "--image", image}, ".")
+		command := strings.Fields(containerCommand)
+		kubectlArgs := append([]string{"run", "-it", "--rm", "--privileged", resourceName, "--namespace", namespace, "--image", image, "--command", "--"}, command...)
+		utilities.RunCommandInteractive("kubectl", kubectlArgs, ".")
 	},
 }
 
@@ -124,6 +136,7 @@ func init() {
 	m8sConnectionCmd.Flags().BoolVarP(&useUbuntu, "ubuntu", "u", false, "Use Ubuntu")
 	m8sConnectionCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Namespace to deploy to")
 	m8sConnectionCmd.Flags().StringVarP(&containerImage, "image", "i", "", "Image to use")
+	m8sConnectionCmd.Flags().StringVarP(&containerCommand, "command", "c", "/bin/sh", "Command to run in the container")
 	m8sCmd.AddCommand(m8sConnectionCmd)
 
 	rootCmd.AddCommand(m8sCmd)
