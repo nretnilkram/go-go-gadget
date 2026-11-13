@@ -68,6 +68,7 @@ go-go-gadget [utilities|u|util|utils] quick-commit
 go-go-gadget [utilities|u|util|utils] empty-commit
 go-go-gadget [utilities|u|util|utils] tf-list-resources <file1> [file2...]
 go-go-gadget [utilities|u|util|utils] semver "1.2.0"
+go-go-gadget [utilities|u|util|utils] bump-chart major|minor|patch
 
 # Kubernetes (m8s)
 go-go-gadget m8s deployment [--alpine|-a|--busybox|-b|--ubuntu|-u] [--namespace|-n default] [--image|-i <image>]

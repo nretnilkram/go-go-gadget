@@ -1,4 +1,4 @@
-.PHONY: help fmt lint lint-fix init upgrade install test test-coverage run clean gamut
+.PHONY: help fmt lint lint-fix init upgrade install test test-coverage run clean gamut fix-go
 
 # Default target
 .DEFAULT_GOAL := help
@@ -20,8 +20,10 @@ lint-fix: ## Run golangci-lint and fix issues
 	golangci-lint run ./... --fix
 
 init: ## Install Go
-	brew install go@1.26
-	brew install golangci-lint
+	brew install go golangci-lint
+
+fix-go: ## Fix Go installation
+	brew reinstall go golangci-lint
 
 upgrade: ## Upgrade Go dependencies
 	go get -u ./...

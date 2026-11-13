@@ -159,6 +159,64 @@ Aliases: semver, sem`,
 	},
 }
 
+var bumpChartCmd = &cobra.Command{
+	Use:     "bump-chart major|minor|patch",
+	Aliases: []string{"bc", "helm-bump"},
+	Short:   "Bump Helm chart versions",
+	Long: `Find Chart.yaml files under the current directory and bump their version
+by major, minor, or patch.
+
+Examples:
+  go-go-gadget utilities bump-chart patch
+  go-go-gadget utilities bump-chart minor
+  go-go-gadget utilities bump-chart major
+
+Aliases: bump-chart, bc, helm-bump`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		printBumpChartUsage := func(reason string) error {
+			_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "\n%s\n\nUsage:\n  %s major|minor|patch\n\nExamples:\n  %s patch\n  %s minor\n  %s major\n\n",
+				reason, cmd.CommandPath(), cmd.CommandPath(), cmd.CommandPath(), cmd.CommandPath())
+			return fmt.Errorf("%s", reason)
+		}
+		if len(args) != 1 {
+			return printBumpChartUsage("missing bump type")
+		}
+		switch strings.ToLower(args[0]) {
+		case "major", "minor", "patch":
+			return nil
+		default:
+			return printBumpChartUsage(fmt.Sprintf("invalid bump type: %s", args[0]))
+		}
+	},
+	DisableFlagsInUseLine: true,
+	SilenceUsage:          true,
+	SilenceErrors:         true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cwd, err := utilities.GetWorkingDir()
+		if err != nil {
+			return err
+		}
+
+		bumpType := strings.ToLower(args[0])
+		results, err := utilities.BumpChartsInDir(cwd, bumpType)
+		if err != nil {
+			return err
+		}
+
+		updated := 0
+		for _, result := range results {
+			if result.Skipped {
+				fmt.Printf("\nSkipping %s (%s)\n", result.File, result.SkipReason)
+				continue
+			}
+			fmt.Printf("\n%s: %s -> %s (%s)\n", result.File, result.OldVersion, result.NewVersion, bumpType)
+			updated++
+		}
+		fmt.Printf("\nUpdated %d Chart.yaml file(s)\n\n", updated)
+		return nil
+	},
+}
+
 func init() {
 	utilCmd.AddCommand(gitQuickBranchCmd)
 
@@ -169,6 +227,8 @@ func init() {
 	utilCmd.AddCommand(tfListResourcesCmd)
 
 	utilCmd.AddCommand(isSemverCmd)
+
+	utilCmd.AddCommand(bumpChartCmd)
 
 	rootCmd.AddCommand(utilCmd)
 }
