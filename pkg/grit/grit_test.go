@@ -1,6 +1,7 @@
 package grit
 
 import (
+	"context"
 	"io"
 	"os"
 	"os/exec"
@@ -626,14 +627,18 @@ func TestRunGitCommandParallel_Completes(t *testing.T) {
 		},
 	})
 
-	RunGitCommandParallel([]string{"status"})
+	if err := RunGitCommandParallel(context.Background(), []string{"status"}); err != nil {
+		t.Fatalf("RunGitCommandParallel returned unexpected error: %v", err)
+	}
 }
 
 func TestRunGitCommandParallel_EmptyRepos(t *testing.T) {
 	setupGritEnv(t)
 
 	// Empty config should return immediately without hanging.
-	RunGitCommandParallel([]string{"status"})
+	if err := RunGitCommandParallel(context.Background(), []string{"status"}); err != nil {
+		t.Fatalf("RunGitCommandParallel returned unexpected error: %v", err)
+	}
 }
 
 func TestRunGitCommandParallel_SemaphoreLimitOne(t *testing.T) {
@@ -656,7 +661,9 @@ func TestRunGitCommandParallel_SemaphoreLimitOne(t *testing.T) {
 	t.Setenv("GRIT_MAX_CONCURRENT", "1")
 
 	// Should complete without deadlock even with concurrency capped at 1.
-	RunGitCommandParallel([]string{"status"})
+	if err := RunGitCommandParallel(context.Background(), []string{"status"}); err != nil {
+		t.Fatalf("RunGitCommandParallel returned unexpected error: %v", err)
+	}
 }
 
 func TestRunGitCommandParallel_InvalidSemaphoreValues(t *testing.T) {
@@ -669,12 +676,13 @@ func TestRunGitCommandParallel_InvalidSemaphoreValues(t *testing.T) {
 		Repositories: []Repository{{Name: "repo-a", Path: "repo-a"}},
 	})
 
-	// These values are all invalid or zero; the semaphore should be disabled
-	// and the function should fall back to unbounded concurrency.
+	// Invalid or zero values fall back to DefaultMaxConcurrent.
 	for _, val := range []string{"abc", "-1", "0"} {
 		t.Run("GRIT_MAX_CONCURRENT="+val, func(t *testing.T) {
 			t.Setenv("GRIT_MAX_CONCURRENT", val)
-			RunGitCommandParallel([]string{"status"})
+			if err := RunGitCommandParallel(context.Background(), []string{"status"}); err != nil {
+				t.Fatalf("RunGitCommandParallel returned unexpected error: %v", err)
+			}
 		})
 	}
 }
@@ -694,7 +702,9 @@ func TestRunGitCommandParallel_ReportsFailedRepos(t *testing.T) {
 	})
 
 	out := captureStdout(t, func() {
-		RunGitCommandParallel([]string{"status"})
+		if err := RunGitCommandParallel(context.Background(), []string{"status"}); err != nil {
+			t.Errorf("RunGitCommandParallel returned unexpected error: %v", err)
+		}
 	})
 
 	if !strings.Contains(out, "DIRECTORIES WITH ERRORS") {

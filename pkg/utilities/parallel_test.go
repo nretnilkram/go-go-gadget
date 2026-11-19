@@ -1,12 +1,33 @@
 package utilities
 
 import (
+	"context"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
+
+func TestDefaultMaxConcurrent(t *testing.T) {
+	got := DefaultMaxConcurrent()
+	if got < 1 || got > maxConcurrentCap {
+		t.Fatalf("DefaultMaxConcurrent() = %d, want in [1, %d]", got, maxConcurrentCap)
+	}
+}
+
+func TestResolveMaxConcurrent(t *testing.T) {
+	if got := resolveMaxConcurrent(0); got != DefaultMaxConcurrent() {
+		t.Fatalf("resolveMaxConcurrent(0) = %d, want %d", got, DefaultMaxConcurrent())
+	}
+	if got := resolveMaxConcurrent(-1); got != DefaultMaxConcurrent() {
+		t.Fatalf("resolveMaxConcurrent(-1) = %d, want %d", got, DefaultMaxConcurrent())
+	}
+	if got := resolveMaxConcurrent(3); got != 3 {
+		t.Fatalf("resolveMaxConcurrent(3) = %d, want 3", got)
+	}
+}
 
 func TestRunCommandParallel_Completes(t *testing.T) {
 	tmp := t.TempDir()
@@ -20,10 +41,12 @@ func TestRunCommandParallel_Completes(t *testing.T) {
 	}
 
 	out := captureStdout(t, func() {
-		RunCommandParallel("pwd", nil, []ParallelDir{
+		if err := RunCommandParallel(context.Background(), "pwd", nil, []ParallelDir{
 			{Name: "repo-a", Path: dirA},
 			{Name: "repo-b", Path: dirB},
-		}, 0)
+		}, 0); err != nil {
+			t.Errorf("RunCommandParallel returned unexpected error: %v", err)
+		}
 	})
 
 	if !strings.Contains(out, "REPO-A") {
@@ -34,6 +57,10 @@ func TestRunCommandParallel_Completes(t *testing.T) {
 	}
 	if !strings.Contains(out, "[pwd]") {
 		t.Fatalf("expected [pwd] command display in output, got:\n%s", out)
+	}
+	// Deterministic order: repo-a before repo-b.
+	if strings.Index(out, "REPO-A") > strings.Index(out, "REPO-B") {
+		t.Fatalf("expected REPO-A before REPO-B in output, got:\n%s", out)
 	}
 }
 
@@ -48,9 +75,11 @@ func TestRunCommandParallel_WithArgs(t *testing.T) {
 	}
 
 	out := captureStdout(t, func() {
-		RunCommandParallel("ls", []string{"hello.txt"}, []ParallelDir{
+		if err := RunCommandParallel(context.Background(), "ls", []string{"hello.txt"}, []ParallelDir{
 			{Name: "repo-a", Path: dirA},
-		}, 0)
+		}, 0); err != nil {
+			t.Errorf("RunCommandParallel returned unexpected error: %v", err)
+		}
 	})
 
 	if !strings.Contains(out, "hello.txt") {
@@ -69,10 +98,12 @@ func TestRunCommandParallel_ReportsFailedDirs(t *testing.T) {
 	}
 
 	out := captureStdout(t, func() {
-		RunCommandParallel("pwd", nil, []ParallelDir{
+		if err := RunCommandParallel(context.Background(), "pwd", nil, []ParallelDir{
 			{Name: "repo-ok", Path: dirOK},
 			{Name: "repo-missing", Path: filepath.Join(tmp, "does-not-exist")},
-		}, 0)
+		}, 0); err != nil {
+			t.Errorf("RunCommandParallel returned unexpected error: %v", err)
+		}
 	})
 
 	if !strings.Contains(out, "DIRECTORIES WITH ERRORS") {
@@ -98,11 +129,71 @@ func TestRunCommandParallel_SemaphoreLimitOne(t *testing.T) {
 	}
 
 	// Should complete without deadlock even with concurrency capped at 1.
-	RunCommandParallel("pwd", nil, dirs, 1)
+	if err := RunCommandParallel(context.Background(), "pwd", nil, dirs, 1); err != nil {
+		t.Fatalf("RunCommandParallel returned unexpected error: %v", err)
+	}
 }
 
 func TestRunCommandParallel_EmptyDirs(t *testing.T) {
-	RunCommandParallel("pwd", nil, nil, 0)
+	if err := RunCommandParallel(context.Background(), "pwd", nil, nil, 0); err != nil {
+		t.Fatalf("RunCommandParallel returned unexpected error: %v", err)
+	}
+}
+
+func TestRunCommandParallel_RespectsConcurrencyLimit(t *testing.T) {
+	tmp := t.TempDir()
+	script := filepath.Join(tmp, "work.sh")
+	if err := os.WriteFile(script, []byte("#!/bin/sh\nsleep 0.2\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	dirs := make([]ParallelDir, 4)
+	for i := range dirs {
+		name := "d" + string(rune('a'+i))
+		path := filepath.Join(tmp, name)
+		if err := os.Mkdir(path, 0755); err != nil {
+			t.Fatal(err)
+		}
+		dirs[i] = ParallelDir{Name: name, Path: path}
+	}
+
+	start := time.Now()
+	if err := RunCommandParallel(context.Background(), script, nil, dirs, 1); err != nil {
+		t.Fatalf("RunCommandParallel returned unexpected error: %v", err)
+	}
+	elapsed := time.Since(start)
+	// 4 * 0.2s = 0.8s at limit 1; allow some slack for scheduling jitter.
+	if elapsed < 700*time.Millisecond {
+		t.Fatalf("expected ~sequential runtime with limit 1, got %v", elapsed)
+	}
+}
+
+func TestRunCommandParallel_ContextCancel(t *testing.T) {
+	tmp := t.TempDir()
+	script := filepath.Join(tmp, "sleep.sh")
+	if err := os.WriteFile(script, []byte("#!/bin/sh\nsleep 5\n"), 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	var dirs []ParallelDir
+	for _, name := range []string{"a", "b"} {
+		path := filepath.Join(tmp, name)
+		if err := os.Mkdir(path, 0755); err != nil {
+			t.Fatal(err)
+		}
+		dirs = append(dirs, ParallelDir{Name: name, Path: path})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	err := RunCommandParallel(ctx, script, nil, dirs, 2)
+	if err == nil {
+		t.Fatal("expected context error, got nil")
+	}
+	if !strings.Contains(err.Error(), "context") {
+		t.Fatalf("expected context error, got: %v", err)
+	}
 }
 
 func captureStdout(t *testing.T, fn func()) string {

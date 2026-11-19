@@ -3,6 +3,7 @@ package utilities
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -34,10 +35,15 @@ func Check(e error) {
 // This prevents command injection by passing arguments directly to exec.Command.
 // Returns the combined stdout and stderr output as a string, and any error from cmd.Run().
 func RunCommandWithError(commandName string, args []string, path string) (string, error) {
+	return RunCommandWithErrorContext(context.Background(), commandName, args, path)
+}
+
+// RunCommandWithErrorContext is like RunCommandWithError but honors ctx cancellation via exec.CommandContext.
+func RunCommandWithErrorContext(ctx context.Context, commandName string, args []string, path string) (string, error) {
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 
-	cmd := exec.Command(commandName, args...)
+	cmd := exec.CommandContext(ctx, commandName, args...)
 	cmd.Dir = path
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr

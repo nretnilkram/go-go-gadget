@@ -1,11 +1,16 @@
 package utilities
 
 import (
+	"context"
 	"fmt"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
 )
+
+// maxConcurrentCap caps the automatic default worker count.
+const maxConcurrentCap = 16
 
 // ParallelDir is a named directory target for parallel command execution.
 type ParallelDir struct {
@@ -23,19 +28,41 @@ type dirResult struct {
 	failure *dirFailure
 }
 
-// RunCommandParallel runs the given command concurrently in each directory.
-// maxConcurrent limits parallelism; values <= 0 mean unlimited.
-func RunCommandParallel(commandName string, args []string, dirs []ParallelDir, maxConcurrent int) {
-	failed := runCommandParallel(commandName, args, dirs, maxConcurrent)
-	printFailedDirs(failed)
+// DefaultMaxConcurrent returns a bounded worker count based on GOMAXPROCS.
+// Values are clamped to [1, maxConcurrentCap].
+func DefaultMaxConcurrent() int {
+	n := runtime.GOMAXPROCS(0) * 2
+	if n > maxConcurrentCap {
+		return maxConcurrentCap
+	}
+	if n < 1 {
+		return 1
+	}
+	return n
 }
 
-func buildParallelDirOutput(dir ParallelDir, commandName string, args []string) dirResult {
+func resolveMaxConcurrent(maxConcurrent int) int {
+	if maxConcurrent <= 0 {
+		return DefaultMaxConcurrent()
+	}
+	return maxConcurrent
+}
+
+// RunCommandParallel runs the given command concurrently in each directory.
+// maxConcurrent limits parallelism; values <= 0 use DefaultMaxConcurrent().
+// Returns ctx.Err() when the context is cancelled before all work finishes.
+func RunCommandParallel(ctx context.Context, commandName string, args []string, dirs []ParallelDir, maxConcurrent int) error {
+	failed, err := runCommandParallel(ctx, commandName, args, dirs, maxConcurrent)
+	printFailedDirs(failed)
+	return err
+}
+
+func buildParallelDirOutput(ctx context.Context, dir ParallelDir, commandName string, args []string) dirResult {
 	commandDisplay := commandName
 	if len(args) > 0 {
 		commandDisplay += " " + strings.Join(args, " ")
 	}
-	output, err := RunCommandWithError(commandName, args, dir.Path)
+	output, err := RunCommandWithErrorContext(ctx, commandName, args, dir.Path)
 	name := strings.ToUpper(dir.Name)
 	display := parallelHeader(name+" -- ["+commandDisplay+"]") + "\n\n" + output + "\n" + parallelFooter(name)
 	result := dirResult{display: display}
@@ -45,48 +72,63 @@ func buildParallelDirOutput(dir ParallelDir, commandName string, args []string) 
 	return result
 }
 
-func runCommandParallel(commandName string, args []string, dirs []ParallelDir, maxConcurrent int) []dirFailure {
+func runCommandParallel(ctx context.Context, commandName string, args []string, dirs []ParallelDir, maxConcurrent int) ([]dirFailure, error) {
+	if len(dirs) == 0 {
+		return nil, nil
+	}
+
+	limit := resolveMaxConcurrent(maxConcurrent)
+	if limit > len(dirs) {
+		limit = len(dirs)
+	}
+
+	results := make([]dirResult, len(dirs))
+	jobs := make(chan int)
+
 	var wg sync.WaitGroup
-	var printMu sync.Mutex
-	var failedMu sync.Mutex
-	var failed []dirFailure
-
-	var semaphore chan struct{}
-	if maxConcurrent > 0 {
-		semaphore = make(chan struct{}, maxConcurrent)
-	}
-
-	for _, dir := range dirs {
+	for range limit {
 		wg.Add(1)
-		go func(dir ParallelDir) {
+		go func() {
 			defer wg.Done()
-
-			if semaphore != nil {
-				semaphore <- struct{}{}
-				defer func() { <-semaphore }()
+			for i := range jobs {
+				if ctx.Err() != nil {
+					return
+				}
+				results[i] = buildParallelDirOutput(ctx, dirs[i], commandName, args)
 			}
-
-			result := buildParallelDirOutput(dir, commandName, args)
-
-			// Print atomically so blocks from concurrent dirs never interleave.
-			printMu.Lock()
-			fmt.Print(result.display)
-			printMu.Unlock()
-
-			if result.failure != nil {
-				failedMu.Lock()
-				failed = append(failed, *result.failure)
-				failedMu.Unlock()
-			}
-		}(dir)
+		}()
 	}
 
+sendLoop:
+	for i := range dirs {
+		select {
+		case <-ctx.Done():
+			break sendLoop
+		case jobs <- i:
+		}
+	}
+	close(jobs)
 	wg.Wait()
+
+	var failed []dirFailure
+	for _, result := range results {
+		if result.display == "" {
+			continue
+		}
+		fmt.Print(result.display)
+		if result.failure != nil {
+			failed = append(failed, *result.failure)
+		}
+	}
 
 	sort.Slice(failed, func(i, j int) bool {
 		return failed[i].Name < failed[j].Name
 	})
-	return failed
+
+	if err := ctx.Err(); err != nil {
+		return failed, err
+	}
+	return failed, nil
 }
 
 func printFailedDirs(failed []dirFailure) {

@@ -1,6 +1,7 @@
 package grit
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -69,16 +70,16 @@ func AddAllRepos() error {
 }
 
 // RunGitCommandParallel runs the given git command concurrently across all configured repositories.
-func RunGitCommandParallel(args []string) {
-	RunCommandParallel("git", args)
+func RunGitCommandParallel(ctx context.Context, args []string) error {
+	return RunCommandParallel(ctx, "git", args)
 }
 
 // RunCommandParallel runs the given command concurrently across all configured repositories.
-func RunCommandParallel(commandName string, args []string) {
+// When max_concurrent / GRIT_MAX_CONCURRENT are unset or <= 0, utilities.DefaultMaxConcurrent is used.
+func RunCommandParallel(ctx context.Context, commandName string, args []string) error {
 	config, err := LoadConfig()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		return
+		return fmt.Errorf("load config: %w", err)
 	}
 
 	dirs := make([]utilities.ParallelDir, len(config.Repositories))
@@ -89,19 +90,19 @@ func RunCommandParallel(commandName string, args []string) {
 		}
 	}
 
-	utilities.RunCommandParallel(commandName, args, dirs, maxConcurrent(config))
+	return utilities.RunCommandParallel(ctx, commandName, args, dirs, maxConcurrent(config))
 }
 
 func maxConcurrent(config Config) int {
-	maxConcurrent := 0
+	limit := 0
 	if maxConcurrentStr := os.Getenv("GRIT_MAX_CONCURRENT"); maxConcurrentStr != "" {
 		if parsed, err := strconv.Atoi(maxConcurrentStr); err == nil && parsed > 0 {
-			maxConcurrent = parsed
+			limit = parsed
 		}
 	}
 	// Config value takes precedence over the environment variable.
 	if config.MaxConcurrent > 0 {
-		maxConcurrent = config.MaxConcurrent
+		limit = config.MaxConcurrent
 	}
-	return maxConcurrent
+	return limit
 }

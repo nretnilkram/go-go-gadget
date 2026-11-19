@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 
@@ -24,12 +25,12 @@ e.g. go-go-gadget grit pull
 Will update all the of the repositories in the configuration.  Useful for updating all repositories in the morning.
 
 Configuration (config.yml):
-  max_concurrent  Maximum number of repositories to process in parallel (default: unlimited).
-                  Takes precedence over the GRIT_MAX_CONCURRENT environment variable.
+  max_concurrent  Maximum number of repositories to process in parallel.
+                  Default: min(GOMAXPROCS*2, 16). Takes precedence over GRIT_MAX_CONCURRENT.
 
 Environment Variables:
-  GRIT_MAX_CONCURRENT  Maximum number of repositories to process in parallel (default: unlimited).
-                       Overridden by max_concurrent in config.yml when set.`,
+  GRIT_MAX_CONCURRENT  Maximum number of repositories to process in parallel.
+                       Default: min(GOMAXPROCS*2, 16). Overridden by max_concurrent in config.yml when set.`,
 	Args: cobra.MinimumNArgs(1),
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if err := grit.TestGritDir(); err != nil {
@@ -38,7 +39,12 @@ Environment Variables:
 		return grit.AppendHistory(cmd.CommandPath() + " " + strings.Join(args, " "))
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		grit.RunGitCommandParallel(args)
+		ctx, stop := signal.NotifyContext(cmd.Context(), os.Interrupt)
+		defer stop()
+
+		if err := grit.RunGitCommandParallel(ctx, args); err != nil {
+			return err
+		}
 		fmt.Println("Finished Run @ " + utilities.ShowDateTime("dash", true))
 		grit.PrintTagLine(cmd.Root().Version)
 		return nil
