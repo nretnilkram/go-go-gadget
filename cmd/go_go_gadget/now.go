@@ -1,7 +1,6 @@
 package go_go_gadget
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -9,43 +8,48 @@ import (
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
-var useColons bool
-var useDots bool
-var useGoRawTime bool
-var useSlashes bool
-var useUnix bool
-var includeTime bool
+func newNowCmd() *cobra.Command {
+	var (
+		useColons    bool
+		useDots      bool
+		useGoRawTime bool
+		useSlashes   bool
+		useUnix      bool
+		includeTime  bool
+	)
 
-var nowCmd = &cobra.Command{
-	Use:     "now",
-	Aliases: []string{"today"},
-	Short:   "Print todays date",
-	Long: `Print out todays date with a number of formatting options including separators and time.
+	cmd := &cobra.Command{
+		Use:     "now",
+		Aliases: []string{"today"},
+		Short:   "Print todays date",
+		Long: `Print out todays date with a number of formatting options including separators and time.
 
 Aliases: now, today`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if useUnix {
-			fmt.Println(time.Now().Unix())
-		} else if useGoRawTime {
-			fmt.Println(utilities.ShowDateTime("raw", includeTime))
-		} else if useColons {
-			fmt.Println(utilities.ShowDateTime("colon", includeTime))
-		} else if useDots {
-			fmt.Println(utilities.ShowDateTime("dot", includeTime))
-		} else if useSlashes {
-			fmt.Println(utilities.ShowDateTime("slash", includeTime))
-		} else {
-			fmt.Println(utilities.ShowDateTime("dash", includeTime))
-		}
-	},
-}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			out := cmd.OutOrStdout()
+			switch {
+			case useUnix:
+				writeln(out, time.Now().Unix())
+			case useGoRawTime:
+				writeln(out, utilities.ShowDateTime("raw", includeTime))
+			case useColons:
+				writeln(out, utilities.ShowDateTime("colon", includeTime))
+			case useDots:
+				writeln(out, utilities.ShowDateTime("dot", includeTime))
+			case useSlashes:
+				writeln(out, utilities.ShowDateTime("slash", includeTime))
+			default:
+				writeln(out, utilities.ShowDateTime("dash", includeTime))
+			}
+			return nil
+		},
+	}
 
-func init() {
-	nowCmd.Flags().BoolVarP(&useColons, "colon", "c", false, "Use colons")
-	nowCmd.Flags().BoolVarP(&useDots, "dots", "d", false, "Use dots")
-	nowCmd.Flags().BoolVarP(&useGoRawTime, "raw", "r", false, "Raw go time")
-	nowCmd.Flags().BoolVarP(&useSlashes, "slashes", "s", false, "Use Slashes")
-	nowCmd.Flags().BoolVarP(&useUnix, "unix", "u", false, "Print Unix timestamp")
-	nowCmd.Flags().BoolVarP(&includeTime, "time", "t", false, "Include time")
-	rootCmd.AddCommand(nowCmd)
+	cmd.Flags().BoolVarP(&useColons, "colon", "c", false, "Use colons")
+	cmd.Flags().BoolVarP(&useDots, "dots", "d", false, "Use dots")
+	cmd.Flags().BoolVarP(&useGoRawTime, "raw", "r", false, "Raw go time")
+	cmd.Flags().BoolVarP(&useSlashes, "slashes", "s", false, "Use Slashes")
+	cmd.Flags().BoolVarP(&useUnix, "unix", "u", false, "Print Unix timestamp")
+	cmd.Flags().BoolVarP(&includeTime, "time", "t", false, "Include time")
+	return cmd
 }

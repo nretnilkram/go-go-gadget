@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -56,19 +57,14 @@ func RunCommandWithErrorContext(ctx context.Context, commandName string, args []
 	return out.String() + stderr.String(), nil
 }
 
-// RunCommandInteractive runs a command with the given name and arguments safely, with shell interpretation and interactive input.
-func RunCommandInteractive(commandName string, args []string, path string) {
-
+// RunCommandInteractive runs a command with stdin/stdout/stderr attached to the process.
+func RunCommandInteractive(commandName string, args []string, path string) error {
 	cmd := exec.Command(commandName, args...)
 	cmd.Dir = path
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		fmt.Println(string(err.Error()))
-	}
+	return cmd.Run()
 }
 
 // FileDirExists returns whether the given file or directory exists
@@ -131,14 +127,14 @@ func GrepFileForTFResources(filename string) ([]string, error) {
 	return resources, nil
 }
 
-// ListTFResources prints the Terraform resource targets found in each of the given files.
-func ListTFResources(files []string) error {
+// ListTFResources writes Terraform resource targets found in each of the given files to w.
+func ListTFResources(w io.Writer, files []string) error {
 	for _, file := range files {
 		resources, err := GrepFileForTFResources(file)
 		if err != nil {
 			return err
 		}
-		fmt.Println(strings.Join(resources, "\n"))
+		_, _ = fmt.Fprintln(w, strings.Join(resources, "\n"))
 	}
 	return nil
 }

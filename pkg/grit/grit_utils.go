@@ -3,6 +3,7 @@ package grit
 import (
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
@@ -41,17 +42,17 @@ func Footer(footerString ...string) string {
 	return "----------------------------------------\n"
 }
 
-// PrintHeader prints a grit header line with an optional header string.
-func PrintHeader(headerString ...string) {
-	fmt.Println(Header(headerString...))
+// PrintHeader writes a grit header line with an optional header string.
+func PrintHeader(w io.Writer, headerString ...string) {
+	_, _ = fmt.Fprintln(w, Header(headerString...))
 }
 
-// PrintFooter prints a grit footer line with an optional footer string.
-func PrintFooter(footerString ...string) {
-	fmt.Println(Footer(footerString...))
+// PrintFooter writes a grit footer line with an optional footer string.
+func PrintFooter(w io.Writer, footerString ...string) {
+	_, _ = fmt.Fprintln(w, Footer(footerString...))
 }
 
-// PrintTagLine prints the grit version tag line.
-func PrintTagLine(version string) {
-	fmt.Println("\n--------\ngo-go-gadget grit v" + version + "\n")
+// PrintTagLine writes the grit version tag line.
+func PrintTagLine(w io.Writer, version string) {
+	_, _ = fmt.Fprintln(w, "\n--------\ngo-go-gadget grit v"+version+"\n")
 }

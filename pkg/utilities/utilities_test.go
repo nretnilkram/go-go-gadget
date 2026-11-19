@@ -106,8 +106,12 @@ func TestListTFResources(t *testing.T) {
 	if err := os.WriteFile(tmp, []byte(content), 0600); err != nil {
 		t.Fatalf("failed to write temp file: %v", err)
 	}
-	if err := ListTFResources([]string{tmp}); err != nil {
+	var buf strings.Builder
+	if err := ListTFResources(&buf, []string{tmp}); err != nil {
 		t.Fatal(err)
+	}
+	if !strings.Contains(buf.String(), "--target=") {
+		t.Fatalf("expected target output, got %q", buf.String())
 	}
 }
 

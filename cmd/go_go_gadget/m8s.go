@@ -1,7 +1,6 @@
 package go_go_gadget
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -10,40 +9,61 @@ import (
 	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
-var useAlpine bool
-var useBusyBox bool
-var useUbuntu bool
-var namespace string
-var containerImage string
-var containerCommand string
-
-var m8sCmd = &cobra.Command{
-	Use:   "m8s",
-	Short: "Useful k8s commands",
-	Long:  `Set of useful kubernetes utilities.`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return cmd.Help()
-	},
+type m8sImageOptions struct {
+	useAlpine      bool
+	useBusyBox     bool
+	useUbuntu      bool
+	namespace      string
+	containerImage string
 }
 
-func resolveImage() (image, pkgManager string) {
+func resolveImage(o m8sImageOptions) (image, pkgManager string) {
 	switch {
-	case containerImage != "":
-		return containerImage, "unknown"
-	case useBusyBox:
+	case o.containerImage != "":
+		return o.containerImage, "unknown"
+	case o.useBusyBox:
 		return "busybox", "none"
-	case useUbuntu:
+	case o.useUbuntu:
 		return "ubuntu", "apt"
 	default:
+		// Alpine is the default; --alpine is accepted for CLI compatibility.
+		_ = o.useAlpine
 		return "alpine", "apk"
 	}
 }
 
-var m8sDeploymentCmd = &cobra.Command{
-	Use:     "deployment",
-	Aliases: []string{"d"},
-	Short:   "Create Deployment",
-	Long: `Create a Deployment in current kubernetes context
+func bindM8sImageFlags(cmd *cobra.Command, o *m8sImageOptions) {
+	cmd.Flags().BoolVarP(&o.useAlpine, "alpine", "a", false, "Use Alpine")
+	cmd.Flags().BoolVarP(&o.useBusyBox, "busybox", "b", false, "Use BusyBox")
+	cmd.Flags().BoolVarP(&o.useUbuntu, "ubuntu", "u", false, "Use Ubuntu")
+	cmd.Flags().StringVarP(&o.namespace, "namespace", "n", "default", "Namespace to deploy to")
+	cmd.Flags().StringVarP(&o.containerImage, "image", "i", "", "Image to use")
+}
+
+func newM8sCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "m8s",
+		Short: "Useful k8s commands",
+		Long:  `Set of useful kubectl utilities.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cmd.Help()
+		},
+	}
+
+	cmd.AddCommand(newM8sDeploymentCmd())
+	cmd.AddCommand(newM8sPodCmd())
+	cmd.AddCommand(newM8sConnectionCmd())
+	return cmd
+}
+
+func newM8sDeploymentCmd() *cobra.Command {
+	var opts m8sImageOptions
+
+	cmd := &cobra.Command{
+		Use:     "deployment",
+		Aliases: []string{"d"},
+		Short:   "Create Deployment",
+		Long: `Create a Deployment in current kubectl context
 
 Some Image Options:
 * archlinux
@@ -52,21 +72,27 @@ Some Image Options:
 * debian
 
 Aliases: deployment, d`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		image, pkgManager := resolveImage()
-		resourceName := "m8-" + m8s.Image2Name(image, "-")
-		m8s.PrintInfo("deployment", image, pkgManager, resourceName)
-		output, err := utilities.RunCommandWithError("kubectl", []string{"create", "deployment", resourceName, "--namespace", namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, ".")
-		fmt.Print(output)
-		return err
-	},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			image, pkgManager := resolveImage(opts)
+			resourceName := "m8-" + m8s.Image2Name(image, "-")
+			m8s.PrintInfo(cmd.OutOrStdout(), "deployment", image, pkgManager, resourceName)
+			output, err := utilities.RunCommandWithError("kubectl", []string{"create", "deployment", resourceName, "--namespace", opts.namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, ".")
+			write(cmd.OutOrStdout(), output)
+			return err
+		},
+	}
+	bindM8sImageFlags(cmd, &opts)
+	return cmd
 }
 
-var m8sPodCmd = &cobra.Command{
-	Use:     "pod",
-	Aliases: []string{"p"},
-	Short:   "Create Pod",
-	Long: `Create a Pod in current kubernetes context
+func newM8sPodCmd() *cobra.Command {
+	var opts m8sImageOptions
+
+	cmd := &cobra.Command{
+		Use:     "pod",
+		Aliases: []string{"p"},
+		Short:   "Create Pod",
+		Long: `Create a Pod in current kubectl context
 
 Some Image Options:
 * archlinux
@@ -75,21 +101,30 @@ Some Image Options:
 * debian
 
 Aliases: pod, p`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		image, pkgManager := resolveImage()
-		resourceName := "m8-utility-" + m8s.Image2Name(image, "-")
-		m8s.PrintInfo("pod", image, pkgManager, resourceName)
-		output, err := utilities.RunCommandWithError("kubectl", []string{"run", resourceName, "--namespace", namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, ".")
-		fmt.Print(output)
-		return err
-	},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			image, pkgManager := resolveImage(opts)
+			resourceName := "m8-utility-" + m8s.Image2Name(image, "-")
+			m8s.PrintInfo(cmd.OutOrStdout(), "pod", image, pkgManager, resourceName)
+			output, err := utilities.RunCommandWithError("kubectl", []string{"run", resourceName, "--namespace", opts.namespace, "--image", image, "--", "tail", "-f", "/dev/null"}, ".")
+			write(cmd.OutOrStdout(), output)
+			return err
+		},
+	}
+	bindM8sImageFlags(cmd, &opts)
+	return cmd
 }
 
-var m8sConnectionCmd = &cobra.Command{
-	Use:     "connection",
-	Aliases: []string{"c", "terminal", "t"},
-	Short:   "Create Connection",
-	Long: `Create a Connection in current kubernetes context
+func newM8sConnectionCmd() *cobra.Command {
+	var (
+		opts             m8sImageOptions
+		containerCommand string
+	)
+
+	cmd := &cobra.Command{
+		Use:     "connection",
+		Aliases: []string{"c", "terminal", "t"},
+		Short:   "Create Connection",
+		Long: `Create a Connection in current kubectl context
 
 Image selection (default: alpine):
   --alpine|-a, --busybox|-b, --ubuntu|-u
@@ -107,40 +142,18 @@ Some Image Options:
 * debian
 
 Aliases: connection, c, terminal, t`,
-	Run: func(cmd *cobra.Command, args []string) {
-		image, pkgManager := resolveImage()
-		resourceName := "m8-tmp-utility-" + m8s.Image2Name(image, "-")
-		m8s.PrintInfo("connection", image, pkgManager, resourceName)
-		kubectlArgs := []string{"run", "-it", "--rm", resourceName, "--namespace", namespace, "--image", image}
-		if command := strings.Fields(containerCommand); len(command) > 0 {
-			kubectlArgs = append(kubectlArgs, append([]string{"--command", "--"}, command...)...)
-		}
-		utilities.RunCommandInteractive("kubectl", kubectlArgs, ".")
-	},
-}
-
-func init() {
-	m8sDeploymentCmd.Flags().BoolVarP(&useAlpine, "alpine", "a", false, "Use Alpine")
-	m8sDeploymentCmd.Flags().BoolVarP(&useBusyBox, "busybox", "b", false, "Use BusyBox")
-	m8sDeploymentCmd.Flags().BoolVarP(&useUbuntu, "ubuntu", "u", false, "Use Ubuntu")
-	m8sDeploymentCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Namespace to deploy to")
-	m8sDeploymentCmd.Flags().StringVarP(&containerImage, "image", "i", "", "Image to use")
-	m8sCmd.AddCommand(m8sDeploymentCmd)
-
-	m8sPodCmd.Flags().BoolVarP(&useAlpine, "alpine", "a", false, "Use Alpine")
-	m8sPodCmd.Flags().BoolVarP(&useBusyBox, "busybox", "b", false, "Use BusyBox")
-	m8sPodCmd.Flags().BoolVarP(&useUbuntu, "ubuntu", "u", false, "Use Ubuntu")
-	m8sPodCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Namespace to deploy to")
-	m8sPodCmd.Flags().StringVarP(&containerImage, "image", "i", "", "Image to use")
-	m8sCmd.AddCommand(m8sPodCmd)
-
-	m8sConnectionCmd.Flags().BoolVarP(&useAlpine, "alpine", "a", false, "Use Alpine")
-	m8sConnectionCmd.Flags().BoolVarP(&useBusyBox, "busybox", "b", false, "Use BusyBox")
-	m8sConnectionCmd.Flags().BoolVarP(&useUbuntu, "ubuntu", "u", false, "Use Ubuntu")
-	m8sConnectionCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "Namespace to deploy to")
-	m8sConnectionCmd.Flags().StringVarP(&containerImage, "image", "i", "", "Image to use")
-	m8sConnectionCmd.Flags().StringVarP(&containerCommand, "command", "c", "", "Command to run in the container")
-	m8sCmd.AddCommand(m8sConnectionCmd)
-
-	rootCmd.AddCommand(m8sCmd)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			image, pkgManager := resolveImage(opts)
+			resourceName := "m8-tmp-utility-" + m8s.Image2Name(image, "-")
+			m8s.PrintInfo(cmd.OutOrStdout(), "connection", image, pkgManager, resourceName)
+			kubectlArgs := []string{"run", "-it", "--rm", resourceName, "--namespace", opts.namespace, "--image", image}
+			if command := strings.Fields(containerCommand); len(command) > 0 {
+				kubectlArgs = append(kubectlArgs, append([]string{"--command", "--"}, command...)...)
+			}
+			return utilities.RunCommandInteractive("kubectl", kubectlArgs, ".")
+		},
+	}
+	bindM8sImageFlags(cmd, &opts)
+	cmd.Flags().StringVarP(&containerCommand, "command", "c", "", "Command to run in the container")
+	return cmd
 }

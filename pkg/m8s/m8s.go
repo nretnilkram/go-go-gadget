@@ -2,6 +2,7 @@ package m8s
 
 import (
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -13,14 +14,14 @@ func ReverseStrArray(target []string) []string {
 	return target
 }
 
-// PrintInfo prints a formatted summary of the Kubernetes resource details.
-func PrintInfo(k8sType string, imageName string, pkgManager string, resourceName string) {
-	fmt.Println("\n##############")
-	fmt.Printf("# Type: %s\n", k8sType)
-	fmt.Printf("# Image: %s\n", imageName)
-	fmt.Printf("# Pkg Manager: %s\n", pkgManager)
-	fmt.Printf("# Name: %s\n", resourceName)
-	fmt.Printf("##############\n\n")
+// PrintInfo writes a formatted summary of the Kubernetes resource details to w.
+func PrintInfo(w io.Writer, k8sType string, imageName string, pkgManager string, resourceName string) {
+	_, _ = fmt.Fprintln(w, "\n##############")
+	_, _ = fmt.Fprintf(w, "# Type: %s\n", k8sType)
+	_, _ = fmt.Fprintf(w, "# Image: %s\n", imageName)
+	_, _ = fmt.Fprintf(w, "# Pkg Manager: %s\n", pkgManager)
+	_, _ = fmt.Fprintf(w, "# Name: %s\n", resourceName)
+	_, _ = fmt.Fprintf(w, "##############\n\n")
 }
 
 // BreakOnSection truncates target by splitting on separator and keeping only the trailing
