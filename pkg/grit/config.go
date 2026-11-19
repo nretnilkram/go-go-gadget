@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"go.yaml.in/yaml/v3"
+
+	"github.com/nretnilkram/go-go-gadget/pkg/utilities"
 )
 
 // Repository represents a single git repository entry in the grit config.
@@ -58,7 +60,7 @@ func WriteConfig(config Config) error {
 	}
 
 	data := []byte("---\n" + string(yamlData))
-	if err := os.WriteFile(ConfigFile, data, 0644); err != nil {
+	if err := utilities.WriteFileAtomic(ConfigFile, data, 0644); err != nil {
 		return fmt.Errorf("write %s: %w", ConfigFile, err)
 	}
 	return nil

@@ -3,8 +3,9 @@ package go_go_gadget
 import (
 	"fmt"
 
-	"github.com/nretnilkram/pswd"
 	"github.com/spf13/cobra"
+
+	"github.com/nretnilkram/go-go-gadget/pkg/password"
 )
 
 var passwordLength int
@@ -19,15 +20,18 @@ var passwordCmd = &cobra.Command{
 Use --symbols=false to generate a password without symbols.
 
 Aliases: password, p, pw`,
-	Run: func(cmd *cobra.Command, args []string) {
-		weight := pswd.PasswordWeight{Lower: 4, Upper: 3, Digit: 3, Symbol: 0}
-
+	RunE: func(cmd *cobra.Command, args []string) error {
+		weight := password.Weight{Lower: 4, Upper: 3, Digit: 3, Symbol: 0}
 		if passwordSymbols {
-			weight = pswd.PasswordWeight{Lower: 4, Upper: 3, Digit: 3, Symbol: 2}
+			weight.Symbol = 2
 		}
 
-		res := pswd.Password(passwordLength, weight)
+		res, err := password.Generate(passwordLength, weight)
+		if err != nil {
+			return err
+		}
 		fmt.Println(res)
+		return nil
 	},
 }
 

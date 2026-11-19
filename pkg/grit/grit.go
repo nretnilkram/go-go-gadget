@@ -38,6 +38,7 @@ func AppendHistory(command string) error {
 }
 
 // AddAllRepos scans the current directory for git repositories and adds any not already in config.
+// New repositories are appended in memory and written once.
 func AddAllRepos() error {
 	entries, err := os.ReadDir(".")
 	if err != nil {
@@ -49,24 +50,40 @@ func AddAllRepos() error {
 		return err
 	}
 
-	existingRepos := make(map[string]bool)
+	existingRepos := make(map[string]bool, len(config.Repositories)*2)
 	for _, repo := range config.Repositories {
 		existingRepos[repo.Name] = true
 		existingRepos[repo.Path] = true
 	}
 
+	added := false
 	for _, entry := range entries {
-		dotGitExists, _ := utilities.FileDirExists(filepath.Join(entry.Name() + "/.git"))
-		if entry.IsDir() && dotGitExists {
-			gitDir := entry.Name()
-			if !existingRepos[gitDir] {
-				if err := AddRepoToConfig(gitDir, gitDir); err != nil {
-					return err
-				}
-			}
+		if !entry.IsDir() {
+			continue
 		}
+
+		gitDir := entry.Name()
+		dotGitExists, err := utilities.FileDirExists(filepath.Join(gitDir, ".git"))
+		if err != nil {
+			return fmt.Errorf("check %s: %w", gitDir, err)
+		}
+		if !dotGitExists || existingRepos[gitDir] {
+			continue
+		}
+
+		fmt.Println("Adding " + gitDir)
+		config.Repositories = append(config.Repositories, Repository{
+			Name: gitDir,
+			Path: gitDir,
+		})
+		existingRepos[gitDir] = true
+		added = true
 	}
-	return nil
+
+	if !added {
+		return nil
+	}
+	return WriteConfig(config)
 }
 
 // RunGitCommandParallel runs the given git command concurrently across all configured repositories.

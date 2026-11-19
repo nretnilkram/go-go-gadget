@@ -153,7 +153,7 @@ func BumpChartFile(path, bumpType string) (ChartBumpResult, error) {
 	if err != nil {
 		return result, err
 	}
-	if err := os.WriteFile(path, []byte(updated), info.Mode().Perm()); err != nil {
+	if err := WriteFileAtomic(path, []byte(updated), info.Mode().Perm()); err != nil {
 		return result, err
 	}
 
